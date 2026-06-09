@@ -1,0 +1,472 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="3900" viewBox="0 0 1440 3900" role="img" aria-label="The Bridge Academy style guide v2">
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="22" stdDeviation="20" flood-color="#0D0D0D" flood-opacity="0.12"/>
+    </filter>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#0D0D0D" flood-opacity="0.08"/>
+    </filter>
+    <linearGradient id="brandRed" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FF3045"/>
+      <stop offset="100%" stop-color="#B01626"/>
+    </linearGradient>
+    <linearGradient id="heroInk" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0D0D0D"/>
+      <stop offset="100%" stop-color="#1F232B"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="1440" height="3900" rx="0" fill="#F5F6F8" stroke="none" stroke-width="1" />
+  <line x1="72" y1="0" x2="72" y2="3900" stroke="#E8EBF0" stroke-width="1" opacity="0.45"/>
+<line x1="180" y1="0" x2="180" y2="3900" stroke="#E8EBF0" stroke-width="1" opacity="0.45"/>
+<line x1="288" y1="0" x2="288" y2="3900" stroke="#E8EBF0" stroke-width="1" opacity="0.45"/>
+<line x1="396" y1="0" x2="396" y2="3900" stroke="#E8EBF0" stroke-width="1" opacity="0.45"/>
+<line x1="504" y1="0" x2="504" y2="3900" stroke="#E8EBF0" stroke-width="1" opacity="0.45"/>
+<line x1="612" y1="0" x2="612" y2="3900" stroke="#E8EBF0" stroke-width="1" opacity="0.45"/>
+<line x1="720" y1="0" x2="720" y2="3900" stroke="#E8EBF0" stroke-width="1" opacity="0.45"/>
+<line x1="828" y1="0" x2="828" y2="3900" stroke="#E8EBF0" stroke-width="1" opacity="0.45"/>
+<line x1="936" y1="0" x2="936" y2="3900" stroke="#E8EBF0" stroke-width="1" opacity="0.45"/>
+<line x1="1044" y1="0" x2="1044" y2="3900" stroke="#E8EBF0" stroke-width="1" opacity="0.45"/>
+<line x1="1152" y1="0" x2="1152" y2="3900" stroke="#E8EBF0" stroke-width="1" opacity="0.45"/>
+<line x1="1260" y1="0" x2="1260" y2="3900" stroke="#E8EBF0" stroke-width="1" opacity="0.45"/>
+<line x1="1368" y1="0" x2="1368" y2="3900" stroke="#E8EBF0" stroke-width="1" opacity="0.45"/>
+
+  <g id="style-guide-page-v2">
+    <g id="hero">
+      <rect x="52" y="44" width="1336" height="344" rx="16" fill="url(#heroInk)" stroke="none" stroke-width="1" filter="url(#shadow)"/>
+      <rect x="92" y="90" width="76" height="76" rx="14" fill="url(#brandRed)" stroke="none" stroke-width="1" />
+<rect x="109.81" y="122.06" width="40.38" height="26.13" rx="3.56" fill="none" stroke="#FFFFFF" stroke-width="3.56" />
+<path d="M109.81 116.13 L149 106.63 L150.19 114.94 L112.19 124.44 Z" fill="#FFFFFF"/>
+<rect x="120.5" y="136.31" width="5.94" height="9.5" rx="1" fill="#FFFFFF" stroke="none" stroke-width="1" />
+<rect x="132.38" y="130.38" width="5.94" height="15.44" rx="1" fill="#FFFFFF" stroke="none" stroke-width="1" />
+<rect x="144.25" y="124.44" width="5.94" height="21.38" rx="1" fill="#FFFFFF" stroke="none" stroke-width="1" />
+      <text x="192" y="108" font-family="Montserrat, Inter, Arial, sans-serif" font-size="17" font-weight="900" fill="#FF3045" text-anchor="start" >THE BRIDGE ACADEMY</text>
+      <text x="192" y="164" font-family="Montserrat, Inter, Arial, sans-serif" font-size="56" font-weight="900" fill="#FFFFFF" text-anchor="start" >Sistema visual base</text>
+      <text x="192" y="210" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="600" fill="#D7DCE4" text-anchor="start" >Paleta, tipografia, espaciado y componentes reutilizables para llevar Figma a React sin reinterpretar.</text>
+      <rect x="192" y="252" width="188" height="32" rx="16" fill="#252B36" stroke="none" stroke-width="1" />
+<text x="286" y="273" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800" fill="#FFFFFF" text-anchor="middle" >Figma page: Style guide</text>
+      <rect x="398" y="252" width="132" height="32" rx="16" fill="#252B36" stroke="none" stroke-width="1" />
+<text x="464" y="273" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800" fill="#FFFFFF" text-anchor="middle" >React parity</text>
+      <rect x="548" y="252" width="176" height="32" rx="16" fill="#252B36" stroke="none" stroke-width="1" />
+<text x="636" y="273" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800" fill="#FFFFFF" text-anchor="middle" >MVP + alta fidelidad</text>
+      <text x="934" y="94" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="900" fill="#FF3045" text-anchor="start" >Archivos leidos</text>
+      <rect x="934" y="118" width="276" height="74" rx="8" fill="#161B24" stroke="#2D3340" stroke-width="1" />
+<text x="952" y="146" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="900" fill="#FFFFFF" text-anchor="start" >producto-diseno.md</text>
+<text x="952" y="170" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="600" fill="#B9C0CA" text-anchor="start" >Historias, roles y pantallas MVP</text>
+      <rect x="934" y="206" width="276" height="74" rx="8" fill="#161B24" stroke="#2D3340" stroke-width="1" />
+<text x="952" y="234" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="900" fill="#FFFFFF" text-anchor="start" >wireframes/*.svg</text>
+<text x="952" y="258" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="600" fill="#B9C0CA" text-anchor="start" >Estructura y jerarquia de layout</text>
+      <rect x="934" y="294" width="276" height="74" rx="8" fill="#161B24" stroke="#2D3340" stroke-width="1" />
+<text x="952" y="322" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="900" fill="#FFFFFF" text-anchor="start" >figma-demo/*.svg</text>
+<text x="952" y="346" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="600" fill="#B9C0CA" text-anchor="start" >Paleta y direccion visual avanzada</text>
+    </g>
+
+    <g id="design-principles">
+      <rect x="72" y="442" width="1296" height="170" rx="12" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" filter="url(#softShadow)"/>
+<text x="100" y="480" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="900" fill="#FF3045" text-anchor="start" >PRINCIPIOS</text>
+<text x="100" y="518" font-family="Montserrat, Inter, Arial, sans-serif" font-size="28" font-weight="900" fill="#1F232B" text-anchor="start" >Criterios que gobiernan el sistema</text>
+<text x="104" y="548" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="700" fill="#343943" text-anchor="start" >1. La interfaz debe sentirse academica, clara y orientada a accion.</text>
+<text x="104" y="572" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="700" fill="#343943" text-anchor="start" >2. Los wireframes grises son estructura; la demo avanzada define la capa visual final.</text>
+<text x="104" y="596" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="700" fill="#343943" text-anchor="start" >3. Cada token y componente debe tener nombre equivalente para Figma y React.</text>
+        <rect x="1010" y="512" width="136" height="32" rx="16" fill="#FFE5E8" stroke="none" stroke-width="1" />
+<text x="1078" y="533" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800" fill="#FF3045" text-anchor="middle" >MVP primero</text>
+        <rect x="1010" y="552" width="150" height="32" rx="16" fill="#ECEFF3" stroke="none" stroke-width="1" />
+<text x="1085" y="573" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800" fill="#1F232B" text-anchor="middle" >Estados visibles</text>
+        <rect x="1010" y="592" width="168" height="32" rx="16" fill="#ECEFF3" stroke="none" stroke-width="1" />
+<text x="1094" y="613" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800" fill="#1F232B" text-anchor="middle" >Componentes 1:1</text>
+    </g>
+
+    <g id="foundations-color">
+      <rect x="72" y="680" width="1296" height="640" rx="12" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" filter="url(#softShadow)"/>
+<text x="100" y="718" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="900" fill="#FF3045" text-anchor="start" >01 FUNDACIONES</text>
+<text x="100" y="756" font-family="Montserrat, Inter, Arial, sans-serif" font-size="28" font-weight="900" fill="#1F232B" text-anchor="start" >Color tokens</text>
+<text x="104" y="786" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="700" fill="#6B7280" text-anchor="start" >La paleta conserva el rojo/ink de la demo visual y el gris estructural de los wireframes.</text>
+        <g id="color-brand-primary">
+<rect x="104" y="840" width="288" height="132" rx="10" fill="#FF3045" stroke="#D3D6DC" stroke-width="1" />
+<rect x="104" y="922" width="288" height="96" rx="10" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" />
+<text x="122" y="954" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="900" fill="#1F232B" text-anchor="start" >Brand primary</text>
+<text x="122" y="980" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800" fill="#6B7280" text-anchor="start" >#FF3045</text>
+<text x="250" y="980" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#343943" text-anchor="start" >CTA / foco</text>
+<text x="122" y="898" font-family="Montserrat, Inter, Arial, sans-serif" font-size="36" font-weight="900" fill="#FFFFFF" text-anchor="start" >Aa</text>
+</g>
+<g id="color-brand-hover">
+<rect x="418" y="840" width="288" height="132" rx="10" fill="#B01626" stroke="#D3D6DC" stroke-width="1" />
+<rect x="418" y="922" width="288" height="96" rx="10" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" />
+<text x="436" y="954" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="900" fill="#1F232B" text-anchor="start" >Brand hover</text>
+<text x="436" y="980" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800" fill="#6B7280" text-anchor="start" >#B01626</text>
+<text x="564" y="980" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#343943" text-anchor="start" >Hover / pressed</text>
+<text x="436" y="898" font-family="Montserrat, Inter, Arial, sans-serif" font-size="36" font-weight="900" fill="#FFFFFF" text-anchor="start" >Aa</text>
+</g>
+<g id="color-ink">
+<rect x="732" y="840" width="288" height="132" rx="10" fill="#1F232B" stroke="#D3D6DC" stroke-width="1" />
+<rect x="732" y="922" width="288" height="96" rx="10" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" />
+<text x="750" y="954" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="900" fill="#1F232B" text-anchor="start" >Ink</text>
+<text x="750" y="980" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800" fill="#6B7280" text-anchor="start" >#1F232B</text>
+<text x="878" y="980" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#343943" text-anchor="start" >Texto principal</text>
+<text x="750" y="898" font-family="Montserrat, Inter, Arial, sans-serif" font-size="36" font-weight="900" fill="#FFFFFF" text-anchor="start" >Aa</text>
+</g>
+<g id="color-canvas">
+<rect x="1046" y="840" width="288" height="132" rx="10" fill="#F5F6F8" stroke="#D3D6DC" stroke-width="1" />
+<rect x="1046" y="922" width="288" height="96" rx="10" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" />
+<text x="1064" y="954" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="900" fill="#1F232B" text-anchor="start" >Canvas</text>
+<text x="1064" y="980" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800" fill="#6B7280" text-anchor="start" >#F5F6F8</text>
+<text x="1192" y="980" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#343943" text-anchor="start" >Fondo app</text>
+<text x="1064" y="898" font-family="Montserrat, Inter, Arial, sans-serif" font-size="36" font-weight="900" fill="#1F232B" text-anchor="start" >Aa</text>
+</g>
+<g id="color-surface">
+<rect x="104" y="1060" width="288" height="132" rx="10" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" />
+<rect x="104" y="1142" width="288" height="96" rx="10" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" />
+<text x="122" y="1174" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="900" fill="#1F232B" text-anchor="start" >Surface</text>
+<text x="122" y="1200" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800" fill="#6B7280" text-anchor="start" >#FFFFFF</text>
+<text x="250" y="1200" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#343943" text-anchor="start" >Cards / paneles</text>
+<text x="122" y="1118" font-family="Montserrat, Inter, Arial, sans-serif" font-size="36" font-weight="900" fill="#1F232B" text-anchor="start" >Aa</text>
+</g>
+<g id="color-border">
+<rect x="418" y="1060" width="288" height="132" rx="10" fill="#D3D6DC" stroke="#D3D6DC" stroke-width="1" />
+<rect x="418" y="1142" width="288" height="96" rx="10" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" />
+<text x="436" y="1174" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="900" fill="#1F232B" text-anchor="start" >Border</text>
+<text x="436" y="1200" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800" fill="#6B7280" text-anchor="start" >#D3D6DC</text>
+<text x="564" y="1200" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#343943" text-anchor="start" >Bordes</text>
+<text x="436" y="1118" font-family="Montserrat, Inter, Arial, sans-serif" font-size="36" font-weight="900" fill="#1F232B" text-anchor="start" >Aa</text>
+</g>
+<g id="color-success">
+<rect x="732" y="1060" width="288" height="132" rx="10" fill="#167A4A" stroke="#D3D6DC" stroke-width="1" />
+<rect x="732" y="1142" width="288" height="96" rx="10" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" />
+<text x="750" y="1174" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="900" fill="#1F232B" text-anchor="start" >Success</text>
+<text x="750" y="1200" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800" fill="#6B7280" text-anchor="start" >#167A4A</text>
+<text x="878" y="1200" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#343943" text-anchor="start" >Completado</text>
+<text x="750" y="1118" font-family="Montserrat, Inter, Arial, sans-serif" font-size="36" font-weight="900" fill="#FFFFFF" text-anchor="start" >Aa</text>
+</g>
+<g id="color-info">
+<rect x="1046" y="1060" width="288" height="132" rx="10" fill="#2563EB" stroke="#D3D6DC" stroke-width="1" />
+<rect x="1046" y="1142" width="288" height="96" rx="10" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" />
+<text x="1064" y="1174" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="900" fill="#1F232B" text-anchor="start" >Info</text>
+<text x="1064" y="1200" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800" fill="#6B7280" text-anchor="start" >#2563EB</text>
+<text x="1192" y="1200" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#343943" text-anchor="start" >Ayuda / estado</text>
+<text x="1064" y="1118" font-family="Montserrat, Inter, Arial, sans-serif" font-size="36" font-weight="900" fill="#FFFFFF" text-anchor="start" >Aa</text>
+</g>
+        <rect x="104" y="1232" width="1264" height="1" rx="0" fill="#D3D6DC" stroke="none" stroke-width="1" />
+        <text x="104" y="1272" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="800" fill="#343943" text-anchor="start" >Regla: rojo solo para acciones principales, foco, progreso y estados criticos. Los estados informativos usan tokens propios.</text>
+    </g>
+
+    <g id="foundations-type-spacing">
+      <rect x="72" y="1388" width="620" height="520" rx="12" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" filter="url(#softShadow)"/>
+<text x="100" y="1426" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="900" fill="#FF3045" text-anchor="start" >02 FUNDACIONES</text>
+<text x="100" y="1464" font-family="Montserrat, Inter, Arial, sans-serif" font-size="28" font-weight="900" fill="#1F232B" text-anchor="start" >Tipografia</text>
+<text x="104" y="1504" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="900" fill="#FF3045" text-anchor="start" >Display</text>
+<text x="104" y="1574" font-family="Montserrat, Inter, Arial, sans-serif" font-size="52" font-weight="900" fill="#1F232B" text-anchor="start" >Aprende creando</text>
+<text x="104" y="1602" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#6B7280" text-anchor="start" >Montserrat / 52px / 900</text>
+        <text x="104" y="1608" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="900" fill="#FF3045" text-anchor="start" >H1</text>
+<text x="104" y="1664" font-family="Montserrat, Inter, Arial, sans-serif" font-size="38" font-weight="900" fill="#1F232B" text-anchor="start" >Cursos asignados</text>
+<text x="104" y="1692" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#6B7280" text-anchor="start" >Montserrat / 38px / 900</text>
+        <text x="104" y="1702" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="900" fill="#FF3045" text-anchor="start" >H2</text>
+<text x="104" y="1748" font-family="Montserrat, Inter, Arial, sans-serif" font-size="28" font-weight="800" fill="#1F232B" text-anchor="start" >Gestion del instructor</text>
+<text x="104" y="1776" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#6B7280" text-anchor="start" >Montserrat / 28px / 800</text>
+        <text x="104" y="1786" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="900" fill="#FF3045" text-anchor="start" >Body</text>
+<text x="104" y="1820" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="500" fill="#1F232B" text-anchor="start" >Texto de interfaz para leer, filtrar y avanzar por lecciones.</text>
+<text x="104" y="1848" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#6B7280" text-anchor="start" >Inter / 16px / 500</text>
+
+      <rect x="748" y="1388" width="620" height="520" rx="12" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" filter="url(#softShadow)"/>
+<text x="776" y="1426" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="900" fill="#FF3045" text-anchor="start" >03 FUNDACIONES</text>
+<text x="776" y="1464" font-family="Montserrat, Inter, Arial, sans-serif" font-size="28" font-weight="900" fill="#1F232B" text-anchor="start" >Espaciado, radios y elevacion</text>
+<text x="780" y="1522" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800" fill="#1F232B" text-anchor="start" >space-1</text>
+<rect x="854" y="1504" width="4" height="24" rx="4" fill="#FF3045" stroke="none" stroke-width="1" />
+<text x="872" y="1522" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800" fill="#6B7280" text-anchor="start" >4px</text>
+        <text x="780" y="1566" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800" fill="#1F232B" text-anchor="start" >space-2</text>
+<rect x="854" y="1548" width="8" height="24" rx="4" fill="#FF3045" stroke="none" stroke-width="1" />
+<text x="876" y="1566" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800" fill="#6B7280" text-anchor="start" >8px</text>
+        <text x="780" y="1610" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800" fill="#1F232B" text-anchor="start" >space-4</text>
+<rect x="854" y="1592" width="16" height="24" rx="4" fill="#FF3045" stroke="none" stroke-width="1" />
+<text x="884" y="1610" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800" fill="#6B7280" text-anchor="start" >16px</text>
+        <text x="780" y="1654" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800" fill="#1F232B" text-anchor="start" >space-6</text>
+<rect x="854" y="1636" width="24" height="24" rx="4" fill="#FF3045" stroke="none" stroke-width="1" />
+<text x="892" y="1654" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800" fill="#6B7280" text-anchor="start" >24px</text>
+        <text x="780" y="1698" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800" fill="#1F232B" text-anchor="start" >space-8</text>
+<rect x="854" y="1680" width="32" height="24" rx="4" fill="#FF3045" stroke="none" stroke-width="1" />
+<text x="900" y="1698" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800" fill="#6B7280" text-anchor="start" >32px</text>
+        <text x="780" y="1742" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800" fill="#1F232B" text-anchor="start" >space-12</text>
+<rect x="854" y="1724" width="48" height="24" rx="4" fill="#FF3045" stroke="none" stroke-width="1" />
+<text x="916" y="1742" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800" fill="#6B7280" text-anchor="start" >48px</text>
+        <rect x="1062" y="1504" width="76" height="54" rx="4" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" />
+<text x="1154" y="1528" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800" fill="#1F232B" text-anchor="start" >radius-sm</text>
+<text x="1154" y="1550" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800" fill="#6B7280" text-anchor="start" >4px</text>
+        <rect x="1062" y="1580" width="76" height="54" rx="8" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" />
+<text x="1154" y="1604" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800" fill="#1F232B" text-anchor="start" >radius-md</text>
+<text x="1154" y="1626" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800" fill="#6B7280" text-anchor="start" >8px</text>
+        <rect x="1062" y="1656" width="76" height="54" rx="12" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" />
+<text x="1154" y="1680" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800" fill="#1F232B" text-anchor="start" >radius-lg</text>
+<text x="1154" y="1702" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800" fill="#6B7280" text-anchor="start" >12px</text>
+        <rect x="1062" y="1748" width="214" height="76" rx="8" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" filter="url(#softShadow)"/>
+        <text x="1082" y="1778" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="900" fill="#1F232B" text-anchor="start" >shadow-md</text>
+        <text x="1082" y="1804" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#6B7280" text-anchor="start" >Cards elevadas y menus</text>
+    </g>
+
+    <g id="components">
+      <text x="72" y="2024" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="900" fill="#FF3045" text-anchor="start" >04 Componentes base</text>
+      <text x="72" y="2070" font-family="Montserrat, Inter, Arial, sans-serif" font-size="40" font-weight="900" fill="#1F232B" text-anchor="start" >Biblioteca reutilizable</text>
+      <text x="72" y="2102" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="700" fill="#6B7280" text-anchor="start" >Cada bloque esta nombrado para convertirse en componente o variante en Figma y mapearse a props de React.</text>
+
+      <rect x="72" y="2150" width="620" height="356" rx="12" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" filter="url(#softShadow)"/>
+      <text x="104" y="2194" font-family="Montserrat, Inter, Arial, sans-serif" font-size="24" font-weight="900" fill="#1F232B" text-anchor="start" >Button</text>
+      <text x="104" y="2222" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800" fill="#6B7280" text-anchor="start" >variant x size x state</text>
+      <g id="component-button-primary-md-default">
+<rect x="104" y="2260" width="152" height="44" rx="8" fill="url(#brandRed)" stroke="none" stroke-width="1" />
+<line x1="121" y1="2282" x2="131" y2="2282" stroke="#FFFFFF" stroke-width="2" />
+<line x1="126" y1="2277" x2="126" y2="2287" stroke="#FFFFFF" stroke-width="2" />
+<text x="150" y="2287" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="900" fill="#FFFFFF" text-anchor="start" >Crear curso</text>
+</g>
+      <g id="component-button-primary-md-hover">
+<rect x="292" y="2260" width="152" height="44" rx="8" fill="#B01626" stroke="none" stroke-width="1" />
+<line x1="309" y1="2282" x2="319" y2="2282" stroke="#FFFFFF" stroke-width="2" />
+<line x1="314" y1="2277" x2="314" y2="2287" stroke="#FFFFFF" stroke-width="2" />
+<text x="338" y="2287" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="900" fill="#FFFFFF" text-anchor="start" >Crear curso</text>
+</g>
+      <g id="component-button-primary-md-disabled" opacity="0.45">
+<rect x="480" y="2260" width="152" height="44" rx="8" fill="url(#brandRed)" stroke="none" stroke-width="1" />
+<line x1="497" y1="2282" x2="507" y2="2282" stroke="#6B7280" stroke-width="2" />
+<line x1="502" y1="2277" x2="502" y2="2287" stroke="#6B7280" stroke-width="2" />
+<text x="526" y="2287" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="900" fill="#6B7280" text-anchor="start" >Crear curso</text>
+</g>
+      <g id="component-button-secondary-md-default">
+<rect x="104" y="2326" width="152" height="44" rx="8" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" />
+<line x1="121" y1="2348" x2="131" y2="2348" stroke="#FF3045" stroke-width="2" />
+<line x1="126" y1="2343" x2="126" y2="2353" stroke="#FF3045" stroke-width="2" />
+<text x="150" y="2353" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="900" fill="#1F232B" text-anchor="start" >Ver detalle</text>
+</g>
+      <g id="component-button-secondary-md-hover">
+<rect x="292" y="2326" width="152" height="44" rx="8" fill="#ECEFF3" stroke="#D3D6DC" stroke-width="1" />
+<line x1="309" y1="2348" x2="319" y2="2348" stroke="#FF3045" stroke-width="2" />
+<line x1="314" y1="2343" x2="314" y2="2353" stroke="#FF3045" stroke-width="2" />
+<text x="338" y="2353" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="900" fill="#1F232B" text-anchor="start" >Ver detalle</text>
+</g>
+      <g id="component-button-secondary-md-disabled" opacity="0.45">
+<rect x="480" y="2326" width="152" height="44" rx="8" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" />
+<line x1="497" y1="2348" x2="507" y2="2348" stroke="#6B7280" stroke-width="2" />
+<line x1="502" y1="2343" x2="502" y2="2353" stroke="#6B7280" stroke-width="2" />
+<text x="526" y="2353" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="900" fill="#6B7280" text-anchor="start" >Ver detalle</text>
+</g>
+      <g id="component-button-ghost-sm-default">
+<rect x="104" y="2392" width="138" height="36" rx="8" fill="transparent" stroke="transparent" stroke-width="1" />
+<line x1="121" y1="2410" x2="131" y2="2410" stroke="#FF3045" stroke-width="2" />
+<line x1="126" y1="2405" x2="126" y2="2415" stroke="#FF3045" stroke-width="2" />
+<text x="150" y="2415" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="900" fill="#1F232B" text-anchor="start" >Cancelar</text>
+</g>
+      <g id="component-button-primary-lg-default">
+<rect x="250" y="2392" width="184" height="52" rx="8" fill="url(#brandRed)" stroke="none" stroke-width="1" />
+<line x1="267" y1="2418" x2="277" y2="2418" stroke="#FFFFFF" stroke-width="2" />
+<line x1="272" y1="2413" x2="272" y2="2423" stroke="#FFFFFF" stroke-width="2" />
+<text x="296" y="2423" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="900" fill="#FFFFFF" text-anchor="start" >Guardar cambios</text>
+</g>
+      <text x="104" y="2472" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800" fill="#343943" text-anchor="start" >React: &lt;Button variant size state leadingIcon trailingIcon /&gt;</text>
+
+      <rect x="748" y="2150" width="620" height="356" rx="12" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" filter="url(#softShadow)"/>
+      <text x="780" y="2194" font-family="Montserrat, Inter, Arial, sans-serif" font-size="24" font-weight="900" fill="#1F232B" text-anchor="start" >Input</text>
+      <text x="780" y="2222" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800" fill="#6B7280" text-anchor="start" >default, focus, error, disabled</text>
+      <g id="component-input-default">
+<text x="780" y="2258" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="900" fill="#1F232B" text-anchor="start" >Default</text>
+<rect x="780" y="2272" width="260" height="50" rx="8" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" />
+<circle cx="804" cy="2297" r="7" fill="none" stroke="#343943" stroke-width="2" />
+<text x="826" y="2303" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="600" fill="#343943" text-anchor="start" >Buscar curso o alumno</text>
+<text x="780" y="2346" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#6B7280" text-anchor="start" >Texto de ayuda opcional</text>
+</g>
+      <g id="component-input-focus">
+<text x="1080" y="2258" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="900" fill="#1F232B" text-anchor="start" >Focus</text>
+<rect x="1080" y="2272" width="260" height="50" rx="8" fill="#FFFFFF" stroke="#FF3045" stroke-width="2" />
+<circle cx="1104" cy="2297" r="7" fill="none" stroke="#343943" stroke-width="2" />
+<text x="1126" y="2303" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="600" fill="#343943" text-anchor="start" >Buscar curso o alumno</text>
+<text x="1080" y="2346" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#6B7280" text-anchor="start" >Texto de ayuda opcional</text>
+</g>
+      <g id="component-input-error">
+<text x="780" y="2378" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="900" fill="#1F232B" text-anchor="start" >Error</text>
+<rect x="780" y="2392" width="260" height="50" rx="8" fill="#FFFFFF" stroke="#C81E35" stroke-width="1" />
+<circle cx="804" cy="2417" r="7" fill="none" stroke="#343943" stroke-width="2" />
+<text x="826" y="2423" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="600" fill="#343943" text-anchor="start" >Buscar curso o alumno</text>
+<text x="780" y="2466" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#C81E35" text-anchor="start" >Revisa este campo antes de continuar</text>
+</g>
+      <g id="component-input-disabled">
+<text x="1080" y="2378" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="900" fill="#1F232B" text-anchor="start" >Disabled</text>
+<rect x="1080" y="2392" width="260" height="50" rx="8" fill="#ECEFF3" stroke="#D3D6DC" stroke-width="1" />
+<circle cx="1104" cy="2417" r="7" fill="none" stroke="#6B7280" stroke-width="2" />
+<text x="1126" y="2423" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="600" fill="#6B7280" text-anchor="start" >No disponible</text>
+<text x="1080" y="2466" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#6B7280" text-anchor="start" >Texto de ayuda opcional</text>
+</g>
+
+      <rect x="72" y="2560" width="620" height="470" rx="12" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" filter="url(#softShadow)"/>
+      <text x="104" y="2604" font-family="Montserrat, Inter, Arial, sans-serif" font-size="24" font-weight="900" fill="#1F232B" text-anchor="start" >Card</text>
+      <text x="104" y="2632" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800" fill="#6B7280" text-anchor="start" >course, metric, lesson</text>
+      <g id="component-card-course">
+<rect x="104" y="2670" width="360" height="282" rx="8" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" filter="url(#softShadow)"/>
+<rect x="124" y="2690" width="320" height="112" rx="8" fill="url(#brandRed)" stroke="none" stroke-width="1" />
+<text x="142" y="2732" font-family="Montserrat, Inter, Arial, sans-serif" font-size="28" font-weight="900" fill="#FFFFFF" text-anchor="start" >React</text>
+<text x="142" y="2764" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="800" fill="#FFE5E8" text-anchor="start" >Proyecto frontend guiado</text>
+<rect x="326" y="2762" width="88" height="32" rx="16" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" />
+<text x="370" y="2783" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800" fill="#FF3045" text-anchor="middle" >Must</text>
+<text x="124" y="2836" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="900" fill="#1F232B" text-anchor="start" >Curso de React desde cero</text>
+<text x="124" y="2864" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700" fill="#6B7280" text-anchor="start" >12 lecciones - Nivel inicial</text>
+<rect x="124" y="2888" width="250" height="8" rx="4" fill="#E5E7EB" stroke="none" stroke-width="1" />
+<rect x="124" y="2888" width="160" height="8" rx="4" fill="#FF3045" stroke="none" stroke-width="1" />
+<text x="390" y="2895" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="900" fill="#1F232B" text-anchor="start" >64%</text>
+<rect x="124" y="2912" width="128" height="30" rx="7" fill="#ECEFF3" stroke="none" stroke-width="1" />
+<text x="146" y="2932" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="900" fill="#1F232B" text-anchor="start" >Ver detalle</text>
+</g>
+      <g id="component-card-metric">
+<rect x="492" y="2670" width="242" height="132" rx="8" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" />
+<text x="510" y="2704" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800" fill="#6B7280" text-anchor="start" >Alumnos inscritos</text>
+<text x="510" y="2752" font-family="Montserrat, Inter, Arial, sans-serif" font-size="40" font-weight="900" fill="#1F232B" text-anchor="start" >128</text>
+<rect x="638" y="2734" width="72" height="32" rx="16" fill="#FFE5E8" stroke="none" stroke-width="1" />
+<text x="674" y="2755" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800" fill="#FF3045" text-anchor="middle" >+12%</text>
+</g>
+      <g id="component-card-lesson">
+<rect x="104" y="2930" width="360" height="86" rx="8" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" />
+<circle cx="140" cy="2973" r="17" fill="#FFE5E8" stroke="#FF3045" stroke-width="2" />
+<text x="133" y="2978" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="900" fill="#FF3045" text-anchor="start" >3</text>
+<text x="174" y="2966" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="900" fill="#1F232B" text-anchor="start" >Subida de PDF y recursos</text>
+<text x="174" y="2990" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#6B7280" text-anchor="start" >Leccion - 18 min</text>
+<rect x="404" y="2957" width="36" height="32" rx="7" fill="#ECEFF3" stroke="none" stroke-width="1" />
+<text x="422" y="2979" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="900" fill="#1F232B" text-anchor="middle" >&gt;</text>
+</g>
+
+      <rect x="748" y="2560" width="620" height="470" rx="12" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" filter="url(#softShadow)"/>
+      <text x="780" y="2604" font-family="Montserrat, Inter, Arial, sans-serif" font-size="24" font-weight="900" fill="#1F232B" text-anchor="start" >Navbar</text>
+      <text x="780" y="2632" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800" fill="#6B7280" text-anchor="start" >public, student, instructor</text>
+      <g id="component-navbar-public">
+<rect x="780" y="2670" width="556" height="72" rx="8" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" filter="url(#softShadow)"/>
+<rect x="798" y="2688" width="36" height="36" rx="14" fill="url(#brandRed)" stroke="none" stroke-width="1" />
+<rect x="806.44" y="2703.19" width="19.13" height="12.38" rx="1.69" fill="none" stroke="#FFFFFF" stroke-width="1.69" />
+<path d="M806.44 2700.38 L825 2695.88 L825.56 2699.81 L807.56 2704.31 Z" fill="#FFFFFF"/>
+<rect x="811.5" y="2709.94" width="2.81" height="4.5" rx="1" fill="#FFFFFF" stroke="none" stroke-width="1" />
+<rect x="817.13" y="2707.13" width="2.81" height="7.31" rx="1" fill="#FFFFFF" stroke="none" stroke-width="1" />
+<rect x="822.75" y="2704.31" width="2.81" height="10.13" rx="1" fill="#FFFFFF" stroke="none" stroke-width="1" />
+<text x="846" y="2705" font-family="Montserrat, Inter, Arial, sans-serif" font-size="12" font-weight="900" fill="#1F232B" text-anchor="start" >The Bridge</text>
+<text x="846" y="2721" font-family="Montserrat, Inter, Arial, sans-serif" font-size="12" font-weight="900" fill="#FF3045" text-anchor="start" >Academy</text>
+<text x="992" y="2714" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="900" fill="#1F232B" text-anchor="start" >Cursos</text>
+<rect x="1098" y="2690" width="92" height="32" rx="16" fill="#ECEFF3" stroke="none" stroke-width="1" />
+<text x="1144" y="2711" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800" fill="#1F232B" text-anchor="middle" >Publico</text>
+<rect x="1210" y="2687" width="82" height="38" rx="8" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" />
+<text x="1251" y="2712" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="900" fill="#1F232B" text-anchor="middle" >Login</text>
+</g>
+      <g id="component-navbar-student">
+<rect x="780" y="2774" width="556" height="72" rx="8" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" filter="url(#softShadow)"/>
+<rect x="798" y="2792" width="36" height="36" rx="14" fill="url(#brandRed)" stroke="none" stroke-width="1" />
+<rect x="806.44" y="2807.19" width="19.13" height="12.38" rx="1.69" fill="none" stroke="#FFFFFF" stroke-width="1.69" />
+<path d="M806.44 2804.38 L825 2799.88 L825.56 2803.81 L807.56 2808.31 Z" fill="#FFFFFF"/>
+<rect x="811.5" y="2813.94" width="2.81" height="4.5" rx="1" fill="#FFFFFF" stroke="none" stroke-width="1" />
+<rect x="817.13" y="2811.13" width="2.81" height="7.31" rx="1" fill="#FFFFFF" stroke="none" stroke-width="1" />
+<rect x="822.75" y="2808.31" width="2.81" height="10.13" rx="1" fill="#FFFFFF" stroke="none" stroke-width="1" />
+<text x="846" y="2809" font-family="Montserrat, Inter, Arial, sans-serif" font-size="12" font-weight="900" fill="#1F232B" text-anchor="start" >The Bridge</text>
+<text x="846" y="2825" font-family="Montserrat, Inter, Arial, sans-serif" font-size="12" font-weight="900" fill="#FF3045" text-anchor="start" >Academy</text>
+<text x="992" y="2818" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="900" fill="#1F232B" text-anchor="start" >Mis cursos</text>
+<rect x="1098" y="2794" width="92" height="32" rx="16" fill="#ECEFF3" stroke="none" stroke-width="1" />
+<text x="1144" y="2815" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800" fill="#1F232B" text-anchor="middle" >Alumno</text>
+<rect x="1210" y="2791" width="90" height="38" rx="8" fill="url(#brandRed)" stroke="none" stroke-width="1" />
+<text x="1255" y="2816" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="900" fill="#FFFFFF" text-anchor="middle" >Perfil</text>
+</g>
+      <g id="component-navbar-instructor">
+<rect x="780" y="2878" width="556" height="72" rx="8" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" filter="url(#softShadow)"/>
+<rect x="798" y="2896" width="36" height="36" rx="14" fill="url(#brandRed)" stroke="none" stroke-width="1" />
+<rect x="806.44" y="2911.19" width="19.13" height="12.38" rx="1.69" fill="none" stroke="#FFFFFF" stroke-width="1.69" />
+<path d="M806.44 2908.38 L825 2903.88 L825.56 2907.81 L807.56 2912.31 Z" fill="#FFFFFF"/>
+<rect x="811.5" y="2917.94" width="2.81" height="4.5" rx="1" fill="#FFFFFF" stroke="none" stroke-width="1" />
+<rect x="817.13" y="2915.13" width="2.81" height="7.31" rx="1" fill="#FFFFFF" stroke="none" stroke-width="1" />
+<rect x="822.75" y="2912.31" width="2.81" height="10.13" rx="1" fill="#FFFFFF" stroke="none" stroke-width="1" />
+<text x="846" y="2913" font-family="Montserrat, Inter, Arial, sans-serif" font-size="12" font-weight="900" fill="#1F232B" text-anchor="start" >The Bridge</text>
+<text x="846" y="2929" font-family="Montserrat, Inter, Arial, sans-serif" font-size="12" font-weight="900" fill="#FF3045" text-anchor="start" >Academy</text>
+<text x="992" y="2922" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="900" fill="#1F232B" text-anchor="start" >Panel</text>
+<rect x="1098" y="2898" width="92" height="32" rx="16" fill="#ECEFF3" stroke="none" stroke-width="1" />
+<text x="1144" y="2919" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800" fill="#1F232B" text-anchor="middle" >Instructor</text>
+<rect x="1210" y="2895" width="82" height="38" rx="8" fill="url(#brandRed)" stroke="none" stroke-width="1" />
+<text x="1251" y="2920" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="900" fill="#FFFFFF" text-anchor="middle" >Salir</text>
+</g>
+    </g>
+
+    <g id="applied-example">
+      <text x="72" y="3122" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="900" fill="#FF3045" text-anchor="start" >05 Aplicacion</text>
+      <text x="72" y="3168" font-family="Montserrat, Inter, Arial, sans-serif" font-size="40" font-weight="900" fill="#1F232B" text-anchor="start" >Ejemplo compuesto</text>
+      <g id="usage-example-dashboard">
+<rect x="72" y="3210" width="1296" height="430" rx="14" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" filter="url(#shadow)"/>
+<rect x="72" y="3210" width="1296" height="74" rx="14" fill="#0D0D0D" stroke="none" stroke-width="1" />
+<rect x="100" y="3226" width="42" height="42" rx="14" fill="url(#brandRed)" stroke="none" stroke-width="1" />
+<rect x="109.84" y="3243.72" width="22.31" height="14.44" rx="1.97" fill="none" stroke="#FFFFFF" stroke-width="1.97" />
+<path d="M109.84 3240.44 L131.5 3235.19 L132.16 3239.78 L111.16 3245.03 Z" fill="#FFFFFF"/>
+<rect x="115.75" y="3251.59" width="3.28" height="5.25" rx="1" fill="#FFFFFF" stroke="none" stroke-width="1" />
+<rect x="122.31" y="3248.31" width="3.28" height="8.53" rx="1" fill="#FFFFFF" stroke="none" stroke-width="1" />
+<rect x="128.88" y="3245.03" width="3.28" height="11.81" rx="1" fill="#FFFFFF" stroke="none" stroke-width="1" />
+<text x="160" y="3255" font-family="Montserrat, Inter, Arial, sans-serif" font-size="18" font-weight="900" fill="#FFFFFF" text-anchor="start" >Dashboard alumno</text>
+<text x="1152" y="3255" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800" fill="#B9C0CA" text-anchor="start" >Sistema aplicado</text>
+<text x="108" y="3336" font-family="Montserrat, Inter, Arial, sans-serif" font-size="30" font-weight="900" fill="#1F232B" text-anchor="start" >Mis cursos asignados</text>
+<text x="108" y="3368" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="700" fill="#6B7280" text-anchor="start" >Componentes base combinados en una pantalla MVP real.</text>
+<g id="usage-course-card">
+<rect x="108" y="3400" width="360" height="282" rx="8" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" />
+<rect x="128" y="3420" width="320" height="112" rx="8" fill="url(#brandRed)" stroke="none" stroke-width="1" />
+<text x="146" y="3462" font-family="Montserrat, Inter, Arial, sans-serif" font-size="28" font-weight="900" fill="#FFFFFF" text-anchor="start" >React</text>
+<text x="146" y="3494" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="800" fill="#FFE5E8" text-anchor="start" >Proyecto frontend guiado</text>
+<rect x="330" y="3492" width="88" height="32" rx="16" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" />
+<text x="374" y="3513" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800" fill="#FF3045" text-anchor="middle" >Must</text>
+<text x="128" y="3566" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="900" fill="#1F232B" text-anchor="start" >Curso de React desde cero</text>
+<text x="128" y="3594" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700" fill="#6B7280" text-anchor="start" >12 lecciones - Nivel inicial</text>
+<rect x="128" y="3618" width="250" height="8" rx="4" fill="#E5E7EB" stroke="none" stroke-width="1" />
+<rect x="128" y="3618" width="160" height="8" rx="4" fill="#FF3045" stroke="none" stroke-width="1" />
+<text x="394" y="3625" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="900" fill="#1F232B" text-anchor="start" >64%</text>
+<rect x="128" y="3642" width="128" height="30" rx="7" fill="#ECEFF3" stroke="none" stroke-width="1" />
+<text x="150" y="3662" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="900" fill="#1F232B" text-anchor="start" >Ver detalle</text>
+</g>
+<g id="usage-card-metric-progress">
+<rect x="512" y="3400" width="242" height="132" rx="8" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" />
+<text x="530" y="3434" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800" fill="#6B7280" text-anchor="start" >Alumnos inscritos</text>
+<text x="530" y="3482" font-family="Montserrat, Inter, Arial, sans-serif" font-size="40" font-weight="900" fill="#1F232B" text-anchor="start" >128</text>
+<rect x="658" y="3464" width="72" height="32" rx="16" fill="#FFE5E8" stroke="none" stroke-width="1" />
+<text x="694" y="3485" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800" fill="#FF3045" text-anchor="middle" >+12%</text>
+</g>
+<g id="usage-card-metric-students">
+<rect x="780" y="3400" width="242" height="132" rx="8" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" />
+<text x="798" y="3434" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="800" fill="#6B7280" text-anchor="start" >Alumnos inscritos</text>
+<text x="798" y="3482" font-family="Montserrat, Inter, Arial, sans-serif" font-size="40" font-weight="900" fill="#1F232B" text-anchor="start" >128</text>
+<rect x="926" y="3464" width="72" height="32" rx="16" fill="#FFE5E8" stroke="none" stroke-width="1" />
+<text x="962" y="3485" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="800" fill="#FF3045" text-anchor="middle" >+12%</text>
+</g>
+<g id="usage-card-lesson-next">
+<rect x="512" y="3558" width="360" height="86" rx="8" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" />
+<circle cx="548" cy="3601" r="17" fill="#FFE5E8" stroke="#FF3045" stroke-width="2" />
+<text x="541" y="3606" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="900" fill="#FF3045" text-anchor="start" >3</text>
+<text x="582" y="3594" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="900" fill="#1F232B" text-anchor="start" >Subida de PDF y recursos</text>
+<text x="582" y="3618" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#6B7280" text-anchor="start" >Leccion - 18 min</text>
+<rect x="812" y="3585" width="36" height="32" rx="7" fill="#ECEFF3" stroke="none" stroke-width="1" />
+<text x="830" y="3607" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="900" fill="#1F232B" text-anchor="middle" >&gt;</text>
+</g>
+<g id="usage-card-lesson-review">
+<rect x="892" y="3558" width="360" height="86" rx="8" fill="#FFFFFF" stroke="#D3D6DC" stroke-width="1" />
+<circle cx="928" cy="3601" r="17" fill="#FFE5E8" stroke="#FF3045" stroke-width="2" />
+<text x="921" y="3606" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="900" fill="#FF3045" text-anchor="start" >3</text>
+<text x="962" y="3594" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="900" fill="#1F232B" text-anchor="start" >Subida de PDF y recursos</text>
+<text x="962" y="3618" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#6B7280" text-anchor="start" >Leccion - 18 min</text>
+<rect x="1192" y="3585" width="36" height="32" rx="7" fill="#ECEFF3" stroke="none" stroke-width="1" />
+<text x="1210" y="3607" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="900" fill="#1F232B" text-anchor="middle" >&gt;</text>
+</g>
+<g id="usage-input-focus">
+<text x="892" y="3400" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="900" fill="#1F232B" text-anchor="start" >Buscar contenido</text>
+<rect x="892" y="3414" width="408" height="50" rx="8" fill="#FFFFFF" stroke="#FF3045" stroke-width="2" />
+<circle cx="916" cy="3439" r="7" fill="none" stroke="#343943" stroke-width="2" />
+<text x="938" y="3445" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="600" fill="#343943" text-anchor="start" >Buscar curso o alumno</text>
+<text x="892" y="3488" font-family="Inter, Arial, sans-serif" font-size="12" font-weight="700" fill="#6B7280" text-anchor="start" >Texto de ayuda opcional</text>
+</g>
+</g>
+    </g>
+
+    <g id="decision-log">
+      <rect x="72" y="3748" width="1296" height="82" rx="12" fill="#0D0D0D" stroke="none" stroke-width="1" />
+      <circle cx="116" cy="3784" r="12" fill="#167A4A" stroke="none" stroke-width="1" />
+<text x="116" y="3789" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="900" fill="#FFFFFF" text-anchor="middle" >✓</text>
+<text x="142" y="3782" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="900" fill="#FFFFFF" text-anchor="start" >Guia en una pagina</text>
+<text x="142" y="3806" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700" fill="#B9C0CA" text-anchor="start" >style-guide.svg contiene fundaciones, componentes y ejemplo</text>
+      <circle cx="514" cy="3784" r="12" fill="#167A4A" stroke="none" stroke-width="1" />
+<text x="514" y="3789" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="900" fill="#FFFFFF" text-anchor="middle" >✓</text>
+<text x="540" y="3782" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="900" fill="#FFFFFF" text-anchor="start" >Componentes reutilizables</text>
+<text x="540" y="3806" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700" fill="#B9C0CA" text-anchor="start" >Button, Card, Input y Navbar con variantes nombradas</text>
+      <circle cx="934" cy="3784" r="12" fill="#167A4A" stroke="none" stroke-width="1" />
+<text x="934" y="3789" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="900" fill="#FFFFFF" text-anchor="middle" >✓</text>
+<text x="960" y="3782" font-family="Inter, Arial, sans-serif" font-size="15" font-weight="900" fill="#FFFFFF" text-anchor="start" >Decisiones documentadas</text>
+<text x="960" y="3806" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="700" fill="#B9C0CA" text-anchor="start" >README + tokens + criterios visuales integrados</text>
+    </g>
+  </g>
+</svg>
