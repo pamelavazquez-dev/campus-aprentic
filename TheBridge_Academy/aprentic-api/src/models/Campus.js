@@ -2,12 +2,14 @@
 
 const collectionName = 'campus';
 
-function buildCampus({ id, nombre, ubicacion }) {
+function buildCampus({ id, nombre, ubicacion, sede = '' }) {
   return {
     id,
     nombre,
     ubicacion,
+    sede,
     createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   };
 }
 

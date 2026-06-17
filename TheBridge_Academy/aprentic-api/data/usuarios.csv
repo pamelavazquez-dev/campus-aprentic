@@ -1,0 +1,4 @@
+id,nombre,email,rol,estado
+u1,Carlos Ruiz,carlos.ruiz@example.com,alumno,activo
+u2,Ana Pérez,ana.perez@example.com,profesor,activo
+u3,María López,maria.lopez@example.com,alumno,activo

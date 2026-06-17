@@ -1,4 +1,4 @@
-id,nombre,email,foto,promocionId
-a1,Carlos Ruiz,carlos.ruiz@example.com,,p1
-a2,María López,maria.lopez@example.com,,p1
-a3,Jorge Martínez,jorge.martinez@example.com,,p2
+id,nombre,email,promocionId,cursoIds
+a1,Carlos Ruiz,carlos.ruiz@example.com,p1,cu1
+a2,María López,maria.lopez@example.com,p1,cu1
+a3,Jorge Martínez,jorge.martinez@example.com,p2,cu2
