@@ -1,24 +1,21 @@
-// Firestore schema helper for Alumno documents.
-// This model includes promotion and progress fields for the course/cohort domain.
+// Firestore schema helper for alumno documents.
+// The document id is usually the Firebase Auth UID.
 
 const collectionName = 'alumnos';
 
-function buildAlumno({ id, nombre, email, foto = '', promocionId, cursoIds = [], inscripcionIds = [] }) {
+function buildAlumno({ nombre = '', email = '', avatar = '', promociones_id = [], promocion_id = '', promocionId = '' }) {
+  const promotions = promociones_id.length
+    ? promociones_id
+    : promocion_id
+    ? [promocion_id]
+    : promocionId
+    ? [promocionId]
+    : [];
   return {
-    id,
     nombre,
     email,
-    foto,
-    promocionId,
-    cursoIds,
-    inscripcionIds,
-    progreso: {
-      completadas: 0,
-      totales: 0,
-    },
-    rol: 'alumno',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    avatar,
+    promociones_id: promotions,
   };
 }
 

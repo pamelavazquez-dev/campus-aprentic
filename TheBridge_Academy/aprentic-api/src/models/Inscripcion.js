@@ -3,19 +3,18 @@
 
 const collectionName = 'inscripciones';
 
-function buildInscripcion({ id, alumnoId, cursoId, instructorId, estado = 'activa' }) {
+function buildInscripcion({ nombre = '', email = '', apellidos = '', dni = '', campus_id = '', promocion_id = '', aceptada = false, observaciones = '', creadoEn = new Date(), actualizadoEn = new Date() }) {
   return {
-    id,
-    alumnoId,
-    cursoId,
-    instructorId,
-    estado,
-    progreso: {
-      completadas: 0,
-      totales: 0,
-    },
-    creadoEn: new Date().toISOString(),
-    actualizadoEn: new Date().toISOString(),
+    nombre,
+    email,
+    apellidos,
+    dni,
+    campus_id,
+    promocion_id,
+    aceptada,
+    observaciones,
+    creadoEn,
+    actualizadoEn,
   };
 }
 

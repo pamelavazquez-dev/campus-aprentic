@@ -3,18 +3,13 @@
 
 const collectionName = 'lecciones';
 
-function buildLeccion({ id, moduloId, titulo, contenido = '', tipoContenido = 'video', recursoUrl = '', orden = 0 }) {
+function buildLeccion({ modulo_id = '', titulo = '', descripcion = '', description = '', contenido_url = '', videos_url = [] }) {
   return {
-    id,
-    moduloId,
+    modulo_id,
     titulo,
-    contenido,
-    tipoContenido,
-    recursoUrl,
-    orden,
-    completadaPor: [],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    descripcion: descripcion || description,
+    contenido_url,
+    videos_url,
   };
 }
 

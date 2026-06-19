@@ -1,18 +1,16 @@
-// Firestore schema helper for Profesor documents.
-// Professors are linked to courses and the user model.
+// Firestore schema helper for profesor documents.
+// The document id is usually the Firebase Auth UID.
 
 const collectionName = 'profesores';
 
-function buildProfesor({ id, nombre, email, avatar = '', cursoIds = [] }) {
+function buildProfesor({ nombre = '', email = '', avatar = '', campus_id = '', promocion_id = [], isActive = true }) {
   return {
-    id,
     nombre,
     email,
     avatar,
-    cursoIds,
-    rol: 'profesor',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    campus_id,
+    promocion_id,
+    isActive,
   };
 }
 

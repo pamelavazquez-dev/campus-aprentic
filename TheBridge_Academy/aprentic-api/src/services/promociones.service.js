@@ -1,49 +1,72 @@
-const { getAll, getDoc, createDoc, updateDoc, deleteDoc } = require('./base.service');
+const { getAll, getDoc, createDoc, updateDoc, deleteDoc, getDocIdFromRef } = require('./base.service');
 const { Promocion, Campus } = require('../models');
+
+function isInvalidDateRange(fechaInicio, fechaFin) {
+  if (!fechaInicio || !fechaFin) return false;
+  return new Date(fechaInicio) >= new Date(fechaFin);
+}
 
 async function obtenerPromociones() {
   const promociones = await getAll(Promocion.collectionName);
   const campus = await getAll(Campus.collectionName);
-  return promociones.map((promo) => ({
-    ...promo,
-    campusData: campus.find((item) => item.nombre === promo.campus) || null,
-  }));
+
+  return promociones.map((promo) => {
+    const campusId = getDocIdFromRef(promo.campus_id || promo.campus);
+    return {
+      ...promo,
+      campusData: campus.find((item) => item.id === campusId) || null,
+    };
+  });
 }
 
 async function obtenerPromocionPorId(id) {
   const promocion = await getDoc(Promocion.collectionName, id);
   if (!promocion) return null;
-  const campus = await getAll(Campus.collectionName);
+
+  const campusId = getDocIdFromRef(promocion.campus_id || promocion.campus);
+  const campus = campusId ? await getDoc(Campus.collectionName, campusId) : null;
+
   return {
     ...promocion,
-    campusData: campus.find((item) => item.nombre === promocion.campus) || null,
+    campusData: campus || null,
   };
 }
 
 async function crearPromocion(data) {
-  if (new Date(data.fechaInicio) >= new Date(data.fechaFin)) {
+  if (isInvalidDateRange(data.fechaInicio, data.fechaFin)) {
     throw new Error('La fecha de inicio debe ser anterior a la fecha de fin');
   }
 
+  const id = data.id || `promo_${Date.now()}`;
   const promocion = Promocion.buildPromocion({
-    ...data,
-    id: data.id || `promo_${Date.now()}`,
+    nombre: data.nombre,
+    fechaInicio: data.fechaInicio,
+    fechaFin: data.fechaFin,
+    campus_id: data.campus_id,
+    alumnos_id: data.alumnos_id,
+    profesor_id: data.profesor_id,
   });
 
-  return createDoc(Promocion.collectionName, promocion.id, promocion);
+  return createDoc(Promocion.collectionName, id, promocion);
 }
 
 async function actualizarPromocion(id, data) {
   const promocionExistente = await getDoc(Promocion.collectionName, id);
-  if (!promocionExistente) {
-    throw new Error('Promoción no encontrada');
-  }
+  if (!promocionExistente) throw new Error('Promocion no encontrada');
 
-  if (data.fechaInicio && data.fechaFin && new Date(data.fechaInicio) >= new Date(data.fechaFin)) {
+  if (isInvalidDateRange(data.fechaInicio, data.fechaFin)) {
     throw new Error('La fecha de inicio debe ser anterior a la fecha de fin');
   }
 
-  return updateDoc(Promocion.collectionName, id, { ...data, updatedAt: new Date().toISOString() });
+  const updatePayload = {};
+  if (data.nombre !== undefined) updatePayload.nombre = data.nombre;
+  if (data.fechaInicio !== undefined) updatePayload.fechaInicio = data.fechaInicio;
+  if (data.fechaFin !== undefined) updatePayload.fechaFin = data.fechaFin;
+  if (data.campus_id !== undefined) updatePayload.campus_id = data.campus_id;
+  if (data.alumnos_id !== undefined) updatePayload.alumnos_id = data.alumnos_id;
+  if (data.profesor_id !== undefined) updatePayload.profesor_id = data.profesor_id;
+
+  return updateDoc(Promocion.collectionName, id, updatePayload);
 }
 
 async function eliminarPromocion(id) {

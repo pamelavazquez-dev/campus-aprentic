@@ -1,20 +1,46 @@
-const BaseService = require('./base.service');
-const { db } = require('../config/db');
+const { getAll, getDoc, createDoc, updateDoc, deleteDoc, getDocIdFromRef } = require('./base.service');
+const { Curso } = require('../models');
 
-const COLLECTION = 'cursos';
-
-class CursosService extends BaseService {
-  constructor() {
-    super(COLLECTION, db);
-  }
-
-  // TODO: getAll()
-  // TODO: getById(id)
-  // TODO: create(data)
-  // TODO: update(id, data)
-  // TODO: delete(id)
-  // TODO: getByCampus(campusId)
-  // TODO: getByInstructor(instructorId)
+async function obtenerCursos() {
+  return getAll(Curso.collectionName);
 }
 
-module.exports = new CursosService();
+async function obtenerCursoPorId(id) {
+  return getDoc(Curso.collectionName, id);
+}
+
+async function crearCurso(data) {
+  const id = data.id || `curso_${Date.now()}`;
+  const curso = Curso.buildCurso({ ...data, id });
+  return createDoc(Curso.collectionName, id, curso);
+}
+
+async function actualizarCurso(id, data) {
+  const existente = await getDoc(Curso.collectionName, id);
+  if (!existente) throw new Error('Curso no encontrado');
+  return updateDoc(Curso.collectionName, id, data);
+}
+
+async function obtenerCursosPorCampus(campusId) {
+  const cursos = await getAll(Curso.collectionName);
+  return cursos.filter((curso) => getDocIdFromRef(curso.campus_id) === campusId);
+}
+
+async function obtenerCursosPorInstructor(instructorId) {
+  const cursos = await getAll(Curso.collectionName);
+  return cursos.filter((curso) => getDocIdFromRef(curso.instructor_id) === instructorId);
+}
+
+async function eliminarCurso(id) {
+  return deleteDoc(Curso.collectionName, id);
+}
+
+module.exports = {
+  obtenerCursos,
+  obtenerCursoPorId,
+  crearCurso,
+  actualizarCurso,
+  obtenerCursosPorCampus,
+  obtenerCursosPorInstructor,
+  eliminarCurso,
+};

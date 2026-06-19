@@ -1,9 +1,12 @@
-const { getAll, getDoc, createDoc, updateDoc, deleteDoc } = require('./base.service');
-const { Proyecto, Promocion, Alumno } = require('../models');
+const { getAll, getDoc, createDoc, updateDoc, deleteDoc, getDocIdFromRef } = require('./base.service');
+const { Proyecto } = require('../models');
+
+function getPromocionId(data) {
+  return getDocIdFromRef(data.promocion_id) || data.promocionId || '';
+}
 
 async function obtenerProyectos() {
-  const proyectos = await getAll(Proyecto.collectionName);
-  return proyectos;
+  return getAll(Proyecto.collectionName);
 }
 
 async function obtenerProyectoPorId(id) {
@@ -11,48 +14,32 @@ async function obtenerProyectoPorId(id) {
 }
 
 async function crearProyecto(data) {
-  const promocion = await getDoc(Promocion.collectionName, data.promocionId);
-  if (!promocion) {
-    throw new Error('La promoción asociada no existe');
-  }
-
-  const alumnoIds = data.alumnoIds || [];
-  const alumnos = await getAll(Alumno.collectionName);
-  const invalidAlumno = alumnoIds.find((alumnoId) => !alumnos.some((alumno) => alumno.id === alumnoId));
-  if (invalidAlumno) {
-    throw new Error(`El alumno ${invalidAlumno} no existe`);
-  }
-
+  const id = data.id || `proy_${Date.now()}`;
   const proyecto = Proyecto.buildProyecto({
-    ...data,
-    id: data.id || `proy_${Date.now()}`,
+    id,
+    titulo: data.titulo,
+    descripcion: data.descripcion,
+    promocionId: getPromocionId(data),
+    alumnoIds: data.alumnoIds,
+    notaIds: data.notaIds,
+    notas: data.notas,
+    estado: data.estado,
   });
 
-  return createDoc(Proyecto.collectionName, proyecto.id, proyecto);
+  return createDoc(Proyecto.collectionName, id, proyecto);
 }
 
 async function actualizarProyecto(id, data) {
   const proyectoExistente = await getDoc(Proyecto.collectionName, id);
-  if (!proyectoExistente) {
-    throw new Error('Proyecto no encontrado');
+  if (!proyectoExistente) throw new Error('Proyecto no encontrado');
+
+  const updatePayload = { ...data };
+  if (data.promocion_id !== undefined || data.promocionId !== undefined) {
+    updatePayload.promocionId = getPromocionId(data);
+    delete updatePayload.promocion_id;
   }
 
-  if (data.promocionId) {
-    const promocion = await getDoc(Promocion.collectionName, data.promocionId);
-    if (!promocion) {
-      throw new Error('La promoción asociada no existe');
-    }
-  }
-
-  if (data.alumnoIds) {
-    const alumnos = await getAll(Alumno.collectionName);
-    const invalidAlumno = data.alumnoIds.find((alumnoId) => !alumnos.some((alumno) => alumno.id === alumnoId));
-    if (invalidAlumno) {
-      throw new Error(`El alumno ${invalidAlumno} no existe`);
-    }
-  }
-
-  return updateDoc(Proyecto.collectionName, id, { ...data, updatedAt: new Date().toISOString() });
+  return updateDoc(Proyecto.collectionName, id, updatePayload);
 }
 
 async function eliminarProyecto(id) {

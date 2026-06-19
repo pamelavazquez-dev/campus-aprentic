@@ -3,16 +3,13 @@
 
 const collectionName = 'modulos';
 
-function buildModulo({ id, cursoId, titulo, descripcion = '', orden = 0 }) {
+function buildModulo({ nombre = '', titulo = '', horas = 0, lecciones_Id = [], lecciones_id = [] }) {
+  const name = nombre || titulo;
+  const lessons = lecciones_Id.length ? lecciones_Id : lecciones_id;
   return {
-    id,
-    cursoId,
-    titulo,
-    descripcion,
-    orden,
-    leccionIds: [],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    nombre: name,
+    horas,
+    lecciones_Id: lessons,
   };
 }
 

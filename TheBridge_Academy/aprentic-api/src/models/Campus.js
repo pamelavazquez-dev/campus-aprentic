@@ -2,14 +2,13 @@
 
 const collectionName = 'campus';
 
-function buildCampus({ id, nombre, ubicacion, sede = '' }) {
+function buildCampus({ nombre = '', sede = '', coordinadores_id = null, modulos_id = [], promociones_id = [] }) {
   return {
-    id,
     nombre,
-    ubicacion,
     sede,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    coordinadores_id,
+    modulos_id,
+    promociones_id,
   };
 }
 

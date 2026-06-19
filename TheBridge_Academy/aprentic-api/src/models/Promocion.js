@@ -3,18 +3,14 @@
 
 const collectionName = 'promociones';
 
-function buildPromocion({ id, nombre, fechaInicio, fechaFin, campus, estado = 'activo', cursoIds = [] }) {
+function buildPromocion({ nombre = '', fechaInicio = null, fechaFin = null, campus_id = '', alumnos_id = [], profesor_id = [] }) {
   return {
-    id,
     nombre,
     fechaInicio,
     fechaFin,
-    campus,
-    estado,
-    cursoIds,
-    descripcion: '',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    campus_id,
+    alumnos_id,
+    profesor_id,
   };
 }
 

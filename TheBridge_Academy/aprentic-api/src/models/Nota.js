@@ -3,7 +3,7 @@
 
 const collectionName = 'notas';
 
-function buildNota({ id, proyectoId, alumnoId, profesorId, valor = 0, comentario = '' }) {
+function buildNota({ id, proyectoId, alumnoId, profesorId, valor = 0, comentario = '', creadoEn = new Date().toISOString(), actualizadoEn = new Date().toISOString() }) {
   return {
     id,
     proyectoId,
@@ -11,8 +11,8 @@ function buildNota({ id, proyectoId, alumnoId, profesorId, valor = 0, comentario
     profesorId,
     valor,
     comentario,
-    creadoEn: new Date().toISOString(),
-    actualizadoEn: new Date().toISOString(),
+    creadoEn,
+    actualizadoEn,
   };
 }
 

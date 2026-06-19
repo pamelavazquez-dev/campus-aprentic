@@ -3,18 +3,16 @@
 
 const collectionName = 'proyectos';
 
-function buildProyecto({ id, titulo, promocionId, alumnoIds = [], descripcion = '' }) {
+function buildProyecto({ id, titulo, descripcion = '', promocionId, alumnoIds = [], notaIds = [], notas = [], estado = 'abierto' }) {
   return {
     id,
     titulo,
     descripcion,
     promocionId,
     alumnoIds,
-    notaIds: [],
-    notas: [],
-    estado: 'abierto',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    notaIds,
+    notas,
+    estado,
   };
 }
 
