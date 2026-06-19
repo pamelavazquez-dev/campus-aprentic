@@ -1,16 +1,28 @@
 # AprenTIC Campus API
 
-Estructura del proyecto (archivos vacíos).
+API CommonJS conectada a Firestore para The Bridge Academy.
 
-Preparación para Firebase
- - Archivo de configuración: src/config/firebase.js (placeholder).
- - Archivos Firebase: firebase.json, .firebaserc.
- - Variables de entorno añadidas en .env.example para credenciales y configuración.
+## Colecciones soportadas
 
-Para conectar con Firebase, rellena las variables en `.env` y añade la inicialización en `src/config/firebase.js`.
+- `admin`
+- `alumnos`
+- `campus`
+- `inscripciones`
+- `lecciones`
+- `modulos`
+- `notas`
+- `profesores`
+- `promociones`
+- `proyectos`
 
-Seed con Firebase
- - Instala dependencias: `npm install`
- - Rellena las variables de Firebase en `.env`
- - Ejecuta `npm run seed`
- - El script generará CSVs en `data/` y, si la configuración de Firebase es válida, inyectará los datos en Firestore.
+No se exponen services ni rutas para `cursos`, `reviews` o `usuarios` porque no aparecen en el esquema real de Firestore. Firebase Auth gestiona las credenciales.
+
+## Scripts
+
+```bash
+npm install
+node scripts/analyze-db.js
+npm run seed
+```
+
+`scripts/analyze-db.js` imprime referencias como rutas (`/campus/id`) para revisar rapido la estructura. `scripts/seed.js` contiene datos de referencia con los mismos nombres de campos que la base actual.

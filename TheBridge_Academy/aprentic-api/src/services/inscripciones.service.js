@@ -20,7 +20,7 @@ async function crearInscripcion(data) {
     promocion_id: data.promocion_id || data.promocionId,
     aceptada: data.aceptada,
     observaciones: data.observaciones,
-    creadoEn: data.creadoEn,
+    creadoEn: data.creadoEn ?? data.creado_En,
     actualizadoEn: data.actualizadoEn,
   });
 
@@ -42,7 +42,9 @@ async function actualizarInscripcion(id, data) {
   }
   if (data.aceptada !== undefined) updatePayload.aceptada = data.aceptada;
   if (data.observaciones !== undefined) updatePayload.observaciones = data.observaciones;
-  if (data.creadoEn !== undefined) updatePayload.creadoEn = data.creadoEn;
+  if (data.creadoEn !== undefined || data.creado_En !== undefined) {
+    updatePayload.creadoEn = data.creadoEn ?? data.creado_En;
+  }
   if (data.actualizadoEn !== undefined) updatePayload.actualizadoEn = data.actualizadoEn;
 
   return updateDoc(Inscripcion.collectionName, id, updatePayload);

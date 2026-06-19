@@ -28,7 +28,7 @@ async function actualizarModulo(id, data) {
 
   const updatePayload = {};
   if (data.nombre !== undefined || data.titulo !== undefined) {
-    updatePayload.nombre = data.nombre || data.titulo;
+    updatePayload.nombre = data.nombre ?? data.titulo;
   }
   if (data.horas !== undefined) updatePayload.horas = data.horas;
   if (data.lecciones_Id !== undefined || data.lecciones_id !== undefined) {

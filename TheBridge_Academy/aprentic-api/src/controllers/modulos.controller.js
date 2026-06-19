@@ -1,12 +1,20 @@
 const modulosService = require('../services/modulos.service');
-
-// TODO: getAll(req, res, next): obtener todos los modulos
-// TODO: getById(req, res, next): obtener modulo por ID
-// TODO: create(req, res, next): crear nuevo modulo
-// TODO: update(req, res, next): actualizar modulo existente
-// TODO: delete(req, res, next): eliminar modulo
-// TODO: getByCurso(req, res, next): obtener modulos por curso
+const createCrudController = require('./crud.controller');
 
 module.exports = {
-  // Controllers aqui
+  ...createCrudController({
+    list: modulosService.obtenerModulos,
+    getById: modulosService.obtenerModuloPorId,
+    create: modulosService.crearModulo,
+    update: modulosService.actualizarModulo,
+    remove: modulosService.eliminarModulo,
+  }),
+
+  async getByLeccion(req, res, next) {
+    try {
+      res.json(await modulosService.obtenerModulosPorLeccion(req.params.leccionId));
+    } catch (error) {
+      next(error);
+    }
+  },
 };

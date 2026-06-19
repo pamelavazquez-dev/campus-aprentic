@@ -3,12 +3,12 @@ const inscripcionesController = require('../controllers/inscripciones.controller
 
 const router = express.Router();
 
-// TODO: GET /api/inscripciones - obtener todas las inscripciones
-// TODO: GET /api/inscripciones/:id - obtener inscripcion por ID
-// TODO: POST /api/inscripciones - crear nueva inscripcion
-// TODO: PUT /api/inscripciones/:id - actualizar inscripcion existente
-// TODO: DELETE /api/inscripciones/:id - eliminar inscripcion
-// TODO: GET /api/inscripciones/alumno/:alumnoId - obtener inscripciones por alumno
-// TODO: GET /api/inscripciones/curso/:cursoId - obtener inscripciones por curso
+router.get('/', inscripcionesController.getAll);
+router.get('/promocion/:promocionId', inscripcionesController.getByPromocion);
+router.get('/campus/:campusId', inscripcionesController.getByCampus);
+router.get('/:id', inscripcionesController.getById);
+router.post('/', inscripcionesController.create);
+router.put('/:id', inscripcionesController.update);
+router.delete('/:id', inscripcionesController.delete);
 
 module.exports = router;

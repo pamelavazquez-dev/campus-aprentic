@@ -1,4 +1,9 @@
-// TODO: Definir rutas de Auth
-// - POST /api/auth/register
-// - POST /api/auth/login
-// - Aplicar validación de entrada y rate limiting si procede
+const express = require('express');
+const authController = require('../controllers/auth.controller');
+
+const router = express.Router();
+
+router.post('/register', authController.register);
+router.post('/login', authController.login);
+
+module.exports = router;

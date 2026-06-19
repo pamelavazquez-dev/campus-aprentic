@@ -5,5 +5,5 @@
 // TODO: Test para create(data)
 // TODO: Test para update(id, data)
 // TODO: Test para delete(id)
-// TODO: Test para getByAlumno(alumnoId)
-// TODO: Test para getByCurso(cursoId)
+// TODO: Test para getByCampus(campusId)
+// TODO: Test para getByPromocion(promocionId)

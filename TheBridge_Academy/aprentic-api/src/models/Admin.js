@@ -3,13 +3,21 @@
 
 const collectionName = 'admin';
 
-function buildAdmin({ nombre = '', email = '', avatar = '', campus_asignados = [], isActive = true }) {
+function buildAdmin({
+  nombre = '',
+  ombre,
+  email = '',
+  avatar = '',
+  campus_asignados = [],
+  isActive,
+  isActice,
+}) {
   return {
-    nombre,
-    email,
     avatar,
     campus_asignados,
-    isActive,
+    email,
+    isActice: isActice ?? isActive ?? true,
+    ombre: ombre ?? nombre,
   };
 }
 

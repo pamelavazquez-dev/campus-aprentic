@@ -1,4 +1,21 @@
-// TODO: Implementar controllers de Auth
-// - register(req, res, next): validar datos, llamar a auth.service.register y devolver token
-// - login(req, res, next): validar credenciales, llamar a auth.service.login y devolver JWT
-// - Manejar errores con next(err) y respuestas 400/401 según corresponda
+const authService = require('../services/auth.service');
+
+module.exports = {
+  async register(req, res, next) {
+    try {
+      const result = await authService.register(req.body);
+      res.status(201).json(result);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  async login(req, res, next) {
+    try {
+      const result = await authService.login(req.body);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  },
+};

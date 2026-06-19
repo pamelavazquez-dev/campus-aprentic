@@ -1,5 +1,10 @@
-// TODO: Definir rutas de Analytics
-// - GET /api/analytics/aptos-por-campus
-// - GET /api/analytics/alumnos-en-riesgo
-// - GET /api/analytics/ranking-no-aptos
-// - Asegurar que sólo usuarios autorizados (admin/profesor) puedan acceder según corresponda
+const express = require('express');
+const analyticsController = require('../controllers/analytics.controller');
+
+const router = express.Router();
+
+router.get('/aptos-por-campus', analyticsController.aptosPorCampus);
+router.get('/alumnos-en-riesgo', analyticsController.alumnosEnRiesgo);
+router.get('/ranking-no-aptos', analyticsController.rankingNoAptos);
+
+module.exports = router;

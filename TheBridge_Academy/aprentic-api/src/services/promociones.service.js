@@ -54,7 +54,9 @@ async function actualizarPromocion(id, data) {
   const promocionExistente = await getDoc(Promocion.collectionName, id);
   if (!promocionExistente) throw new Error('Promocion no encontrada');
 
-  if (isInvalidDateRange(data.fechaInicio, data.fechaFin)) {
+  const nextFechaInicio = data.fechaInicio ?? promocionExistente.fechaInicio;
+  const nextFechaFin = data.fechaFin ?? promocionExistente.fechaFin;
+  if (isInvalidDateRange(nextFechaInicio, nextFechaFin)) {
     throw new Error('La fecha de inicio debe ser anterior a la fecha de fin');
   }
 

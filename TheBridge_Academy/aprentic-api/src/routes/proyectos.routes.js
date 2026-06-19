@@ -1,4 +1,12 @@
-// TODO: Definir rutas de Proyectos y Notas
-// - CRUD de proyectos
-// - POST/PUT para gestionar notas dentro de un proyecto
-// - Control de permisos: solo profesores pueden escribir notas
+const express = require('express');
+const proyectosController = require('../controllers/proyectos.controller');
+
+const router = express.Router();
+
+router.get('/', proyectosController.getAll);
+router.get('/:id', proyectosController.getById);
+router.post('/', proyectosController.create);
+router.put('/:id', proyectosController.update);
+router.delete('/:id', proyectosController.delete);
+
+module.exports = router;

@@ -1,8 +1,43 @@
-// TODO: Configurar Express
-// - Inicializar express, CORS y bodyParser (JSON)
-// - Registrar rutas principales (/api/auth, /api/alumnos, /api/profesores, /api/promociones, /api/proyectos, /api/analytics, /api/campus, /api/cursos, /api/inscripciones, /api/lecciones, /api/modulos, /api/notas, /api/reviews, /api/usuarios)
-// - Integrar Swagger en /api-docs
-// - Añadir middleware global de manejo de errores (errorHandler)
+const express = require('express');
+const cors = require('cors');
 
-// Notas:
-// - No incluir lógica aquí; exportar la instancia de app para tests.
+const authRoutes = require('./routes/auth.routes');
+const alumnosRoutes = require('./routes/alumnos.routes');
+const profesoresRoutes = require('./routes/profesores.routes');
+const promocionesRoutes = require('./routes/promociones.routes');
+const proyectosRoutes = require('./routes/proyectos.routes');
+const analyticsRoutes = require('./routes/analytics.routes');
+const campusRoutes = require('./routes/campus.routes');
+const inscripcionesRoutes = require('./routes/inscripciones.routes');
+const leccionesRoutes = require('./routes/lecciones.routes');
+const modulosRoutes = require('./routes/modulos.routes');
+const notasRoutes = require('./routes/notas.routes');
+const adminsRoutes = require('./routes/admins.routes');
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+// Register API routes
+app.use('/api/auth', authRoutes);
+app.use('/api/alumnos', alumnosRoutes);
+app.use('/api/profesores', profesoresRoutes);
+app.use('/api/promociones', promocionesRoutes);
+app.use('/api/proyectos', proyectosRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/campus', campusRoutes);
+app.use('/api/inscripciones', inscripcionesRoutes);
+app.use('/api/lecciones', leccionesRoutes);
+app.use('/api/modulos', modulosRoutes);
+app.use('/api/notas', notasRoutes);
+app.use('/api/admins', adminsRoutes);
+
+// Note: /api/cursos, /api/reviews and /api/usuarios are not part of the real Firestore schema.
+
+// Basic error handling
+app.use((req, res, next) => {
+	res.status(404).json({ error: 'Not found' });
+});
+
+module.exports = app;

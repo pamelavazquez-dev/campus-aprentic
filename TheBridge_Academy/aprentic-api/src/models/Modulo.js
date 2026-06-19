@@ -1,5 +1,4 @@
 // Firestore schema helper for Modulo documents.
-// Modules belong to a course and group lesson content.
 
 const collectionName = 'modulos';
 

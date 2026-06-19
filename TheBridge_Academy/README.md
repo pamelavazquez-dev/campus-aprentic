@@ -1,16 +1,54 @@
-# React + Vite
+# The Bridge Academy
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Proyecto con frontend React/Vite y backend `aprentic-api` conectado a Firestore.
 
-Currently, two official plugins are available:
+## Esquema Firestore real
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+El backend esta alineado con las colecciones visibles en las capturas de `fotos/`:
 
-## React Compiler
+- `admin`
+- `alumnos`
+- `campus`
+- `inscripciones`
+- `lecciones`
+- `modulos`
+- `notas`
+- `profesores`
+- `promociones`
+- `proyectos`
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Las colecciones scaffold antiguas `cursos`, `reviews` y `usuarios` no forman parte del esquema real usado por la API. La autenticacion se deja en Firebase Auth y no crea documentos locales de usuarios.
 
-## Expanding the ESLint configuration
+## Backend
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+La API vive en `aprentic-api/src/`:
+
+- `models/`: builders con los nombres exactos de campos de Firestore.
+- `services/`: CRUD y filtros por relaciones, normalizando `DocumentReference` a rutas legibles.
+- `controllers/` y `routes/`: endpoints REST para las colecciones reales.
+- `scripts/analyze-db.js`: inspecciona Firestore mostrando referencias como `/coleccion/documento`.
+- `scripts/seed.js`: dataset de referencia alineado con el esquema actual.
+
+Los services aceptan alias de entrada cuando ayudan a la API, pero persisten los campos tal como existen en Firestore. Por ejemplo, `admin` escribe `isActice` y `ombre` porque esos son los campos vistos en la base.
+
+## Frontend
+
+La app React esta en `src/` con paginas base (`Home`, `Login`, `Dashboard`, `Profile`) y componentes reutilizables (`Button`, `Card`, `Input`, `Layout`, `Navbar`, etc.).
+
+## Comandos
+
+Frontend:
+
+```bash
+npm install
+npm run dev
+npm run build
+```
+
+Backend:
+
+```bash
+cd aprentic-api
+npm install
+node scripts/analyze-db.js
+```

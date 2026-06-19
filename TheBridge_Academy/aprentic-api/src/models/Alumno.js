@@ -4,8 +4,13 @@
 const collectionName = 'alumnos';
 
 function buildAlumno({ nombre = '', email = '', avatar = '', promociones_id = [], promocion_id = '', promocionId = '' }) {
-  const promotions = promociones_id.length
+  const promociones = Array.isArray(promociones_id)
     ? promociones_id
+    : promociones_id
+    ? [promociones_id]
+    : [];
+  const promotions = promociones.length
+    ? promociones
     : promocion_id
     ? [promocion_id]
     : promocionId

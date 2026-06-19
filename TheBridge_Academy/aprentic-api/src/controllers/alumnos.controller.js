@@ -1,6 +1,10 @@
-// TODO: Implementar controllers para Alumnos
-// - obtenerAlumnos(req, res, next): soportar filtros, populate(promocion)
-// - crearAlumno(req, res, next): validar y delegar a alumnos.service.crearAlumno
-// - actualizarAlumno(req, res, next)
-// - eliminarAlumno(req, res, next)
-// - Devolver 404 cuando el recurso no exista
+const alumnosService = require('../services/alumnos.service');
+const createCrudController = require('./crud.controller');
+
+module.exports = createCrudController({
+  list: alumnosService.obtenerAlumnos,
+  getById: alumnosService.obtenerAlumnoPorId,
+  create: alumnosService.crearAlumno,
+  update: alumnosService.actualizarAlumno,
+  remove: alumnosService.eliminarAlumno,
+});

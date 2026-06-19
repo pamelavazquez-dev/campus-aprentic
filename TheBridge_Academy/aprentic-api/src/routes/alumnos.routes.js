@@ -1,7 +1,12 @@
-// TODO: Definir rutas de Alumnos
-// - GET /api/alumnos
-// - GET /api/alumnos/:id
-// - POST /api/alumnos
-// - PUT /api/alumnos/:id
-// - DELETE /api/alumnos/:id
-// - Proteger rutas con auth.required y requireRole donde sea necesario
+const express = require('express');
+const alumnosController = require('../controllers/alumnos.controller');
+
+const router = express.Router();
+
+router.get('/', alumnosController.getAll);
+router.get('/:id', alumnosController.getById);
+router.post('/', alumnosController.create);
+router.put('/:id', alumnosController.update);
+router.delete('/:id', alumnosController.delete);
+
+module.exports = router;

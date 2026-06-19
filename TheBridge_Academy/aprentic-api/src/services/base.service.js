@@ -11,10 +11,14 @@ const REFERENCE_COLLECTION_BY_FIELD = {
   modulos_id: 'modulos',
   promocion_id: 'promociones',
   promociones_id: 'promociones',
-  profesor_id: 'profesores',
+  profesor_id: 'profesor',
 };
 
 const EMBEDDED_ID_COLLECTIONS = new Set(['notas', 'proyectos']);
+const DATE_FIELDS_BY_COLLECTION = {
+  inscripciones: new Set(['actualizadoEn', 'creadoEn']),
+  promociones: new Set(['fechaFin', 'fechaInicio']),
+};
 
 function collection(name) {
   return db.collection(name);
@@ -84,20 +88,34 @@ function toFirestoreReference(value, fallbackCollection) {
   return value;
 }
 
-function normalizeWriteValue(key, value) {
+function toDateValue(value) {
+  if (value === null || value === undefined || value === '') return value ?? null;
+  if (value instanceof Date) return value;
+
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? value : date;
+}
+
+function isDateField(collectionName, key) {
+  return Boolean(collectionName && key && DATE_FIELDS_BY_COLLECTION[collectionName]?.has(key));
+}
+
+function normalizeWriteValue(key, value, collectionName = null) {
   if (value === null || value === undefined) return value;
+
+  if (isDateField(collectionName, key)) return toDateValue(value);
 
   const fallbackCollection = REFERENCE_COLLECTION_BY_FIELD[key];
   if (fallbackCollection) {
     if (Array.isArray(value)) {
-      return value.map((item) => normalizeWriteValue(key, item));
+      return value.map((item) => normalizeWriteValue(key, item, collectionName));
     }
     if (typeof value === 'string' || getReferencePath(value)) {
       return toFirestoreReference(value, fallbackCollection);
     }
   }
 
-  if (Array.isArray(value)) return value.map((item) => normalizeWriteValue(null, item));
+  if (Array.isArray(value)) return value.map((item) => normalizeWriteValue(null, item, collectionName));
 
   if (value instanceof Date) return value;
   if (typeof value === 'object') {
@@ -106,7 +124,7 @@ function normalizeWriteValue(key, value) {
 
     const normalized = {};
     for (const [innerKey, innerValue] of Object.entries(value)) {
-      normalized[innerKey] = normalizeWriteValue(innerKey, innerValue);
+      normalized[innerKey] = normalizeWriteValue(innerKey, innerValue, collectionName);
     }
     return normalized;
   }
@@ -118,7 +136,7 @@ function prepareDocData(collectionName, data) {
   const prepared = {};
   for (const [key, value] of Object.entries(data || {})) {
     if (key === 'id' && !EMBEDDED_ID_COLLECTIONS.has(collectionName)) continue;
-    prepared[key] = normalizeWriteValue(key, value);
+    prepared[key] = normalizeWriteValue(key, value, collectionName);
   }
   return prepared;
 }

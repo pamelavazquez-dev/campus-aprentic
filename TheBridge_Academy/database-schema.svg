@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1100" viewBox="0 0 1400 1100">
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#1F232B" />
+    </marker>
+    <style>
+      .box { fill: #FFFFFF; stroke: #D3D6DC; stroke-width: 2; rx: 12; }
+      .title { font: 700 16px Inter, Arial, sans-serif; fill: #0D0D0D; }
+      .field { font: 500 13px Inter, Arial, sans-serif; fill: #4B5563; }
+      .line { stroke: #0D0D0D; stroke-width: 1.6; fill: none; }
+      .label { font: 500 12px Inter, Arial, sans-serif; fill: #1F232B; }
+      .group-title { font: 700 20px Inter, Arial, sans-serif; fill: #FF3045; }
+    </style>
+  </defs>
+
+  <text x="40" y="40" class="group-title">Diagrama Real de Base de Datos — The Bridge Academy</text>
+  <text x="40" y="68" class="label">Estructura Firestore actual con referencias snake_case y rutas de documentos</text>
+
+  <!-- Row 1: Campus & Promociones -->
+  <g transform="translate(40,110)">
+    <rect class="box" width="280" height="140" />
+    <text x="16" y="28" class="title">campus</text>
+    <text x="16" y="54" class="field">id</text>
+    <text x="16" y="72" class="field">nombre</text>
+    <text x="16" y="90" class="field">ubicacion, sede</text>
+    <text x="16" y="108" class="field">modulos_id[], isActive</text>
+  </g>
+
+  <g transform="translate(360,110)">
+    <rect class="box" width="300" height="160" />
+    <text x="16" y="28" class="title">promociones</text>
+    <text x="16" y="54" class="field">id</text>
+    <text x="16" y="72" class="field">nombre</text>
+    <text x="16" y="90" class="field">campus_id (ref)</text>
+    <text x="16" y="108" class="field">alumnos_id[], profesor_id[]</text>
+    <text x="16" y="126" class="field">isActive, estado</text>
+  </g>
+
+  <!-- Row 2: Profesores & Usuarios -->
+  <g transform="translate(40,340)">
+    <rect class="box" width="300" height="140" />
+    <text x="16" y="28" class="title">profesores</text>
+    <text x="16" y="54" class="field">id (UID Firebase)</text>
+    <text x="16" y="72" class="field">nombre, email</text>
+    <text x="16" y="90" class="field">campus_id (ref)</text>
+    <text x="16" y="108" class="field">promocion_id[], isActive</text>
+  </g>
+
+  <g transform="translate(370,340)">
+    <rect class="box" width="280" height="120" />
+    <text x="16" y="28" class="title">usuarios</text>
+    <text x="16" y="54" class="field">id</text>
+    <text x="16" y="72" class="field">nombre, email</text>
+    <text x="16" y="90" class="field">rol, isActive</text>
+  </g>
+
+  <!-- Row 3: Alumnos & Inscripciones -->
+  <g transform="translate(700,110)">
+    <rect class="box" width="320" height="160" />
+    <text x="16" y="28" class="title">alumnos</text>
+    <text x="16" y="54" class="field">id</text>
+    <text x="16" y="72" class="field">nombre, email, dni</text>
+    <text x="16" y="90" class="field">campus_id (ref)</text>
+    <text x="16" y="108" class="field">promocion_id (ref)</text>
+    <text x="16" y="126" class="field">creado_En, actualizadoEn</text>
+  </g>
+
+  <g transform="translate(700,340)">
+    <rect class="box" width="320" height="160" />
+    <text x="16" y="28" class="title">inscripciones</text>
+    <text x="16" y="54" class="field">id</text>
+    <text x="16" y="72" class="field">nombre, email, dni</text>
+    <text x="16" y="90" class="field">campus_id (ref)</text>
+    <text x="16" y="108" class="field">promocion_id (ref)</text>
+    <text x="16" y="126" class="field">aceptada, observaciones</text>
+  </g>
+
+  <!-- Row 4: Módulos, Lecciones -->
+  <g transform="translate(40,540)">
+    <rect class="box" width="300" height="140" />
+    <text x="16" y="28" class="title">modulos</text>
+    <text x="16" y="54" class="field">id</text>
+    <text x="16" y="72" class="field">titulo</text>
+    <text x="16" y="90" class="field">horas</text>
+    <text x="16" y="108" class="field">lecciones_id[] (ref)</text>
+  </g>
+
+  <g transform="translate(370,540)">
+    <rect class="box" width="300" height="160" />
+    <text x="16" y="28" class="title">lecciones</text>
+    <text x="16" y="54" class="field">id</text>
+    <text x="16" y="72" class="field">titulo</text>
+    <text x="16" y="90" class="field">modulo_id (ref)</text>
+    <text x="16" y="108" class="field">contenido_url</text>
+    <text x="16" y="126" class="field">videos_url[]</text>
+  </g>
+
+  <!-- Row 5: Proyectos, Notas -->
+  <g transform="translate(700,540)">
+    <rect class="box" width="300" height="140" />
+    <text x="16" y="28" class="title">proyectos</text>
+    <text x="16" y="54" class="field">id</text>
+    <text x="16" y="72" class="field">titulo, descripcion</text>
+    <text x="16" y="90" class="field">promocionId</text>
+    <text x="16" y="108" class="field">alumnoIds[], notaIds[]</text>
+  </g>
+
+  <g transform="translate(1050,540)">
+    <rect class="box" width="300" height="140" />
+    <text x="16" y="28" class="title">notas</text>
+    <text x="16" y="54" class="field">id</text>
+    <text x="16" y="72" class="field">alumnoId, profesorId</text>
+    <text x="16" y="90" class="field">proyectoId</text>
+    <text x="16" y="108" class="field">valor, comentario</text>
+  </g>
+
+  <!-- References -->
+  <path d="M360 180 L640 180" class="line" marker-end="url(#arrow)" />
+  <text x="490" y="170" class="label">promociones.campus_id → campus</text>
+
+  <path d="M200 250 L360 340" class="line" marker-end="url(#arrow)" />
+  <text x="260" y="290" class="label">campus.modulos_id → modulos</text>
+
+  <path d="M660 270 L720 340" class="line" marker-end="url(#arrow)" />
+  <text x="680" y="310" class="label">profesores.campus_id → campus</text>
+
+  <path d="M660 270 L760 280" class="line" marker-end="url(#arrow)" />
+  <text x="700" y="260" class="label">promociones.alumnos_id → alumnos</text>
+
+  <path d="M200 480 L370 550" class="line" marker-end="url(#arrow)" />
+  <text x="270" y="520" class="label">campus.modulos_id → modulos</text>
+
+  <path d="M400 680 L400 700" class="line" marker-end="url(#arrow)" />
+  <text x="420" y="690" class="label">modulos.lecciones_id → lecciones</text>
+
+  <path d="M660 610 L700 610" class="line" marker-end="url(#arrow)" />
+  <text x="680" y="600" class="label">proyectos → notas</text>
+
+</svg>

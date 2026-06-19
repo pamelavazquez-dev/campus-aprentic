@@ -31,7 +31,7 @@ async function actualizarLeccion(id, data) {
   if (data.modulo_id !== undefined) updatePayload.modulo_id = data.modulo_id;
   if (data.titulo !== undefined) updatePayload.titulo = data.titulo;
   if (data.descripcion !== undefined || data.description !== undefined) {
-    updatePayload.descripcion = data.descripcion || data.description;
+    updatePayload.descripcion = data.descripcion ?? data.description;
   }
   if (data.contenido_url !== undefined) updatePayload.contenido_url = data.contenido_url;
   if (data.videos_url !== undefined) updatePayload.videos_url = data.videos_url;

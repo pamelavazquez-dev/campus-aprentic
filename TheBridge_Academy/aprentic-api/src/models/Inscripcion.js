@@ -1,20 +1,46 @@
 // Firestore schema helper for Inscripcion documents.
-// Enrollments connect alumno and curso with progress state.
 
 const collectionName = 'inscripciones';
 
-function buildInscripcion({ nombre = '', email = '', apellidos = '', dni = '', campus_id = '', promocion_id = '', aceptada = false, observaciones = '', creadoEn = new Date(), actualizadoEn = new Date() }) {
+function toDateValue(value, fallback = new Date()) {
+  if (value === undefined) return fallback;
+  if (value === null || value === '') return null;
+  if (value instanceof Date) return value;
+
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? value : date;
+}
+
+function toInscripcionPromocionRef(value) {
+  if (typeof value !== 'string') return value;
+  const cleanValue = value.trim().replace(/^\/+/, '');
+  if (!cleanValue || cleanValue.includes('/')) return value;
+  return `/promocion_id/${cleanValue}`;
+}
+
+function buildInscripcion({
+  nombre = '',
+  email = '',
+  apellidos = '',
+  dni = '',
+  campus_id = '',
+  promocion_id = '',
+  aceptada = false,
+  observaciones = '',
+  creadoEn,
+  actualizadoEn,
+}) {
   return {
-    nombre,
-    email,
-    apellidos,
-    dni,
-    campus_id,
-    promocion_id,
     aceptada,
+    actualizadoEn: toDateValue(actualizadoEn),
+    apellidos,
+    campus_id,
+    creadoEn: toDateValue(creadoEn),
+    dni,
+    email,
+    nombre,
     observaciones,
-    creadoEn,
-    actualizadoEn,
+    promocion_id: toInscripcionPromocionRef(promocion_id),
   };
 }
 

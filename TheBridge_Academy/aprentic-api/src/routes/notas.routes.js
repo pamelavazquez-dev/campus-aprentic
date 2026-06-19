@@ -3,13 +3,13 @@ const notasController = require('../controllers/notas.controller');
 
 const router = express.Router();
 
-// TODO: GET /api/notas - obtener todas las notas
-// TODO: GET /api/notas/:id - obtener nota por ID
-// TODO: POST /api/notas - crear nueva nota
-// TODO: PUT /api/notas/:id - actualizar nota existente
-// TODO: DELETE /api/notas/:id - eliminar nota
-// TODO: GET /api/notas/proyecto/:proyectoId - obtener notas por proyecto
-// TODO: GET /api/notas/alumno/:alumnoId - obtener notas por alumno
-// TODO: GET /api/notas/profesor/:profesorId - obtener notas por profesor
+router.get('/', notasController.getAll);
+router.get('/proyecto/:proyectoId', notasController.getByProyecto);
+router.get('/alumno/:alumnoId', notasController.getByAlumno);
+router.get('/profesor/:profesorId', notasController.getByProfesor);
+router.get('/:id', notasController.getById);
+router.post('/', notasController.create);
+router.put('/:id', notasController.update);
+router.delete('/:id', notasController.delete);
 
 module.exports = router;
