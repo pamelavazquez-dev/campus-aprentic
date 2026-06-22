@@ -1,0 +1,93 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ----------------------------------------------------------------------
+    // FUNCIONES AUXILIARES (Roles y Autenticación)
+    // ----------------------------------------------------------------------
+    function isAuth() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuth() && exists(/databases/$(database)/documents/admin/$(request.auth.uid));
+    }
+    
+    function isProfesor() {
+      return isAuth() && exists(/databases/$(database)/documents/profesor/$(request.auth.uid));
+    }
+    
+    function isAlumno() {
+      return isAuth() && exists(/databases/$(database)/documents/alumnos/$(request.auth.uid));
+    }
+
+    // ----------------------------------------------------------------------
+    // REGLAS POR DEFECTO
+    // Bloqueamos cualquier acceso a colecciones no definidas explícitamente
+    // ----------------------------------------------------------------------
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // ----------------------------------------------------------------------
+    // GESTIÓN DE USUARIOS
+    // ----------------------------------------------------------------------
+    match /admin/{userId} {
+      allow read, write: if isAdmin();
+    }
+    
+    match /profesor/{userId} {
+      allow read: if isAuth(); // Todos los logueados pueden ver a los profesores
+      allow write: if isAdmin(); // Solo admin puede crear profesores
+    }
+    
+    match /alumnos/{userId} {
+      // El alumno puede leer su propio perfil, admin y profes pueden ver a todos
+      allow read: if isAdmin() || isProfesor() || (isAuth() && request.auth.uid == userId);
+      // Solo admin puede dar de alta o borrar alumnos
+      allow write: if isAdmin(); 
+    }
+
+    // ----------------------------------------------------------------------
+    // ESTRUCTURA ACADÉMICA
+    // ----------------------------------------------------------------------
+    match /promociones/{promocionId} {
+      allow read: if isAuth(); // Todos pueden ver las promociones
+      allow write: if isAdmin(); // Solo admin crea promociones
+    }
+    
+    match /modulos/{moduloId} {
+      allow read: if isAuth();
+      allow write: if isAdmin() || isProfesor(); // Profesores pueden gestionar módulos
+    }
+    
+    match /lecciones/{leccionId} {
+      allow read: if isAuth();
+      allow write: if isAdmin() || isProfesor(); // Profesores pueden subir lecciones y PDFs
+    }
+    
+    match /inscripciones/{inscripcionId} {
+      // Idealmente el alumno solo vería las suyas, pero para el MVP simplificamos
+      allow read: if isAuth();
+      allow write: if isAdmin(); // Solo admin inscribe alumnos en promociones
+    }
+
+    // ----------------------------------------------------------------------
+    // PROGRESO Y PARTICIPACIÓN
+    // ----------------------------------------------------------------------
+    match /notas/{notaId} {
+      allow read: if isAuth();
+      allow write: if isAdmin() || isProfesor(); // Profesores ponen notas
+    }
+    
+    match /proyectos/{proyectoId} {
+      allow read: if isAuth();
+      allow write: if isAdmin() || isProfesor() || isAlumno(); // Alumnos suben su trabajo
+    }
+    
+    match /reviews/{reviewId} {
+      allow read: if isAuth();
+      allow write: if isAdmin() || isAlumno(); // Alumnos dejan valoraciones
+    }
+  }
+}
