@@ -19,8 +19,15 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Auth middleware
+const { verifyToken } = require('./middlewares/auth.middleware');
+
 // Register API routes
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes); // Pública
+
+// Proteger todas las rutas debajo de esta línea
+app.use(verifyToken);
+
 app.use('/api/alumnos', alumnosRoutes);
 app.use('/api/profesores', profesoresRoutes);
 app.use('/api/promociones', promocionesRoutes);
