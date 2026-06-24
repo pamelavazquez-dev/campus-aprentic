@@ -3,6 +3,7 @@ import { DataContext } from '../../context/DataContext';
 import { useNavigate } from 'react-router-dom';
 import ValoracionesTab from './ValoracionesTab';
 import DirectorioTab from './DirectorioTab';
+import Avatar from '../../components/ui/Avatar';
 
 export default function DashboardAdmin() {
   const { usuarios, equipo, promociones, modulos, loading } = useContext(DataContext);
@@ -11,13 +12,7 @@ export default function DashboardAdmin() {
 
   if (loading) return <div>Cargando panel...</div>;
 
-  // Helpers para generar iniciales
-  const getInitials = (name) => {
-    if (!name) return 'U';
-    const parts = name.split(' ');
-    if (parts.length > 1) return (parts[0][0] + parts[1][0]).toUpperCase();
-    return name.substring(0, 2).toUpperCase();
-  };
+  // Removed local getInitials as it is handled by Avatar component
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
@@ -120,9 +115,7 @@ export default function DashboardAdmin() {
                   
                   {/* Columna 1: Info del Usuario */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
-                    <div style={{ width: '36px', height: '36px', flexShrink: 0, background: 'linear-gradient(135deg, var(--gray100) 0%, var(--gray200) 100%)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-strong)', fontWeight: 'bold', fontSize: '13px', border: '1px solid var(--border)' }}>
-                      {getInitials(miembro.nombre || miembro.email || '')}
-                    </div>
+                    <Avatar src={miembro.avatar} name={miembro.nombre || miembro.email || ''} size="md" />
                     <div style={{ minWidth: 0 }}>
                       <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-strong)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{miembro.nombre || 'Usuario Sin Nombre'}</div>
                       <div style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{miembro.email || 'Sin email'}</div>

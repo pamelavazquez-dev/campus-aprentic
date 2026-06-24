@@ -1,5 +1,6 @@
 import { useContext, useMemo } from 'react';
 import { DataContext } from '../../context/DataContext';
+import Avatar from '../../components/ui/Avatar';
 
 export default function DirectorioTab() {
   const { usuarios, campuses, promociones, loading } = useContext(DataContext);
@@ -54,13 +55,7 @@ export default function DirectorioTab() {
     return Object.values(groups).filter(g => g.usuarios.length > 0 || g.campusInfo.id !== 'unassigned');
   }, [usuarios, campuses, promociones]);
 
-  // Helpers
-  const getInitials = (name) => {
-    if (!name) return 'U';
-    const parts = name.split(' ');
-    if (parts.length > 1) return (parts[0][0] + parts[1][0]).toUpperCase();
-    return name.substring(0, 2).toUpperCase();
-  };
+  // Removed local getInitials as it is handled by Avatar component
 
   return (
     <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
@@ -83,9 +78,7 @@ export default function DirectorioTab() {
             ) : (
               group.usuarios.map((u, i) => (
                 <div key={u.id || i} className="bg-surface backdrop-blur-lg border border-border-default rounded-xl p-4 flex items-center gap-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-pointer">
-                  <div style={{ width: '48px', height: '48px', flexShrink: 0, background: 'linear-gradient(135deg, var(--brand-primary) 0%, #1e3a8a 100%)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', fontSize: '16px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }}>
-                    {getInitials(u.nombre || u.email)}
-                  </div>
+                  <Avatar src={u.avatar} name={u.nombre || u.email} size="lg" />
                   <div style={{ minWidth: 0, flex: 1 }}>
                     <div style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-strong)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {u.nombre || 'Sin Nombre'}

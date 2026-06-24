@@ -2,6 +2,7 @@ import { signOut } from 'firebase/auth';
 import { auth } from '../config/firebase';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import Logo from '../components/Logo';
+import Avatar from '../components/ui/Avatar';
 
 export default function InstructorLayout({ user }) {
   const navigate = useNavigate();
@@ -16,14 +17,7 @@ export default function InstructorLayout({ user }) {
     navigate('/login');
   };
 
-  // Helpers para generar iniciales
-  const getInitials = (name) => {
-    if (!name) return 'U';
-    const parts = name.split(' ');
-    if (parts.length > 1) return (parts[0][0] + parts[1][0]).toUpperCase();
-    return name.substring(0, 2).toUpperCase();
-  };
-
+  // Removed local getInitials as it is handled by Avatar component
   const userName = user?.displayName || user?.email?.split('@')[0] || 'Instructor';
 
   return (
@@ -52,9 +46,7 @@ export default function InstructorLayout({ user }) {
 
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-3 bg-white/5 py-1.5 pr-4 pl-1.5 rounded-full border border-white/10">
-            <div className="w-8 h-8 bg-gradient-to-br from-brand-primary to-[#B01626] rounded-full flex items-center justify-center text-white font-bold text-xs">
-              {getInitials(userName)}
-            </div>
+            <Avatar src={user?.photoURL || user?.avatar} name={userName} size="sm" />
             <div className="flex flex-col">
               <span className="text-[13px] font-bold text-white leading-[1.2]">{userName}</span>
               <span className="text-[11px] font-semibold text-[#B9C0CA]">Instructor</span>

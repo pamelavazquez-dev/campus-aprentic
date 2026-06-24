@@ -14,7 +14,7 @@ export const campusConverter = {
       snapshot.id, 
       data.nombre || '', 
       data.sede || '',
-      data.coordinadores_id || '',
+      data.coordinadores_id || [],
       data.modulos_id || [],
       data.promociones_id || []
     );
