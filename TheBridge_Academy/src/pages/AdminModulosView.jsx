@@ -84,7 +84,7 @@ export default function AdminModulosView() {
       render: (modulo) => (
         <button
           type="button"
-          className="bg-transparent text-[#64748B] border-none py-2 px-4 rounded-md text-sm font-black cursor-pointer transition-colors duration-300 hover:bg-black/5 hover:text-brand-primary inline-flex items-center justify-center gap-2"
+          className="bg-surface-solid border border-border-default text-text-secondary py-2 px-4 rounded-xl text-sm font-bold cursor-pointer transition-colors duration-300 hover:bg-brand-primary/10 hover:border-brand-primary/30 hover:text-brand-primary inline-flex items-center justify-center gap-2 shadow-sm"
           onClick={() => {
             setSelectedModulo(modulo);
             setShowForm(true);

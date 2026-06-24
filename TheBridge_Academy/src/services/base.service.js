@@ -96,11 +96,8 @@ export const updateDoc = async (collectionName, id, data, converter = null) => {
   if (converter) docRef = docRef.withConverter(converter);
   
   const preparedData = converter ? data : prepareDocData(data);
-  if (converter) {
-    await setDoc(docRef, preparedData, { merge: true });
-  } else {
-    await firestoreUpdateDoc(docRef, preparedData);
-  }
+  // Always use setDoc with merge to avoid "No document to update" errors
+  await setDoc(docRef, preparedData, { merge: true });
   return { id, ...data };
 };
 

@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import { useState } from 'react';
 import { createPromocion } from '../../services/promociones.service';
 
@@ -24,7 +25,7 @@ export default function CrearPromocionForm({ onClose, onCreated }) {
       onClose();
     } catch (error) {
       console.error("Error al crear promoción", error);
-      alert("Error al guardar en base de datos. Comprueba los permisos o el .env");
+      toast.error("Error al guardar en base de datos. Comprueba los permisos o el .env");
     } finally {
       setLoading(false);
     }

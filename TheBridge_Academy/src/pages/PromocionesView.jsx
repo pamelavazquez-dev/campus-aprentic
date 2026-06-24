@@ -69,7 +69,7 @@ export default function PromocionesView() {
                   </div>
                   
                   <div className="flex gap-3">
-                    <button className="px-5 py-2.5 rounded-xl font-bold text-sm bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                    <button className="px-5 py-2.5 rounded-xl font-bold text-sm bg-surface-solid border border-border-default text-text-secondary hover:bg-surface hover:text-text-strong transition-colors shadow-sm">
                       Editar Sede
                     </button>
                     <button 
@@ -82,12 +82,12 @@ export default function PromocionesView() {
                 </div>
 
                 {/* Lista de Promociones */}
-                <div className="bg-gray-50/50 rounded-xl p-6 border border-gray-100">
+                <div className="bg-surface-solid/50 rounded-xl p-6 border border-border-default">
                   <h4 className="text-sm font-black text-text-secondary uppercase tracking-widest mb-4">Promociones Activas</h4>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {promosEnCampus.map((promo) => (
-                      <div key={promo.id} className="bg-white border border-border-default p-4 rounded-xl flex items-center justify-between group hover:border-brand-primary/30 transition-colors shadow-sm">
+                      <div key={promo.id} className="bg-surface-solid border border-border-default p-4 rounded-xl flex items-center justify-between group hover:border-brand-primary/30 transition-colors shadow-sm">
                         <div>
                           <div className="font-bold text-text-strong">{promo.nombre}</div>
                           <div className="text-xs text-text-secondary font-medium mt-0.5">
@@ -101,7 +101,7 @@ export default function PromocionesView() {
                     ))}
                     
                     {promosEnCampus.length === 0 && (
-                      <div className="col-span-full py-8 text-center border-2 border-dashed border-gray-200 rounded-xl">
+                      <div className="col-span-full py-8 text-center border-2 border-dashed border-border-default rounded-xl">
                         <p className="text-sm text-text-secondary font-medium">Esta sede no tiene promociones activas.</p>
                       </div>
                     )}

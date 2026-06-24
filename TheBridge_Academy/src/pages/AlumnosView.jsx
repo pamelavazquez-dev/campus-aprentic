@@ -5,10 +5,12 @@ import { createDoc, updateDoc } from '../services/base.service';
 import { doc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import Avatar from '../components/ui/Avatar';
+import toast from 'react-hot-toast';
 
 export default function UsuariosView() {
   const { usuarios, campuses, loading } = useContext(DataContext);
   const [showWizard, setShowWizard] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [step, setStep] = useState(1);
   const [usuario, setUsuario] = useState({ nombre: '', email: '', rol: 'Instructor', campus_id: '' });
   const [saving, setSaving] = useState(false);
@@ -52,7 +54,7 @@ export default function UsuariosView() {
       setShowWizard(false);
     } catch (error) {
       console.error("Error al crear usuario", error);
-      alert("Error al crear el usuario.");
+      toast.error("Error al crear el usuario.");
     } finally {
       setSaving(false);
     }
@@ -69,11 +71,58 @@ export default function UsuariosView() {
       await updateDoc('alumnos', selectedUser.id, { modulos_id: selectedUser.modulos_id });
       setShowMatricula(false);
       setSelectedUser(null);
-      // DataContext will auto-refresh if there is a listener, or we might need to rely on it
-      alert("Matrícula actualizada.");
+      toast.success("Matrícula actualizada.");
     } catch (e) {
       console.error(e);
-      alert("Error actualizando matrícula.");
+      toast.error("Error actualizando matrícula.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleToggleUserStatus = async (userToToggle) => {
+    setSaving(userToToggle.id);
+    try {
+      // Use the _collection field to always write to the correct Firestore collection
+      const collectionName = userToToggle._collection || 'alumnos';
+
+      await updateDoc(collectionName, userToToggle.id, { isActive: !userToToggle.isActive });
+      toast.success(`Usuario ${!userToToggle.isActive ? 'activado' : 'inactivado'} correctamente`);
+    } catch (error) {
+      console.error(error);
+      toast.error('Error al cambiar el estado del usuario');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleOpenEdit = (u) => {
+    setUsuario({
+      id: u.id,
+      nombre: u.nombre || '',
+      email: u.email || '',
+      rol: u.rol || 'Alumno',
+      campus_id: u.campus_id?.id || u.campus_id || campuses[0]?.id || '',
+      _collection: u._collection || 'alumnos'
+    });
+    setShowEditModal(true);
+  };
+
+  const handleUpdateUser = async () => {
+    setSaving(true);
+    try {
+      // Use the _collection field to always write to the correct Firestore collection
+      const collectionName = usuario._collection || 'alumnos';
+
+      await updateDoc(collectionName, usuario.id, {
+        nombre: usuario.nombre,
+        campus_id: doc(db, 'campus', usuario.campus_id),
+      });
+      toast.success('Usuario actualizado correctamente');
+      setShowEditModal(false);
+    } catch (error) {
+      console.error(error);
+      toast.error('Error al actualizar el usuario');
     } finally {
       setSaving(false);
     }
@@ -101,16 +150,16 @@ export default function UsuariosView() {
           title="Directorio de Usuarios"
           description="Gestiona todo el personal, instructores y alumnos de la academia."
           actions={(
-            <button className="bg-white text-brand-primary py-3 px-6 rounded-xl text-sm font-black transition-all duration-300 hover:-translate-y-0.5 shadow-[0_8px_16px_rgba(0,0,0,0.1)] inline-flex items-center justify-center gap-2 border-none cursor-pointer" type="button" onClick={() => setShowWizard(true)}>
+            <button className="bg-surface-solid text-brand-primary py-3 px-6 rounded-xl text-sm font-black transition-all duration-300 hover:-translate-y-0.5 shadow-[0_8px_16px_rgba(0,0,0,0.1)] inline-flex items-center justify-center gap-2 border-none cursor-pointer" type="button" onClick={() => setShowWizard(true)}>
               + Nuevo Usuario
             </button>
           )}
         />
 
-        <div className="flex flex-col sm:flex-row gap-4 mt-8 bg-white/50 backdrop-blur-md border border-gray-200/60 rounded-2xl p-4 shadow-sm">
+        <div className="flex flex-col sm:flex-row gap-4 mt-8 bg-surface backdrop-blur-md border border-gray-200/60 rounded-2xl p-4 shadow-sm">
           <div className="flex-1 flex flex-col gap-1">
             <label className="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Filtrar por Rol</label>
-            <select className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300 cursor-pointer" value={filterRol} onChange={e => setFilterRol(e.target.value)}>
+            <select className="w-full px-4 py-2.5 bg-surface-solid border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300 cursor-pointer" value={filterRol} onChange={e => setFilterRol(e.target.value)}>
               <option value="">Todos los roles</option>
               <option value="Administrador">Administrador</option>
               <option value="Instructor">Instructor</option>
@@ -119,7 +168,7 @@ export default function UsuariosView() {
           </div>
           <div className="flex-1 flex flex-col gap-1">
             <label className="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Filtrar por Campus</label>
-            <select className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300 cursor-pointer" value={filterCampus} onChange={e => setFilterCampus(e.target.value)}>
+            <select className="w-full px-4 py-2.5 bg-surface-solid border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300 cursor-pointer" value={filterCampus} onChange={e => setFilterCampus(e.target.value)}>
               <option value="">Todos los campus</option>
               {campuses.map(c => (
                 <option key={c.id} value={c.id}>{c.nombre || c.id}</option>
@@ -130,8 +179,8 @@ export default function UsuariosView() {
 
         <div className="flex flex-col gap-5 mt-6">
           {filteredUsuarios.length === 0 ? (
-            <div className="py-20 text-center bg-white/50 backdrop-blur-md rounded-3xl border border-gray-200/60 shadow-sm">
-              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
+            <div className="py-20 text-center bg-surface backdrop-blur-md rounded-3xl border border-gray-200/60 shadow-sm">
+              <div className="w-16 h-16 bg-surface-solid rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
                 <svg className="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
@@ -140,7 +189,7 @@ export default function UsuariosView() {
             </div>
           ) : (
             filteredUsuarios.map((u, i) => (
-              <div key={u.id || i} className="bg-white/70 backdrop-blur-xl border border-gray-200/60 rounded-3xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-400 hover:-translate-y-1.5 hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] flex flex-col md:flex-row items-center gap-6 relative overflow-hidden group">
+              <div key={u.id || i} className="bg-surface backdrop-blur-xl border border-gray-200/60 rounded-3xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-400 hover:-translate-y-1.5 hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] flex flex-col md:flex-row items-center gap-6 relative overflow-hidden group">
                 <div className="absolute top-0 left-0 w-1.5 h-full bg-brand-gradient opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 
                 <Avatar src={u.avatar} name={u.nombre || u.email} size="2xl" rounded="rounded-2xl" className="shadow-lg shadow-brand-primary/20 transform group-hover:scale-105 group-hover:rotate-3 transition-all duration-300" />
@@ -172,8 +221,19 @@ export default function UsuariosView() {
                         Matricular
                       </button>
                     )}
-                    <button className="bg-white text-gray-600 border border-gray-200 hover:border-gray-300 hover:bg-gray-50 py-2.5 px-5 rounded-xl text-sm font-bold transition-all cursor-pointer shadow-sm">
+                    <button 
+                      className="bg-surface-solid text-gray-600 border border-border-default hover:border-brand-primary/50 hover:bg-surface py-2.5 px-5 rounded-xl text-sm font-bold transition-all cursor-pointer shadow-sm"
+                      onClick={() => handleOpenEdit(u)}
+                    >
                       Editar
+                    </button>
+                    <button
+                      type="button"
+                      className={`py-2 px-4 rounded-xl text-sm font-bold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 border-none shadow-sm ${u.isActive ? 'bg-danger/10 text-danger hover:bg-danger hover:text-white' : 'bg-surface-solid border border-border-default text-gray-400 hover:bg-brand-primary/10 hover:text-brand-primary'}`}
+                      onClick={() => handleToggleUserStatus(u)}
+                      disabled={saving === u.id}
+                    >
+                      {saving === u.id ? '...' : u.isActive ? 'Inactivar' : 'Activar'}
                     </button>
                   </div>
                 </div>
@@ -200,7 +260,7 @@ export default function UsuariosView() {
                   const isCurrent = step === s;
                   return (
                     <div key={s} className="flex flex-col items-center gap-2">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-sm border-2 transition-colors duration-300 ${isActive ? (isCurrent ? 'bg-brand-primary border-brand-primary text-white shadow-md' : 'bg-white border-brand-primary text-brand-primary') : 'bg-white border-gray-200 text-gray-400'}`}>
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-sm border-2 transition-colors duration-300 ${isActive ? (isCurrent ? 'bg-brand-primary border-brand-primary text-white shadow-md' : 'bg-surface-solid border-brand-primary text-brand-primary') : 'bg-surface-solid border-gray-200 text-gray-400'}`}>
                         {s}
                       </div>
                       <span className={`text-xs font-bold transition-colors ${isActive ? 'text-text-strong' : 'text-gray-400'}`}>{label}</span>
@@ -215,14 +275,14 @@ export default function UsuariosView() {
                 <div className="flex flex-col gap-5 animate-fadeSlideDown">
                   <div className="flex flex-col gap-2">
                     <label className="text-sm font-bold text-text-strong">Nombre Completo</label>
-                    <input className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300" value={usuario.nombre} onChange={e => setUsuario({...usuario, nombre: e.target.value})} placeholder="Ej: Laura Ruiz" />
+                    <input className="w-full px-4 py-3 bg-surface-solid border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300" value={usuario.nombre} onChange={e => setUsuario({...usuario, nombre: e.target.value})} placeholder="Ej: Laura Ruiz" />
                   </div>
                   <div className="flex flex-col gap-2">
                     <label className="text-sm font-bold text-text-strong">Email corporativo</label>
-                    <input className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300" type="email" value={usuario.email} onChange={e => setUsuario({...usuario, email: e.target.value})} placeholder="l.ruiz@academy.com" />
+                    <input className="w-full px-4 py-3 bg-surface-solid border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300" type="email" value={usuario.email} onChange={e => setUsuario({...usuario, email: e.target.value})} placeholder="l.ruiz@academy.com" />
                   </div>
                   <div className="flex gap-4 mt-4 pt-4 border-t border-gray-100">
-                    <button className="flex-1 bg-white border-2 border-gray-200 text-gray-600 py-3 rounded-xl text-sm font-bold transition-all hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 cursor-pointer shadow-sm" onClick={() => { setShowWizard(false); setStep(1); }}>Cancelar</button>
+                    <button className="flex-1 bg-surface-solid border-2 border-gray-200 text-gray-600 py-3 rounded-xl text-sm font-bold transition-all hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 cursor-pointer shadow-sm" onClick={() => { setShowWizard(false); setStep(1); }}>Cancelar</button>
                     <button className="flex-1 bg-brand-gradient text-white py-3 rounded-xl text-sm font-bold transition-all hover:shadow-lg hover:-translate-y-0.5 border-none cursor-pointer" onClick={() => setStep(2)}>
                       Siguiente
                     </button>
@@ -234,7 +294,7 @@ export default function UsuariosView() {
                 <div className="flex flex-col gap-5 animate-fadeSlideDown">
                   <div className="flex flex-col gap-2">
                     <label className="text-sm font-bold text-text-strong">Rol en la Plataforma</label>
-                    <select className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300 cursor-pointer" value={usuario.rol} onChange={e => setUsuario({...usuario, rol: e.target.value})}>
+                    <select className="w-full px-4 py-3 bg-surface-solid border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300 cursor-pointer" value={usuario.rol} onChange={e => setUsuario({...usuario, rol: e.target.value})}>
                       <option>Instructor</option>
                       <option>Alumno</option>
                       <option>Administrador</option>
@@ -242,14 +302,14 @@ export default function UsuariosView() {
                   </div>
                   <div className="flex flex-col gap-2">
                     <label className="text-sm font-bold text-text-strong">Campus Asignado</label>
-                    <select className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300 cursor-pointer" value={usuario.campus_id} onChange={e => setUsuario({...usuario, campus_id: e.target.value})}>
+                    <select className="w-full px-4 py-3 bg-surface-solid border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300 cursor-pointer" value={usuario.campus_id} onChange={e => setUsuario({...usuario, campus_id: e.target.value})}>
                       {campuses.map(c => (
                         <option key={c.id} value={c.id}>{c.nombre || c.id}</option>
                       ))}
                     </select>
                   </div>
                   <div className="flex gap-4 mt-4 pt-4 border-t border-gray-100">
-                    <button className="flex-1 bg-white border-2 border-gray-200 text-gray-600 py-3 rounded-xl text-sm font-bold transition-all hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 cursor-pointer shadow-sm" onClick={() => setStep(1)}>Atrás</button>
+                    <button className="flex-1 bg-surface-solid border-2 border-gray-200 text-gray-600 py-3 rounded-xl text-sm font-bold transition-all hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 cursor-pointer shadow-sm" onClick={() => setStep(1)}>Atrás</button>
                     <button className="flex-1 bg-brand-gradient text-white py-3 rounded-xl text-sm font-bold transition-all hover:shadow-lg hover:-translate-y-0.5 border-none cursor-pointer" onClick={() => setStep(3)}>Siguiente</button>
                   </div>
                 </div>
@@ -276,7 +336,7 @@ export default function UsuariosView() {
                     </div>
                   </div>
                   <div className="flex gap-4 mt-2">
-                    <button className="flex-1 bg-white border-2 border-gray-200 text-gray-600 py-3 rounded-xl text-sm font-bold transition-all hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 cursor-pointer shadow-sm" disabled={saving} onClick={() => setStep(2)}>Atrás</button>
+                    <button className="flex-1 bg-surface-solid border-2 border-gray-200 text-gray-600 py-3 rounded-xl text-sm font-bold transition-all hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 cursor-pointer shadow-sm" disabled={saving} onClick={() => setStep(2)}>Atrás</button>
                     <button className="flex-[2] bg-brand-gradient text-white py-3 rounded-xl text-sm font-bold transition-all hover:shadow-lg hover:-translate-y-0.5 border-none cursor-pointer disabled:opacity-50" disabled={saving} onClick={handleSaveUser}>
                       {saving ? 'Guardando...' : 'Confirmar y Crear'}
                     </button>
@@ -293,11 +353,11 @@ export default function UsuariosView() {
           <div className="bg-surface border border-border-default rounded-3xl w-full max-w-lg shadow-2xl transform transition-all duration-400 overflow-hidden">
             <div className="px-8 py-6 border-b border-border-default bg-gray-50/50 flex justify-between items-center">
               <h3 className="m-0 text-xl font-black text-text-strong">Matricular Alumno</h3>
-              <button className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-text-secondary hover:bg-red-50 hover:text-brand-primary transition-colors border-none cursor-pointer" onClick={() => setShowMatricula(false)}>✕</button>
+              <button className="w-8 h-8 rounded-full bg-surface flex items-center justify-center text-text-secondary hover:bg-danger/10 hover:text-brand-primary transition-colors border-none cursor-pointer" onClick={() => setShowMatricula(false)}>✕</button>
             </div>
             
             <div className="p-8 flex flex-col gap-6">
-              <p className="m-0 text-sm font-medium text-gray-500">
+              <p className="m-0 text-sm font-medium text-text-secondary">
                 Selecciona los módulos a los que <strong className="text-brand-primary">{selectedUser.nombre || selectedUser.email}</strong> tendrá acceso.
               </p>
               
@@ -305,7 +365,7 @@ export default function UsuariosView() {
                 {modulos.filter(m => m.activo !== false).map(m => {
                   const isSelected = selectedUser.modulos_id.includes(m.id);
                   return (
-                    <label key={m.id} className={`flex items-center gap-4 p-4 border rounded-2xl cursor-pointer transition-all duration-200 ${isSelected ? 'bg-red-50/50 border-brand-primary shadow-sm' : 'bg-white border-gray-200 hover:border-gray-300'}`}>
+                    <label key={m.id} className={`flex items-center gap-4 p-4 border rounded-2xl cursor-pointer transition-all duration-200 ${isSelected ? 'bg-danger/5 border-brand-primary shadow-sm' : 'bg-surface-solid border-border-default hover:border-gray-300'}`}>
                       <div className="relative flex items-center">
                         <input 
                           type="checkbox" 
@@ -316,7 +376,7 @@ export default function UsuariosView() {
                               : selectedUser.modulos_id.filter(id => id !== m.id);
                             setSelectedUser({ ...selectedUser, modulos_id: newMods });
                           }}
-                          className={`w-5 h-5 rounded border-2 appearance-none cursor-pointer transition-colors ${isSelected ? 'bg-brand-primary border-brand-primary' : 'bg-white border-gray-300'}`}
+                          className={`w-5 h-5 rounded border-2 appearance-none cursor-pointer transition-colors ${isSelected ? 'bg-brand-primary border-brand-primary' : 'bg-surface-solid border-border-default'}`}
                         />
                         {isSelected && (
                           <svg className="absolute w-3 h-3 text-white left-1 top-1 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
@@ -330,12 +390,51 @@ export default function UsuariosView() {
                 })}
               </div>
 
-              <div className="flex gap-3 pt-4 border-t border-gray-100">
-                <button className="flex-1 bg-gray-100 text-gray-600 py-3 rounded-xl text-sm font-bold transition-colors hover:bg-gray-200 border-none cursor-pointer" disabled={saving} onClick={() => setShowMatricula(false)}>
+              <div className="flex gap-3 pt-4 border-t border-border-default">
+                <button className="flex-1 bg-surface text-text-secondary py-3 rounded-xl text-sm font-bold transition-colors hover:bg-gray-200 border-none cursor-pointer" disabled={saving} onClick={() => setShowMatricula(false)}>
                   Cancelar
                 </button>
                 <button className="flex-[2] bg-brand-gradient text-white py-3 rounded-xl text-sm font-bold transition-all hover:shadow-lg hover:-translate-y-0.5 border-none cursor-pointer disabled:opacity-50" disabled={saving} onClick={handleSaveMatricula}>
                   {saving ? 'Guardando...' : 'Guardar Matrícula'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showEditModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-surface border border-border-default rounded-3xl w-full max-w-lg shadow-2xl transform transition-all duration-400 overflow-hidden">
+            <div className="px-8 py-6 border-b border-border-default bg-gray-50/50 flex justify-between items-center">
+              <h3 className="m-0 text-xl font-black text-text-strong">Editar Usuario</h3>
+              <button className="w-8 h-8 rounded-full bg-surface flex items-center justify-center text-text-secondary hover:bg-danger/10 hover:text-brand-primary transition-colors border-none cursor-pointer" onClick={() => setShowEditModal(false)}>✕</button>
+            </div>
+            <div className="p-8 flex flex-col gap-5">
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-bold text-text-strong">Nombre Completo</label>
+                <input className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10" value={usuario.nombre} onChange={e => setUsuario({...usuario, nombre: e.target.value})} placeholder="Ej: Laura Ruiz" />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-bold text-text-strong">Email corporativo</label>
+                <input className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-xl text-sm text-text-strong transition-all duration-200 outline-none opacity-60 cursor-not-allowed" type="email" value={usuario.email} disabled title="El email no se puede editar" />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-bold text-text-strong">Rol</label>
+                <input className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-xl text-sm text-text-strong transition-all duration-200 outline-none opacity-60 cursor-not-allowed" value={usuario.rol} disabled title="El rol no se puede cambiar. Inactiva el usuario y crea uno nuevo." />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-bold text-text-strong">Campus Asignado</label>
+                <select className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 cursor-pointer" value={usuario.campus_id} onChange={e => setUsuario({...usuario, campus_id: e.target.value})}>
+                  {campuses.map(c => (
+                    <option key={c.id} value={c.id}>{c.nombre || c.id}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex gap-4 mt-4 pt-4 border-t border-border-default">
+                <button className="flex-1 bg-surface-solid border-2 border-border-default text-text-secondary py-3 rounded-xl text-sm font-bold transition-all hover:bg-surface hover:text-text-strong cursor-pointer shadow-sm" onClick={() => setShowEditModal(false)}>Cancelar</button>
+                <button className="flex-1 bg-brand-gradient text-white py-3 rounded-xl text-sm font-bold transition-all hover:shadow-lg hover:-translate-y-0.5 border-none cursor-pointer disabled:opacity-50" disabled={saving} onClick={handleUpdateUser}>
+                  {saving ? 'Guardando...' : 'Guardar Cambios'}
                 </button>
               </div>
             </div>

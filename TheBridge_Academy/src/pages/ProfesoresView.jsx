@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import { useEffect, useState } from 'react';
 import CrearProfesorForm from '../components/forms/CrearProfesorForm';
 import Badge from '../components/ui/Badge';
@@ -64,7 +65,7 @@ export default function ProfesoresView() {
       )));
     } catch (error) {
       console.error('Error actualizando estado del profesor', error.code || error.name, error.message, error);
-      alert(`No se pudo cambiar el estado del profesor. ${error.code || error.message || ''}`);
+      toast.error(`No se pudo cambiar el estado del profesor. ${error.code || error.message || ''}`);
     } finally {
       setSavingProfesorId('');
     }

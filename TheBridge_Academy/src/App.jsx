@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import { ThemeProvider } from './context/ThemeContext';
+import { Toaster } from 'react-hot-toast';
 
 // Componentes
 import Login from './components/Login';
@@ -42,6 +43,32 @@ function App() {
 
   return (
     <ThemeProvider>
+      <Toaster 
+        position="top-right" 
+        toastOptions={{
+          style: {
+            background: 'var(--surface-solid)',
+            color: 'var(--text-strong)',
+            border: '1px solid var(--border-default)',
+            borderRadius: '12px',
+            boxShadow: '0 10px 24px rgba(0,0,0,0.1)',
+            fontWeight: 600,
+            fontSize: '14px',
+          },
+          success: {
+            iconTheme: {
+              primary: '#10B981',
+              secondary: 'white',
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: '#EF4444',
+              secondary: 'white',
+            },
+          },
+        }}
+      />
       <BrowserRouter>
       <Routes>
         <Route path="/login" element={!user ? <Login /> : <Navigate to={`/${role || 'login'}`} replace />} />

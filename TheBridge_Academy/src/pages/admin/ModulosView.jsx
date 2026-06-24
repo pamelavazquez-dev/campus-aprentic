@@ -55,7 +55,7 @@ export default function ModulosView() {
           <h2 style={{ fontSize: '32px', fontWeight: 900, marginBottom: '8px', color: 'white' }}>Gestión de Módulos</h2>
           <p style={{ margin: 0, color: '#B9C0CA' }}>Control global de todos los cursos, asignación de profesores y temarios.</p>
         </div>
-        <button className="bg-white text-brand-primary py-3 px-6 rounded-lg text-sm font-black transition-all duration-300 hover:-translate-y-0.5 shadow-glow inline-flex items-center justify-center gap-2 border-none cursor-pointer" style={{ width: 'auto', boxShadow: '0 8px 16px rgba(0,0,0,0.1)' }} onClick={() => navigate('/admin/modulos/nuevo')}>
+        <button className="bg-surface-solid text-brand-primary py-3 px-6 rounded-lg text-sm font-black transition-all duration-300 hover:-translate-y-0.5 shadow-glow inline-flex items-center justify-center gap-2 border-none cursor-pointer" style={{ width: 'auto', boxShadow: '0 8px 16px rgba(0,0,0,0.1)' }} onClick={() => navigate('/admin/modulos/nuevo')}>
           + Nuevo Módulo
         </button>
       </div>
@@ -73,7 +73,7 @@ export default function ModulosView() {
         </div>
       )}
 
-      <div className="w-full overflow-x-auto bg-white rounded-xl shadow-sm border border-border-default">
+      <div className="w-full overflow-x-auto bg-surface-solid rounded-xl shadow-sm border border-border-default">
         {loading ? (
           <div style={{ padding: '32px', textAlign: 'center' }}>Cargando módulos...</div>
         ) : (
@@ -103,7 +103,7 @@ export default function ModulosView() {
                       {asignando === mod.id ? (
                         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                           <select
-                            className="w-full px-4 py-3 bg-white border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
+                            className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
                             defaultValue={mod.profesor_id || ''}
                             onChange={e => handleAsignar(mod.id, e.target.value)}
                             style={{ padding: '6px 10px', fontSize: '13px', minWidth: '180px' }}

@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import { useState, useEffect, useContext } from 'react';
 import { DataContext } from '../../context/DataContext';
 import { getAllNotas, createNota, updateNota } from '../../services/notas.service';
@@ -68,7 +69,7 @@ export default function CalificacionesView() {
       setShowModal(false);
     } catch (e) {
       console.error(e);
-      alert("Error al guardar la nota");
+      toast.error("Error al guardar la nota");
     } finally {
       setSaving(false);
     }
@@ -88,7 +89,7 @@ export default function CalificacionesView() {
           Seleccionar Módulo
         </label>
         <select
-          className="w-full px-4 py-3 bg-white border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
+          className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
           value={selectedModulo}
           onChange={e => setSelectedModulo(e.target.value)}
           style={{ fontSize: '15px', fontWeight: 600, padding: '12px 16px', width: '100%', maxWidth: '400px' }}
@@ -145,7 +146,7 @@ export default function CalificacionesView() {
           <div className="bg-surface rounded-2xl w-full max-w-lg shadow-2xl animate-fade-in flex flex-col max-h-[90vh]" style={{ maxWidth: '500px', width: '100%' }}>
             <div className="p-6 border-b border-border-default flex justify-between items-center bg-gray150/50 rounded-t-2xl">
               <h3 style={{ fontSize: '24px', fontWeight: 900, color: 'var(--text-strong)' }}>Calificar Alumno</h3>
-              <button className="bg-transparent text-[#94A3B8] border-none p-2 rounded-lg cursor-pointer transition-colors duration-200 flex items-center justify-center hover:bg-white hover:text-brand-primary" onClick={() => setShowModal(false)}>✕</button>
+              <button className="bg-transparent text-[#94A3B8] border-none p-2 rounded-lg cursor-pointer transition-colors duration-200 flex items-center justify-center hover:bg-surface-solid hover:text-brand-primary" onClick={() => setShowModal(false)}>✕</button>
             </div>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', margin: '24px 0' }}>
@@ -154,7 +155,7 @@ export default function CalificacionesView() {
                 <input 
                   type="number" 
                   min="0" max="10" step="0.1"
-                  className="w-full px-4 py-3 bg-white border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]" 
+                  className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]" 
                   style={{ width: '100%', padding: '12px' }}
                   value={notaForm.valor} 
                   onChange={e => setNotaForm({...notaForm, valor: e.target.value})} 
@@ -163,7 +164,7 @@ export default function CalificacionesView() {
               <div>
                 <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Comentario / Feedback</label>
                 <textarea 
-                  className="w-full px-4 py-3 bg-white border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]" 
+                  className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]" 
                   style={{ width: '100%', padding: '12px', minHeight: '100px', resize: 'vertical' }}
                   value={notaForm.comentario} 
                   onChange={e => setNotaForm({...notaForm, comentario: e.target.value})}
