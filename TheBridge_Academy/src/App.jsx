@@ -1,23 +1,35 @@
-import { useState, useEffect } from 'react';
-import { auth } from './config/firebase';
-import { onAuthStateChanged } from 'firebase/auth';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './hooks/useAuth';
+
+// Componentes
 import Login from './components/Login';
-import AdminLayout from './components/layout/AdminLayout';
+import ProtectedRoute from './layouts/ProtectedRoute';
+
+// Layouts
+import AdminLayout from './layouts/AdminLayout';
+import InstructorLayout from './layouts/InstructorLayout';
+import AlumnoLayout from './layouts/AlumnoLayout';
+
+// Páginas actuales de admin
 import PromocionesView from './pages/PromocionesView';
 import AlumnosView from './pages/AlumnosView';
 
-function App() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [currentView, setCurrentView] = useState('promociones');
+import DashboardAdmin from './pages/admin/DashboardAdmin';
+import InstructorDashboard from './pages/instructor/InstructorDashboard';
+import WizardCurso from './pages/instructor/WizardCurso';
+import AlumnoDashboard from './pages/alumno/AlumnoDashboard';
+import VisorLeccion from './pages/alumno/VisorLeccion';
+import InscripcionesView from './pages/admin/InscripcionesView';
+import CalificacionesView from './pages/instructor/CalificacionesView';
+import MisNotasView from './pages/alumno/MisNotasView';
+import AdminModulosView from './pages/AdminModulosView';
+import ProfesoresView from './pages/ProfesoresView';
+import LeccionesView from './pages/LeccionesView';
+import ModulosView from './pages/ModulosView';
+import { DataProvider } from './context/DataContext';
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setLoading(false);
-    });
-    return () => unsubscribe();
-  }, []);
+function App() {
+  const { user, role, loading } = useAuth();
 
   if (loading) {
     return (
@@ -27,25 +39,57 @@ function App() {
     );
   }
 
-  // Si no está logueado, muestra el login
-  if (!user) {
-    return <Login />;
-  }
-
-  // Router simple:
-  const renderView = () => {
-    switch(currentView) {
-      case 'promociones': return <PromocionesView />;
-      case 'alumnos': return <AlumnosView />;
-      case 'profesores': return <div style={{padding: '48px', textAlign: 'center'}}>Módulo Profesores próximamente</div>;
-      default: return <PromocionesView />;
-    }
-  };
-
   return (
-    <AdminLayout user={user} currentView={currentView} setCurrentView={setCurrentView}>
-      {renderView()}
-    </AdminLayout>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={!user ? <Login /> : <Navigate to={`/${role || 'login'}`} replace />} />
+        
+        {/* Rutas de Administrador */}
+        <Route path="/admin/*" element={
+          <ProtectedRoute user={user} role={role} requiredRole="admin">
+            <DataProvider>
+              <AdminLayout user={user} />
+            </DataProvider>
+          </ProtectedRoute>
+        }>
+          <Route index element={<DashboardAdmin />} />
+          <Route path="usuarios" element={<AlumnosView />} />
+          <Route path="profesores" element={<ProfesoresView />} />
+          <Route path="campus" element={<PromocionesView />} />
+          <Route path="modulos" element={<AdminModulosView />} />
+          <Route path="inscripciones" element={<InscripcionesView />} />
+          <Route path="modulos/nuevo" element={<WizardCurso isAdmin={true} />} />
+          <Route path="modulos/ver/:id" element={<VisorLeccion isAdmin={true} />} />
+        </Route>
+
+        {/* Rutas de Instructor */}
+        <Route path="/instructor/*" element={
+          <ProtectedRoute user={user} role={role} requiredRole="instructor">
+            <InstructorLayout user={user} />
+          </ProtectedRoute>
+        }>
+          <Route index element={<InstructorDashboard />} />
+          <Route path="wizard" element={<WizardCurso />} />
+          <Route path="lecciones" element={<LeccionesView />} />
+          <Route path="modulos" element={<ModulosView />} />
+          <Route path="notas" element={<CalificacionesView />} />
+        </Route>
+
+        {/* Rutas de Alumno */}
+        <Route path="/alumno/*" element={
+          <ProtectedRoute user={user} role={role} requiredRole="alumno">
+            <AlumnoLayout user={user} />
+          </ProtectedRoute>
+        }>
+          <Route index element={<AlumnoDashboard />} />
+          <Route path="visor/:id?" element={<VisorLeccion />} />
+          <Route path="notas" element={<MisNotasView />} />
+        </Route>
+
+        {/* Redirección por defecto */}
+        <Route path="*" element={<Navigate to={user ? `/${role}` : "/login"} replace />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 

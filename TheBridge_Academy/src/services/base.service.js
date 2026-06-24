@@ -1,5 +1,6 @@
 import { db } from '../config/firebase';
 import { 
+  addDoc,
   collection, 
   doc, 
   getDoc as firestoreGetDoc, 
@@ -73,12 +74,21 @@ export const getAll = async (collectionName, converter = null) => {
 };
 
 export const createDoc = async (collectionName, id, data, converter = null) => {
+  if (!id) {
+    let collRef = collection(db, collectionName);
+    if (converter) collRef = collRef.withConverter(converter);
+
+    const preparedData = converter ? data : prepareDocData(data);
+    const docRef = await addDoc(collRef, preparedData);
+    return { ...data, id: docRef.id };
+  }
+
   let docRef = doc(db, collectionName, id);
   if (converter) docRef = docRef.withConverter(converter);
   
   const preparedData = converter ? data : prepareDocData(data);
   await setDoc(docRef, preparedData);
-  return { id, ...data }; // Retornamos los datos para feedback
+  return { ...data, id }; // Retornamos los datos para feedback
 };
 
 export const updateDoc = async (collectionName, id, data, converter = null) => {
@@ -86,7 +96,11 @@ export const updateDoc = async (collectionName, id, data, converter = null) => {
   if (converter) docRef = docRef.withConverter(converter);
   
   const preparedData = converter ? data : prepareDocData(data);
-  await firestoreUpdateDoc(docRef, preparedData);
+  if (converter) {
+    await setDoc(docRef, preparedData, { merge: true });
+  } else {
+    await firestoreUpdateDoc(docRef, preparedData);
+  }
   return { id, ...data };
 };
 

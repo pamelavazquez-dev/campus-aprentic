@@ -1,0 +1,26 @@
+import { Nota } from '../models/Nota.model.js';
+
+export const notaConverter = {
+  toFirestore: (nota) => ({
+    proyectoId: nota.proyectoId,
+    alumnoId: nota.alumnoId,
+    profesorId: nota.profesorId,
+    valor: nota.valor,
+    comentario: nota.comentario,
+    creadoEn: nota.creadoEn,
+    actualizadoEn: nota.actualizadoEn
+  }),
+  fromFirestore: (snapshot, options) => {
+    const data = snapshot.data(options);
+    return new Nota(
+      snapshot.id,
+      data.proyectoId || '',
+      data.alumnoId || '',
+      data.profesorId || '',
+      data.valor || 0,
+      data.comentario || '',
+      data.creadoEn || new Date().toISOString(),
+      data.actualizadoEn || new Date().toISOString()
+    );
+  }
+};

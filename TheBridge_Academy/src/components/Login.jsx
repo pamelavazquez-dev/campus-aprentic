@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { auth } from '../config/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import Logo from './Logo';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -16,51 +17,58 @@ export default function Login() {
       await signInWithEmailAndPassword(auth, email, password);
     } catch (err) {
       console.error(err);
-      setError('Credenciales incorrectas o error de red.');
+      if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found') {
+        setError('El usuario no existe o la contraseña es incorrecta.');
+      } else {
+        setError('Error de red o configuración de Firebase.');
+      }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="glass-card" style={{ maxWidth: '400px', margin: '0 auto' }}>
-      <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-        <svg className="icon" style={{ width: '48px', height: '48px', marginBottom: '1rem' }} role="presentation">
-          <use href="/icons.svg#documentation-icon"></use>
-        </svg>
-        <h2>Acceso Plataforma</h2>
-        <p>Inicia sesión para continuar</p>
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-surface-solid p-6">
+      <div className="bg-surface backdrop-blur-lg border border-border-default rounded-xl max-w-[420px] w-full p-12 shadow-md hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-fade-in">
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-6">
+            <Logo size="xl" />
+          </div>
+          <p className="text-text-secondary text-[15px] m-0">Acceso a la plataforma educativa</p>
+        </div>
 
-      {error && <div style={{ color: 'var(--danger600)', background: 'var(--brand-soft)', padding: '10px', borderRadius: 'var(--radius-md)', marginBottom: '1rem', fontSize: '14px', border: '1px solid var(--danger600)' }}>{error}</div>}
+        {error && <div className="text-danger bg-danger/10 p-3 rounded-md mb-6 text-sm border border-danger/20 text-center font-medium">{error}</div>}
 
-      <form onSubmit={handleLogin}>
-        <div className="input-group">
-          <label>Email</label>
+      <form onSubmit={handleLogin} className="mb-6">
+        <div className="mb-6 text-left">
+          <label className="block mb-2 text-sm font-semibold text-text-primary">Email</label>
           <input 
             type="email" 
-            className="glass-input" 
+            className="w-full p-[14px] bg-surface-solid border border-border-default rounded-md text-text-strong text-sm font-semibold transition-all duration-300 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] focus:outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 focus:-translate-y-[1px]" 
             value={email} 
             onChange={(e) => setEmail(e.target.value)} 
             required 
-            placeholder="admin@aprentic.com"
+            placeholder="usuario@demo.com"
           />
         </div>
-        <div className="input-group">
-          <label>Contraseña</label>
+        <div className="mb-6 text-left">
+          <label className="block mb-2 text-sm font-semibold text-text-primary">Contraseña</label>
           <input 
             type="password" 
-            className="glass-input" 
+            className="w-full p-[14px] bg-surface-solid border border-border-default rounded-md text-text-strong text-sm font-semibold transition-all duration-300 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] focus:outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 focus:-translate-y-[1px]" 
             value={password} 
             onChange={(e) => setPassword(e.target.value)} 
             required 
             placeholder="••••••••"
           />
         </div>
-        <button type="submit" className="btn-primary" disabled={loading}>
-          {loading ? 'Verificando...' : 'Entrar al Dashboard'}
+        <button type="submit" className="w-full bg-brand-gradient text-white border-none py-[14px] px-6 rounded-md text-sm font-black cursor-pointer transition-all duration-300 flex justify-center items-center gap-2 shadow-glow relative overflow-hidden hover:-translate-y-0.5 hover:shadow-[0px_16px_32px_rgba(255,48,69,0.4)] active:translate-y-[1px] disabled:bg-gray300 disabled:shadow-none disabled:text-gray500 disabled:cursor-not-allowed disabled:transform-none" disabled={loading}>
+          {loading ? 'Verificando...' : 'Iniciar Sesión'}
         </button>
       </form>
+
+
+    </div>
     </div>
   );
 }
