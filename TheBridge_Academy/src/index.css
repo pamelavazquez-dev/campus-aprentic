@@ -20,6 +20,9 @@
   --color-text-secondary: var(--text-secondary);
   --color-border-default: var(--border-default);
 
+  --background-image-brand-gradient: var(--brand-gradient);
+  --background-image-ink-gradient: var(--ink-gradient);
+
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius-md);
   --radius-lg: var(--radius-lg);
@@ -97,6 +100,10 @@
   /* Ajustar sombras para dark mode (más sutiles oscuras) */
   --shadow-md: 0px 22px 40px rgba(0, 0, 0, 0.4);
   --shadow-sm: 0px 10px 24px rgba(0, 0, 0, 0.3);
+}
+
+.dark .logo-image {
+  filter: invert(1) hue-rotate(180deg);
 }
 
 body, html {

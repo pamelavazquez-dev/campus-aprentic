@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { auth } from '../config/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import Logo from './Logo';
+import ThemeToggle from './ui/ThemeToggle';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -20,7 +21,7 @@ export default function Login() {
       if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found') {
         setError('El usuario no existe o la contraseña es incorrecta.');
       } else {
-        setError('Error de red o configuración de Firebase.');
+        setError('Error al conectar con la plataforma.');
       }
     } finally {
       setLoading(false);
@@ -28,47 +29,94 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-surface-solid p-6">
-      <div className="bg-surface backdrop-blur-lg border border-border-default rounded-xl max-w-[420px] w-full p-12 shadow-md hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-fade-in">
-        <div className="text-center mb-8">
-          <div className="flex justify-center mb-6">
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-canvas">
+      
+      {/* Background Decorators */}
+      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-brand-primary/10 blur-[120px] rounded-full pointer-events-none mix-blend-multiply dark:mix-blend-screen transition-all duration-1000"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-info/10 blur-[120px] rounded-full pointer-events-none mix-blend-multiply dark:mix-blend-screen transition-all duration-1000"></div>
+
+      {/* Theme Toggle Navbar */}
+      <div className="absolute top-6 right-6 z-20">
+        <ThemeToggle variant="adaptive" />
+      </div>
+
+      <div className="bg-surface backdrop-blur-2xl border border-border-default rounded-3xl max-w-[440px] w-[90%] p-10 sm:p-12 shadow-xl hover:shadow-2xl transition-all duration-500 animate-fade-in relative z-10">
+        
+        <div className="text-center mb-10 flex flex-col items-center">
+          <div className="flex justify-center mb-6 transform hover:scale-105 transition-transform duration-500">
             <Logo size="xl" />
           </div>
-          <p className="text-text-secondary text-[15px] m-0">Acceso a la plataforma educativa</p>
+          <h2 className="text-2xl font-black text-text-strong mb-2 tracking-tight">Bienvenido de nuevo</h2>
+          <p className="text-text-secondary text-[15px] font-medium">Accede a tu plataforma educativa</p>
         </div>
 
-        {error && <div className="text-danger bg-danger/10 p-3 rounded-md mb-6 text-sm border border-danger/20 text-center font-medium">{error}</div>}
+        {error && (
+          <div className="animate-fade-in flex items-center gap-3 text-danger bg-danger/10 p-4 rounded-xl mb-6 text-sm border border-danger/20 font-semibold shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            <p>{error}</p>
+          </div>
+        )}
 
-      <form onSubmit={handleLogin} className="mb-6">
-        <div className="mb-6 text-left">
-          <label className="block mb-2 text-sm font-semibold text-text-primary">Email</label>
-          <input 
-            type="email" 
-            className="w-full p-[14px] bg-surface-solid border border-border-default rounded-md text-text-strong text-sm font-semibold transition-all duration-300 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] focus:outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 focus:-translate-y-[1px]" 
-            value={email} 
-            onChange={(e) => setEmail(e.target.value)} 
-            required 
-            placeholder="usuario@demo.com"
-          />
-        </div>
-        <div className="mb-6 text-left">
-          <label className="block mb-2 text-sm font-semibold text-text-primary">Contraseña</label>
-          <input 
-            type="password" 
-            className="w-full p-[14px] bg-surface-solid border border-border-default rounded-md text-text-strong text-sm font-semibold transition-all duration-300 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] focus:outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 focus:-translate-y-[1px]" 
-            value={password} 
-            onChange={(e) => setPassword(e.target.value)} 
-            required 
-            placeholder="••••••••"
-          />
-        </div>
-        <button type="submit" className="w-full bg-brand-gradient text-white border-none py-[14px] px-6 rounded-md text-sm font-black cursor-pointer transition-all duration-300 flex justify-center items-center gap-2 shadow-glow relative overflow-hidden hover:-translate-y-0.5 hover:shadow-[0px_16px_32px_rgba(255,48,69,0.4)] active:translate-y-[1px] disabled:bg-gray300 disabled:shadow-none disabled:text-gray500 disabled:cursor-not-allowed disabled:transform-none" disabled={loading}>
-          {loading ? 'Verificando...' : 'Iniciar Sesión'}
-        </button>
-      </form>
+        <form onSubmit={handleLogin} className="space-y-5">
+          <div className="space-y-2 text-left group">
+            <label className="block text-sm font-bold text-text-strong group-focus-within:text-brand-primary transition-colors">Correo electrónico</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-text-secondary group-focus-within:text-brand-primary transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><path d="m2 4 10 8 10-8"></path></svg>
+              </div>
+              <input 
+                type="email" 
+                className="w-full pl-11 pr-4 py-3.5 bg-canvas border border-border-default rounded-xl text-text-strong text-[15px] font-semibold transition-all duration-300 focus:outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 focus:-translate-y-[2px] shadow-sm" 
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)} 
+                required 
+                placeholder="usuario@thebridge.tech"
+              />
+            </div>
+          </div>
+          
+          <div className="space-y-2 text-left group">
+            <label className="block text-sm font-bold text-text-strong group-focus-within:text-brand-primary transition-colors">Contraseña</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-text-secondary group-focus-within:text-brand-primary transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              </div>
+              <input 
+                type="password" 
+                className="w-full pl-11 pr-4 py-3.5 bg-canvas border border-border-default rounded-xl text-text-strong text-[15px] font-semibold transition-all duration-300 focus:outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 focus:-translate-y-[2px] shadow-sm" 
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)} 
+                required 
+                placeholder="••••••••"
+              />
+            </div>
+          </div>
 
+          <div className="pt-2">
+            <button 
+              type="submit" 
+              className="w-full bg-brand-gradient text-white border-none py-4 px-6 rounded-xl text-[15px] font-black cursor-pointer transition-all duration-300 flex justify-center items-center gap-3 shadow-glow relative overflow-hidden group hover:shadow-[0px_16px_32px_rgba(255,48,69,0.35)] hover:-translate-y-1 active:translate-y-0 disabled:opacity-70 disabled:cursor-not-allowed" 
+              disabled={loading}
+            >
+              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
+              <span className="relative z-10 flex items-center gap-2">
+                {loading ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    Verificando...
+                  </>
+                ) : (
+                  <>
+                    Iniciar Sesión
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-1 transition-transform"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                  </>
+                )}
+              </span>
+            </button>
+          </div>
+        </form>
 
-    </div>
+      </div>
     </div>
   );
 }

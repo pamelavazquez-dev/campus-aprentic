@@ -21,7 +21,7 @@ export default function Logo({ size = 'md', showText = true, className = '' }) {
       <img 
         src="/Logo.svg" 
         alt="The Bridge" 
-        className={`h-full max-w-none object-left object-cover dark:invert dark:hue-rotate-180`}
+        className={`h-full max-w-none object-left object-cover logo-image`}
       />
     </div>
   );

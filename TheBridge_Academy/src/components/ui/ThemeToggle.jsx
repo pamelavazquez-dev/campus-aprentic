@@ -1,13 +1,18 @@
 import React from 'react';
 import { useTheme } from '../../context/ThemeContext';
 
-export default function ThemeToggle() {
+export default function ThemeToggle({ variant = 'dark-header', className = '' }) {
   const { theme, toggleTheme } = useTheme();
   
+  const baseClasses = "relative w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer hover:scale-105 shrink-0";
+  const variantClasses = variant === 'dark-header' 
+    ? "bg-white/5 hover:bg-white/15 border border-white/10 text-white" 
+    : "bg-surface-solid hover:bg-border-default border border-border-default text-text-strong shadow-sm";
+
   return (
     <button 
       onClick={toggleTheme}
-      className="relative w-10 h-10 rounded-full flex items-center justify-center bg-white/5 hover:bg-white/15 border border-white/10 text-white transition-all duration-300 cursor-pointer hover:scale-105"
+      className={`${baseClasses} ${variantClasses} ${className}`}
       title={theme === 'light' ? 'Activar modo oscuro' : 'Activar modo claro'}
     >
       {theme === 'light' ? (
