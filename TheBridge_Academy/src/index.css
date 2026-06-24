@@ -2,43 +2,43 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-primary: #FF3045;
-  --color-brand-hover: #B01626;
-  --color-ink: #1F232B;
-  --color-canvas: #F5F6F8;
-  --color-surface: rgba(255, 255, 255, 0.85);
-  --color-surface-solid: #FFFFFF;
-  --color-success: #167A4A;
-  --color-info: #2563EB;
-  --color-danger: #C81E35;
-  --color-gray500: #6B7280;
-  --color-gray300: #D3D6DC;
-  --color-gray150: #ECEFF3;
-  --color-text-strong: #1F232B;
-  --color-text-primary: #1F232B;
-  --color-text-secondary: #6B7280;
-  --color-border-default: rgba(211, 214, 220, 0.5);
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-hover: var(--brand-hover);
+  --color-ink: var(--ink);
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-solid: var(--surface-solid);
+  --color-success: var(--success);
+  --color-info: var(--info);
+  --color-danger: var(--danger);
+  --color-gray500: var(--gray500);
+  --color-gray300: var(--gray300);
+  --color-gray150: var(--gray150);
+  --color-gray100: var(--gray100);
+  --color-text-strong: var(--text-strong);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-border-default: var(--border-default);
 
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
 
-  --shadow-md: 0px 22px 40px rgba(13, 13, 13, 0.12);
-  --shadow-sm: 0px 10px 24px rgba(13, 13, 13, 0.08);
-  --shadow-glow: 0px 12px 24px rgba(255, 48, 69, 0.3);
+  --shadow-md: var(--shadow-md);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-glow: var(--shadow-glow);
 }
 
-
 :root {
-  /* Colors from style-guide.svg */
+  /* Light Mode Colors */
   --brand-primary: #FF3045;
   --brand-hover: #B01626;
   --ink: #1F232B;
   --canvas: #F5F6F8;
-  --surface: rgba(255, 255, 255, 0.85); /* Glassmorphism base */
+  --surface: rgba(255, 255, 255, 0.85);
   --surface-solid: #FFFFFF;
-  --border: rgba(211, 214, 220, 0.5); /* Soft border for glass */
+  --border: rgba(211, 214, 220, 0.5);
   --success: #167A4A;
   --info: #2563EB;
   --danger: #C81E35;
@@ -74,6 +74,29 @@
   --shadow-md: 0px 22px 40px rgba(13, 13, 13, 0.12);
   --shadow-sm: 0px 10px 24px rgba(13, 13, 13, 0.08);
   --shadow-glow: 0px 12px 24px rgba(255, 48, 69, 0.3);
+}
+
+.dark {
+  /* Dark Mode Colors */
+  --ink: #F8FAFC;
+  --canvas: #0F172A; /* Slate 900 */
+  --surface: rgba(30, 41, 59, 0.85); /* Slate 800 glass */
+  --surface-solid: #1E293B; /* Slate 800 */
+  --border: rgba(51, 65, 85, 0.5); /* Slate 700 */
+  --gray500: #94A3B8; /* Slate 400 */
+  --gray300: #475569; /* Slate 600 */
+  --gray150: #1E293B; /* Slate 800 */
+  --gray100: rgba(15, 23, 42, 0.8);
+  --white: #0F172A;
+  
+  --text-strong: #F8FAFC;
+  --text-primary: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --border-default: var(--border);
+  
+  /* Ajustar sombras para dark mode (más sutiles oscuras) */
+  --shadow-md: 0px 22px 40px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0px 10px 24px rgba(0, 0, 0, 0.3);
 }
 
 body, html {

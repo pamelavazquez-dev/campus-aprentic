@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
+import { ThemeProvider } from './context/ThemeContext';
 
 // Componentes
 import Login from './components/Login';
@@ -40,7 +41,8 @@ function App() {
   }
 
   return (
-    <BrowserRouter>
+    <ThemeProvider>
+      <BrowserRouter>
       <Routes>
         <Route path="/login" element={!user ? <Login /> : <Navigate to={`/${role || 'login'}`} replace />} />
         
@@ -89,7 +91,8 @@ function App() {
         {/* Redirección por defecto */}
         <Route path="*" element={<Navigate to={user ? `/${role}` : "/login"} replace />} />
       </Routes>
-    </BrowserRouter>
+      </BrowserRouter>
+    </ThemeProvider>
   )
 }
 

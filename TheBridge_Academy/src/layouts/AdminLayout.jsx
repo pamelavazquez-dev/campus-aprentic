@@ -3,6 +3,7 @@ import { auth } from '../config/firebase';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import Logo from '../components/Logo';
 import Avatar from '../components/ui/Avatar';
+import ThemeToggle from '../components/ui/ThemeToggle';
 
 export default function AdminLayout({ user }) {
   const navigate = useNavigate();
@@ -48,6 +49,7 @@ export default function AdminLayout({ user }) {
         </nav>
 
         <div className="flex items-center gap-6">
+          <ThemeToggle />
           <div className="flex items-center gap-3 bg-white/5 py-1.5 pr-4 pl-1.5 rounded-full border border-white/10">
             <Avatar src={user?.photoURL || user?.avatar} name={userName} size="sm" />
             <div className="flex flex-col">
