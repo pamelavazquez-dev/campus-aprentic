@@ -203,6 +203,12 @@ export default function PromocionesView() {
                             <div className="text-xs text-text-secondary font-medium">
                               ID: {promo.id.substring(0, 8)}...
                             </div>
+                            {promo.estado === 'completada' && promo.fechaFin && (
+                              <div className="text-[11px] text-danger font-bold mt-1.5 flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                Finalizada: {promo.fechaFin}
+                              </div>
+                            )}
                           </div>
                           <span className={`text-[10px] px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider ${promo.estado === 'completada' ? 'bg-gray200 text-text-secondary' : 'bg-green-100 text-green-700'}`}>
                             {promo.estado === 'completada' ? 'Inactiva' : 'Activa'}
