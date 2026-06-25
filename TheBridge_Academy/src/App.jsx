@@ -3,6 +3,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuth } from './hooks/useAuth';
 import { ThemeProvider } from './context/ThemeContext';
 import { Toaster } from 'react-hot-toast';
+import { auth } from './config/firebase';
+import { signOut } from 'firebase/auth';
 
 const queryClient = new QueryClient();
 
@@ -78,7 +80,16 @@ function App() {
       <BrowserRouter>
         <ErrorBoundary>
         <Routes>
-        <Route path="/login" element={!user ? <Login /> : <Navigate to={`/${role || 'login'}`} replace />} />
+        <Route path="/login" element={
+          !user ? <Login /> : 
+          role ? <Navigate to={`/${role}`} replace /> : 
+          <div style={{ textAlign: 'center', marginTop: '20vh' }}>
+            <h2>⚠️ Acceso Denegado</h2>
+            <p>Tu cuenta no tiene ningún rol asignado en el sistema.</p>
+            <p>Por favor, contacta con un administrador.</p>
+            <button onClick={() => signOut(auth)} style={{ marginTop: '20px', padding: '10px 20px', cursor: 'pointer' }}>Cerrar Sesión</button>
+          </div>
+        } />
         
         {/* Rutas de Administrador */}
         <Route path="/admin/*" element={
