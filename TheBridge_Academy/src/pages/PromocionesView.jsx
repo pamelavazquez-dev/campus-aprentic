@@ -2,7 +2,7 @@ import { useState, useContext } from 'react';
 import { DataContext } from '../context/DataContext';
 import CrearPromocionForm from '../components/forms/CrearPromocionForm';
 import EditarCampusForm from '../components/forms/EditarCampusForm';
-import { deletePromocion } from '../services/promociones.service';
+import { deletePromocion, updatePromocion } from '../services/promociones.service';
 import toast from 'react-hot-toast';
 
 export default function PromocionesView() {
@@ -30,6 +30,17 @@ export default function PromocionesView() {
         console.error("Error al eliminar promoción:", error);
         toast.error("Hubo un error al eliminar la promoción");
       }
+    }
+  };
+
+  const handleToggleEstado = async (promo) => {
+    const nuevoEstado = promo.estado === 'completada' ? 'activa' : 'completada';
+    try {
+      await updatePromocion(promo.id, { ...promo, estado: nuevoEstado });
+      toast.success(`Promoción ${nuevoEstado === 'completada' ? 'desactivada' : 'activada'} correctamente`);
+    } catch (error) {
+      console.error("Error al cambiar estado:", error);
+      toast.error("Error al actualizar el estado de la promoción");
     }
   };
 
@@ -113,14 +124,30 @@ export default function PromocionesView() {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {promosEnCampus.map((promo) => (
-                      <div key={promo.id} className="bg-surface-solid border border-border-default p-4 rounded-xl flex items-center justify-between group hover:border-brand-primary/30 transition-colors shadow-sm">
+                      <div key={promo.id} className={`bg-surface-solid border border-border-default p-4 rounded-xl flex items-center justify-between group hover:border-brand-primary/30 transition-colors shadow-sm ${promo.estado === 'completada' ? 'opacity-60 grayscale-[30%]' : ''}`}>
                         <div>
-                          <div className="font-bold text-text-strong">{promo.nombre}</div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-bold text-text-strong">{promo.nombre}</span>
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${promo.estado === 'completada' ? 'bg-gray200 text-text-secondary' : 'bg-green-100 text-green-700'}`}>
+                              {promo.estado === 'completada' ? 'Inactiva' : 'Activa'}
+                            </span>
+                          </div>
                           <div className="text-xs text-text-secondary font-medium mt-0.5">
                             ID: {promo.id.substring(0, 8)}...
                           </div>
                         </div>
                         <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button 
+                            onClick={() => handleToggleEstado(promo)}
+                            className={`${promo.estado === 'completada' ? 'text-green-600 bg-green-50 hover:bg-green-100' : 'text-amber-600 bg-amber-50 hover:bg-amber-100'} p-2 rounded-lg transition-colors cursor-pointer border-none`}
+                            title={promo.estado === 'completada' ? "Reactivar Promoción" : "Desactivar Promoción"}
+                          >
+                            {promo.estado === 'completada' ? (
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            ) : (
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                            )}
+                          </button>
                           <button 
                             onClick={() => handleEdit(promo)}
                             className="text-brand-primary bg-brand-primary/10 hover:bg-brand-primary/20 p-2 rounded-lg transition-colors cursor-pointer border-none"
