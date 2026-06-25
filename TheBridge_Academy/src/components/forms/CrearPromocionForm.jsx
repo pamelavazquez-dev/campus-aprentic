@@ -1,8 +1,10 @@
 import toast from 'react-hot-toast';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { DataContext } from '../../context/DataContext';
 import { createPromocion, updatePromocion } from '../../services/promociones.service';
 
 export default function CrearPromocionForm({ onClose, onCreated, initialData = null }) {
+  const { campuses } = useContext(DataContext);
   const [formData, setFormData] = useState({
     nombre: '',
     campus: 'Madrid',
@@ -22,7 +24,7 @@ export default function CrearPromocionForm({ onClose, onCreated, initialData = n
     }
   }, [initialData]);
 
-  const isEditing = !!initialData;
+  const isEditing = !!(initialData && initialData.id);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -77,10 +79,12 @@ export default function CrearPromocionForm({ onClose, onCreated, initialData = n
               value={formData.campus}
               onChange={e => setFormData({...formData, campus: e.target.value})}
             >
-              <option value="Madrid">Madrid</option>
-              <option value="Sevilla">Sevilla</option>
-              <option value="Valencia">Valencia</option>
-              <option value="Remoto">Remoto</option>
+              <option value="" disabled>Selecciona una sede</option>
+              {campuses && campuses.map(camp => (
+                <option key={camp.id} value={camp.id}>
+                  {camp.nombre || camp.id}
+                </option>
+              ))}
             </select>
           </div>
 

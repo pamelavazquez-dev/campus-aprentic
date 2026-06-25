@@ -99,7 +99,7 @@ export default function PromocionesView() {
                       Editar Sede
                     </button>
                     <button 
-                      onClick={() => { setPromoToEdit(null); setShowModal(true); }} 
+                      onClick={() => { setPromoToEdit({ campus_id: campus.id }); setShowModal(true); }} 
                       className="px-5 py-2.5 rounded-xl font-bold text-sm bg-brand-primary text-white hover:bg-red-600 transition-colors shadow-sm"
                     >
                       + Añadir Promoción
