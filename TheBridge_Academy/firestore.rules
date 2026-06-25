@@ -1,0 +1,117 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ----------------------------------------------------------------------
+    // GESTION DE USUARIOS Y CAMPUS
+    // ----------------------------------------------------------------------
+    match /campus/{campusId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && exists(/databases/$(database)/documents/admin/$(request.auth.uid));
+    }
+
+    match /admin/{userId} {
+      allow read: if request.auth != null && (request.auth.uid == userId || exists(/databases/$(database)/documents/admin/$(request.auth.uid)));
+      allow write: if request.auth != null && exists(/databases/$(database)/documents/admin/$(request.auth.uid));
+    }
+
+    match /profesores/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && exists(/databases/$(database)/documents/admin/$(request.auth.uid));
+    }
+
+    match /alumnos/{userId} {
+      allow read: if request.auth != null && (
+        exists(/databases/$(database)/documents/admin/$(request.auth.uid)) ||
+        exists(/databases/$(database)/documents/profesores/$(request.auth.uid)) ||
+        request.auth.uid == userId ||
+        resource.data.email == request.auth.token.email
+      );
+      allow write: if request.auth != null && exists(/databases/$(database)/documents/admin/$(request.auth.uid));
+    }
+
+    // ----------------------------------------------------------------------
+    // ESTRUCTURA ACADEMICA
+    // ----------------------------------------------------------------------
+    match /promociones/{promocionId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && exists(/databases/$(database)/documents/admin/$(request.auth.uid));
+    }
+
+    match /modulos/{moduloId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && (
+        exists(/databases/$(database)/documents/admin/$(request.auth.uid)) ||
+        exists(/databases/$(database)/documents/profesores/$(request.auth.uid))
+      );
+    }
+
+    match /lecciones/{leccionId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && (
+        exists(/databases/$(database)/documents/admin/$(request.auth.uid)) ||
+        exists(/databases/$(database)/documents/profesores/$(request.auth.uid))
+      );
+    }
+
+    match /inscripciones/{inscripcionId} {
+      allow read: if request.auth != null && (
+        exists(/databases/$(database)/documents/admin/$(request.auth.uid)) ||
+        exists(/databases/$(database)/documents/profesores/$(request.auth.uid)) ||
+        resource.data.alumnoId == request.auth.uid ||
+        resource.data.alumnoEmail == request.auth.token.email ||
+        get(/databases/$(database)/documents/alumnos/$(resource.data.alumnoId)).data.email == request.auth.token.email
+      );
+      allow write: if request.auth != null && exists(/databases/$(database)/documents/admin/$(request.auth.uid));
+    }
+
+    // ----------------------------------------------------------------------
+    // PROGRESO Y PARTICIPACION
+    // ----------------------------------------------------------------------
+    match /notas/{notaId} {
+      allow read: if request.auth != null && (
+        exists(/databases/$(database)/documents/admin/$(request.auth.uid)) ||
+        exists(/databases/$(database)/documents/profesores/$(request.auth.uid)) ||
+        resource.data.alumnoId == request.auth.uid ||
+        resource.data.alumnoEmail == request.auth.token.email ||
+        get(/databases/$(database)/documents/alumnos/$(resource.data.alumnoId)).data.email == request.auth.token.email
+      );
+      allow write: if request.auth != null && (
+        exists(/databases/$(database)/documents/admin/$(request.auth.uid)) ||
+        exists(/databases/$(database)/documents/profesores/$(request.auth.uid))
+      );
+    }
+
+    match /proyectos/{proyectoId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && (
+        exists(/databases/$(database)/documents/admin/$(request.auth.uid)) ||
+        exists(/databases/$(database)/documents/profesores/$(request.auth.uid)) ||
+        request.resource.data.alumnoId == request.auth.uid ||
+        request.resource.data.alumnoEmail == request.auth.token.email ||
+        get(/databases/$(database)/documents/alumnos/$(request.resource.data.alumnoId)).data.email == request.auth.token.email
+      );
+      allow update, delete: if request.auth != null && (
+        exists(/databases/$(database)/documents/admin/$(request.auth.uid)) ||
+        exists(/databases/$(database)/documents/profesores/$(request.auth.uid)) ||
+        resource.data.alumnoId == request.auth.uid ||
+        resource.data.alumnoEmail == request.auth.token.email ||
+        get(/databases/$(database)/documents/alumnos/$(resource.data.alumnoId)).data.email == request.auth.token.email
+      );
+    }
+
+    match /reviews/{reviewId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && (
+        exists(/databases/$(database)/documents/admin/$(request.auth.uid)) ||
+        request.resource.data.alumnoId == request.auth.uid ||
+        request.resource.data.alumnoEmail == request.auth.token.email
+      );
+      allow update, delete: if request.auth != null && (
+        exists(/databases/$(database)/documents/admin/$(request.auth.uid)) ||
+        resource.data.alumnoId == request.auth.uid ||
+        resource.data.alumnoEmail == request.auth.token.email
+      );
+    }
+  }
+}

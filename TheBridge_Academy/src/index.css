@@ -120,7 +120,7 @@
 }
 
 .dark .logo-image {
-  filter: invert(1) hue-rotate(180deg);
+  filter: none;
 }
 
 body, html {
@@ -147,6 +147,7 @@ body, html {
   max-width: none;
   padding: 0;
   box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 /* Typography from style-guide.svg */
@@ -209,4 +210,47 @@ p {
 
 .dark :is(.bg-white, .bg-gray-50) {
   background-color: var(--surface-solid) !important;
+}
+
+@media (max-width: 768px) {
+  h1 { font-size: 36px; }
+  h2 { font-size: 28px; }
+  h3 { font-size: 22px; }
+
+  table {
+    min-width: 680px;
+  }
+
+  .lesson-view-shell {
+    margin: 0 auto !important;
+    min-height: auto !important;
+  }
+
+  .lesson-view-header {
+    padding: 16px !important;
+  }
+
+  .lesson-view-header > div {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+
+  .lesson-view-main {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .lesson-sidebar {
+    width: 100% !important;
+    position: static !important;
+    max-height: 260px;
+    border-right: 0 !important;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .lesson-content {
+    padding: 0 !important;
+    overflow-x: hidden;
+  }
 }

@@ -1,9 +1,12 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useContext } from 'react';
 import { getAllModulos, updateModulo } from '../../services/modulos.service';
 import { getAllLecciones, createLeccion, deleteLeccion } from '../../services/lecciones.service';
 import { useNavigate } from 'react-router-dom';
 import { useRBAC } from '../../hooks/useRBAC';
+import { useAuth } from '../../hooks/useAuth';
+import { DataContext } from '../../context/DataContext';
 import { ROLES } from '../../utils/rbac';
+import { filterModulesByTracks, getProfesorTracks, getUniqueModulesByName, inferModuleTrack } from '../../utils/academicFilters';
 
 export default function WizardCurso() {
   const [modulos, setModulos] = useState([]);
@@ -17,14 +20,26 @@ export default function WizardCurso() {
   const [mensaje, setMensaje] = useState({ text: '', type: '' });
   const navigate = useNavigate();
   const { isAuthorized } = useRBAC();
+  const { profile } = useAuth();
+  const { promociones } = useContext(DataContext);
   const isAdmin = isAuthorized(ROLES.ADMIN);
+  const profesorTracks = useMemo(
+    () => getProfesorTracks(profile, promociones),
+    [profile, promociones]
+  );
 
   const fetchData = async () => {
     try {
       const [mods, lecs] = await Promise.all([getAllModulos(), getAllLecciones()]);
-      setModulos(mods);
+      const visibleMods = isAdmin
+        ? mods
+        : getUniqueModulesByName(filterModulesByTracks(mods, profesorTracks));
+
+      setModulos(visibleMods);
       setLecciones(lecs);
-      if (!selectedModulo && mods.length > 0) setSelectedModulo(mods[0].id);
+      if ((!selectedModulo || !visibleMods.some((modulo) => modulo.id === selectedModulo)) && visibleMods.length > 0) {
+        setSelectedModulo(visibleMods[0].id);
+      }
     } catch (e) {
       console.error('Error cargando datos:', e);
     } finally {
@@ -32,7 +47,7 @@ export default function WizardCurso() {
     }
   };
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => { fetchData(); }, [isAdmin, profesorTracks.join('|')]);
 
   // Filtrar lecciones por módulo seleccionado
   const leccionesFiltradas = useMemo(() => {
@@ -170,6 +185,7 @@ export default function WizardCurso() {
               try {
                 await updateModulo(moduloActual.id, {
                   nombre: moduloActual.nombre,
+                  tipo: moduloActual.tipo || inferModuleTrack(moduloActual),
                   horas: moduloActual.horas,
                   lecciones_Id: moduloActual.lecciones_Id || [],
                   profesor_id: moduloActual.profesor_id || '',

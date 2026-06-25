@@ -1,17 +1,25 @@
 import { useState, useEffect, useContext, useMemo } from 'react';
 import { DataContext } from '../../context/DataContext';
 import { useAuth } from '../../hooks/useAuth';
-import { getAllNotas } from '../../services/notas.service';
+import { getNotasByAlumnoId } from '../../services/notas.service';
 
 export default function MisNotasView() {
-  const { user } = useAuth();
+  const { profile } = useAuth();
   const { modulos, loading: dataLoading } = useContext(DataContext);
   const [notas, setNotas] = useState([]);
   const [loadingNotas, setLoadingNotas] = useState(true);
 
   const fetchNotas = async () => {
+    if (!profile?.id) {
+      setNotas([]);
+      setLoadingNotas(false);
+      return;
+    }
+
+    setLoadingNotas(true);
+
     try {
-      const data = await getAllNotas();
+      const data = await getNotasByAlumnoId(profile.id);
       setNotas(data);
     } catch (error) {
       console.error("Error cargando notas:", error);
@@ -22,13 +30,13 @@ export default function MisNotasView() {
 
   useEffect(() => {
     fetchNotas();
-  }, []);
+  }, [profile?.id]);
 
   // Filtrar notas para el alumno actual
   const misNotas = useMemo(() => {
-    if (!user) return [];
-    return notas.filter(n => n.alumnoId === user.uid);
-  }, [notas, user]);
+    if (!profile) return [];
+    return notas.filter(n => n.alumnoId === profile.id);
+  }, [notas, profile]);
 
   if (dataLoading || loadingNotas) return <div>Cargando tus notas...</div>;
 

@@ -1,7 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, enableMultiTabIndexedDbPersistence } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
 import { getAnalytics } from 'firebase/analytics';
 
 export const firebaseConfig = {
@@ -19,7 +18,6 @@ export const analytics = app && typeof window !== 'undefined' ? getAnalytics(app
 
 export const auth = app ? getAuth(app) : null;
 export const db = app ? getFirestore(app) : null;
-export const storage = app ? getStorage(app) : null;
 
 // Activar persistencia offline (caché local) para evitar reads innecesarios
 if (db) {

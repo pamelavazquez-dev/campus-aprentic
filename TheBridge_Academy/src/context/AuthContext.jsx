@@ -1,13 +1,14 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import { auth, db } from '../config/firebase';
+import { auth } from '../config/firebase';
+import { getUserRole } from '../services/roles.service';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -15,28 +16,18 @@ export const AuthProvider = ({ children }) => {
       if (currentUser) {
         setUser(currentUser);
         try {
-          const [adminDoc, profDoc, alumnoDoc] = await Promise.all([
-            getDoc(doc(db, 'admin', currentUser.uid)),
-            getDoc(doc(db, 'profesores', currentUser.uid)),
-            getDoc(doc(db, 'alumnos', currentUser.uid))
-          ]);
-
-          if (adminDoc.exists()) {
-            setRole('admin');
-          } else if (profDoc.exists()) {
-            setRole('instructor');
-          } else if (alumnoDoc.exists()) {
-            setRole('alumno');
-          } else {
-            setRole(null);
-          }
+          const roleData = await getUserRole(currentUser.uid, currentUser.email);
+          setRole(roleData?.name || null);
+          setProfile(roleData?.profile || null);
         } catch (error) {
           console.error("Error al obtener el rol del usuario:", error);
           setRole(null);
+          setProfile(null);
         }
       } else {
         setUser(null);
         setRole(null);
+        setProfile(null);
       }
       setLoading(false);
     });
@@ -44,7 +35,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, role, loading }}>
+    <AuthContext.Provider value={{ user, role, profile, loading }}>
       {children}
     </AuthContext.Provider>
   );

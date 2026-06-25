@@ -1,10 +1,8 @@
-import { useState, useEffect, useContext, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { getAllModulos } from '../../services/modulos.service';
 import { getAllLecciones } from '../../services/lecciones.service';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../../config/firebase';
 
 export default function AlumnoDashboard() {
   const [modulos, setModulos] = useState([]);
@@ -12,7 +10,7 @@ export default function AlumnoDashboard() {
   const [loading, setLoading] = useState(true);
   const [alumnoActual, setAlumnoActual] = useState(null);
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { profile } = useAuth();
 
   useEffect(() => {
     async function fetchData() {
@@ -20,13 +18,7 @@ export default function AlumnoDashboard() {
         const [mods, lecs] = await Promise.all([getAllModulos(), getAllLecciones()]);
         setModulos(mods.filter(m => m.activo !== false));
         setLecciones(lecs);
-        
-        if (user?.uid) {
-          const alumnoDoc = await getDoc(doc(db, 'alumnos', user.uid));
-          if (alumnoDoc.exists()) {
-            setAlumnoActual({ id: alumnoDoc.id, ...alumnoDoc.data() });
-          }
-        }
+        setAlumnoActual(profile);
       } catch (error) {
         console.error("Error al cargar datos:", error);
       } finally {
@@ -34,7 +26,7 @@ export default function AlumnoDashboard() {
       }
     }
     fetchData();
-  }, []);
+  }, [profile]);
 
 
   const modulosAsignados = useMemo(() => {
