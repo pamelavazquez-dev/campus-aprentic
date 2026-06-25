@@ -4,37 +4,55 @@ import { useNavigate } from 'react-router-dom';
 import ValoracionesTab from './ValoracionesTab';
 import DirectorioTab from './DirectorioTab';
 import Avatar from '../../components/ui/Avatar';
-import { collection, getCountFromServer } from 'firebase/firestore';
+import { collection, getCountFromServer, getDocs, query, limit } from 'firebase/firestore';
 import { db } from '../../config/firebase';
-import { useUsuarios } from '../../hooks/useUsuarios';
 
 export default function DashboardAdmin() {
   const { promociones, modulos, loading } = useContext(DataContext);
   const [activeTab, setActiveTab] = useState('resumen');
   const navigate = useNavigate();
   const [counts, setCounts] = useState({ alumnos: 0, profes: 0, admin: 0 });
-
-  const { data: profesData } = useUsuarios('Instructor');
-  const equipo = profesData?.docs || [];
+  const [equipo, setEquipo] = useState([]);
+  const [loadingEquipo, setLoadingEquipo] = useState(true);
 
   useEffect(() => {
-    const fetchCounts = async () => {
+    const fetchData = async () => {
       try {
-        const [al, pr, ad] = await Promise.all([
+        // Fetch counts
+        const [alCount, prCount, adCount] = await Promise.all([
           getCountFromServer(collection(db, 'alumnos')),
           getCountFromServer(collection(db, 'profesores')),
           getCountFromServer(collection(db, 'admin'))
         ]);
         setCounts({
-          alumnos: al.data().count,
-          profes: pr.data().count,
-          admin: ad.data().count
+          alumnos: alCount.data().count,
+          profes: prCount.data().count,
+          admin: adCount.data().count
         });
+
+        // Fetch recientes (2 de cada)
+        const [alSnap, prSnap, adSnap] = await Promise.all([
+          getDocs(query(collection(db, 'alumnos'), limit(2))),
+          getDocs(query(collection(db, 'profesores'), limit(2))),
+          getDocs(query(collection(db, 'admin'), limit(2)))
+        ]);
+
+        const formatUser = (doc, rol) => ({ id: doc.id, ...doc.data(), rol });
+        
+        const recientes = [
+          ...adSnap.docs.map(d => formatUser(d, 'Administrador')),
+          ...prSnap.docs.map(d => formatUser(d, 'Instructor')),
+          ...alSnap.docs.map(d => formatUser(d, 'Alumno'))
+        ];
+        
+        setEquipo(recientes);
       } catch (error) {
-        console.error("Error al obtener conteo de usuarios:", error);
+        console.error("Error al cargar datos del panel:", error);
+      } finally {
+        setLoadingEquipo(false);
       }
     };
-    fetchCounts();
+    fetchData();
   }, []);
 
   const totalUsuarios = counts.alumnos + counts.profes + counts.admin;
@@ -118,10 +136,10 @@ export default function DashboardAdmin() {
           </div>
         </div>
 
-        {/* Lista de Profesores/Usuarios Estricta */}
+        {/* Lista de Usuarios Recientes Estricta */}
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <h3 style={{ margin: 0, fontSize: '18px', color: 'var(--text-strong)' }}>Directorio de Equipo Reciente</h3>
+            <h3 style={{ margin: 0, fontSize: '18px', color: 'var(--text-strong)' }}>Muestra de Usuarios Recientes</h3>
             <button className="bg-transparent text-[#64748B] border-none py-2 px-4 rounded-md text-sm font-black cursor-pointer transition-colors duration-300 hover:bg-black/5 hover:text-brand-primary inline-flex items-center justify-center gap-2" onClick={() => navigate('/admin/usuarios')}>Ver todos</button>
           </div>
           
@@ -134,9 +152,13 @@ export default function DashboardAdmin() {
               <div style={{ textAlign: 'right' }}>Status</div>
             </div>
 
-            {equipo.length === 0 ? (
+            {loadingEquipo ? (
               <div style={{ padding: '48px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-                No hay miembros en el equipo.
+                Cargando muestra de usuarios...
+              </div>
+            ) : equipo.length === 0 ? (
+              <div style={{ padding: '48px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                No hay usuarios registrados.
               </div>
             ) : (
               equipo.map((miembro, index) => (
