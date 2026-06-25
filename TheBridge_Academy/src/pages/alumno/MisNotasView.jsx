@@ -5,7 +5,7 @@ import { getAllNotas } from '../../services/notas.service';
 
 export default function MisNotasView() {
   const { user } = useAuth();
-  const { usuarios, modulos, loading: dataLoading } = useContext(DataContext);
+  const { modulos, loading: dataLoading } = useContext(DataContext);
   const [notas, setNotas] = useState([]);
   const [loadingNotas, setLoadingNotas] = useState(true);
 
@@ -24,17 +24,11 @@ export default function MisNotasView() {
     fetchNotas();
   }, []);
 
-  // Buscar el documento del alumno actual
-  const alumnoActual = useMemo(() => {
-    if (!user || !usuarios.length) return null;
-    return usuarios.find(u => u.id === user.uid || u.email === user.email);
-  }, [user, usuarios]);
-
   // Filtrar notas para el alumno actual
   const misNotas = useMemo(() => {
-    if (!alumnoActual) return [];
-    return notas.filter(n => n.alumnoId === alumnoActual.id);
-  }, [notas, alumnoActual]);
+    if (!user) return [];
+    return notas.filter(n => n.alumnoId === user.uid);
+  }, [notas, user]);
 
   if (dataLoading || loadingNotas) return <div>Cargando tus notas...</div>;
 

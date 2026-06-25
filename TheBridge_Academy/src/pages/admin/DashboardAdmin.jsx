@@ -1,14 +1,61 @@
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { DataContext } from '../../context/DataContext';
 import { useNavigate } from 'react-router-dom';
 import ValoracionesTab from './ValoracionesTab';
 import DirectorioTab from './DirectorioTab';
 import Avatar from '../../components/ui/Avatar';
+import { collection, getCountFromServer, getDocs, query, limit } from 'firebase/firestore';
+import { db } from '../../config/firebase';
 
 export default function DashboardAdmin() {
-  const { usuarios, equipo, promociones, modulos, loading } = useContext(DataContext);
+  const { promociones, modulos, loading } = useContext(DataContext);
   const [activeTab, setActiveTab] = useState('resumen');
   const navigate = useNavigate();
+  const [counts, setCounts] = useState({ alumnos: 0, profes: 0, admin: 0 });
+  const [equipo, setEquipo] = useState([]);
+  const [loadingEquipo, setLoadingEquipo] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch counts
+        const [alCount, prCount, adCount] = await Promise.all([
+          getCountFromServer(collection(db, 'alumnos')),
+          getCountFromServer(collection(db, 'profesores')),
+          getCountFromServer(collection(db, 'admin'))
+        ]);
+        setCounts({
+          alumnos: alCount.data().count,
+          profes: prCount.data().count,
+          admin: adCount.data().count
+        });
+
+        // Fetch recientes (2 de cada)
+        const [alSnap, prSnap, adSnap] = await Promise.all([
+          getDocs(query(collection(db, 'alumnos'), limit(2))),
+          getDocs(query(collection(db, 'profesores'), limit(2))),
+          getDocs(query(collection(db, 'admin'), limit(2)))
+        ]);
+
+        const formatUser = (doc, rol) => ({ id: doc.id, ...doc.data(), rol });
+        
+        const recientes = [
+          ...adSnap.docs.map(d => formatUser(d, 'Administrador')),
+          ...prSnap.docs.map(d => formatUser(d, 'Instructor')),
+          ...alSnap.docs.map(d => formatUser(d, 'Alumno'))
+        ];
+        
+        setEquipo(recientes);
+      } catch (error) {
+        console.error("Error al cargar datos del panel:", error);
+      } finally {
+        setLoadingEquipo(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const totalUsuarios = counts.alumnos + counts.profes + counts.admin;
 
   if (loading) return <div>Cargando panel...</div>;
 
@@ -57,7 +104,7 @@ export default function DashboardAdmin() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
           <div className="bg-gradient-to-br from-[#0f172a] to-[#3e0c15] rounded-2xl p-6 shadow-xl relative overflow-hidden transition-all duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-1.5 hover:shadow-2xl hover:border-brand-primary/30 flex flex-col cursor-pointer border border-white/10" onClick={() => navigate('/admin/usuarios')}>
             <div style={{ fontSize: '48px', fontWeight: 900, color: 'white', marginBottom: '8px', lineHeight: 1 }}>
-              {usuarios.length}
+              {totalUsuarios || '-'}
             </div>
             <div style={{ fontSize: '16px', fontWeight: 700, color: '#B9C0CA' }}>Usuarios Registrados</div>
             <div style={{ marginTop: 'auto', paddingTop: '24px', display: 'flex', justifyContent: 'space-between', color: 'var(--brand-primary)', fontWeight: 'bold', fontSize: '14px' }}>
@@ -89,10 +136,10 @@ export default function DashboardAdmin() {
           </div>
         </div>
 
-        {/* Lista de Profesores/Usuarios Estricta */}
+        {/* Lista de Usuarios Recientes Estricta */}
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <h3 style={{ margin: 0, fontSize: '18px', color: 'var(--text-strong)' }}>Directorio de Equipo Reciente</h3>
+            <h3 style={{ margin: 0, fontSize: '18px', color: 'var(--text-strong)' }}>Muestra de Usuarios Recientes</h3>
             <button className="bg-transparent text-[#64748B] border-none py-2 px-4 rounded-md text-sm font-black cursor-pointer transition-colors duration-300 hover:bg-black/5 hover:text-brand-primary inline-flex items-center justify-center gap-2" onClick={() => navigate('/admin/usuarios')}>Ver todos</button>
           </div>
           
@@ -105,9 +152,13 @@ export default function DashboardAdmin() {
               <div style={{ textAlign: 'right' }}>Status</div>
             </div>
 
-            {equipo.length === 0 ? (
+            {loadingEquipo ? (
               <div style={{ padding: '48px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-                No hay miembros en el equipo.
+                Cargando muestra de usuarios...
+              </div>
+            ) : equipo.length === 0 ? (
+              <div style={{ padding: '48px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                No hay usuarios registrados.
               </div>
             ) : (
               equipo.map((miembro, index) => (

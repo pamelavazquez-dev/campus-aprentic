@@ -1,5 +1,6 @@
 import { useState, useContext, useEffect } from 'react';
 import { DataContext } from '../context/DataContext';
+import { useUsuarios } from '../hooks/useUsuarios';
 import PageHeader from '../components/ui/PageHeader';
 import { createDoc, updateDoc } from '../services/base.service';
 import { doc } from 'firebase/firestore';
@@ -8,7 +9,12 @@ import Avatar from '../components/ui/Avatar';
 import toast from 'react-hot-toast';
 
 export default function UsuariosView() {
-  const { usuarios, campuses, loading } = useContext(DataContext);
+  const { campuses, modulos } = useContext(DataContext);
+  const [filterRol, setFilterRol] = useState('Alumno');
+  const [filterCampus, setFilterCampus] = useState('');
+  
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useUsuarios(filterRol, filterCampus);
+  const usuarios = data?.pages.flatMap(page => page.docs) || [];
   const [showWizard, setShowWizard] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [step, setStep] = useState(1);
@@ -16,10 +22,6 @@ export default function UsuariosView() {
   const [saving, setSaving] = useState(false);
   const [showMatricula, setShowMatricula] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const { modulos } = useContext(DataContext);
-
-  const [filterRol, setFilterRol] = useState('');
-  const [filterCampus, setFilterCampus] = useState('');
 
   // Set default campus when campuses load
   useEffect(() => {
@@ -128,19 +130,12 @@ export default function UsuariosView() {
     }
   };
 
-  if (loading) return (
+  if (isLoading) return (
     <div className="flex flex-col items-center justify-center p-20 gap-4">
       <div className="w-12 h-12 border-4 border-brand-primary/20 border-t-brand-primary rounded-full animate-spin"></div>
       <span className="text-gray-500 font-bold tracking-wide">Cargando directorio...</span>
     </div>
   );
-
-  const filteredUsuarios = usuarios.filter(u => {
-    const matchRol = filterRol ? u.rol === filterRol : true;
-    const campusId = u.campus_id?.id || u.campus_id;
-    const matchCampus = filterCampus ? campusId === filterCampus : true;
-    return matchRol && matchCampus;
-  });
 
   return (
     <div className="max-w-6xl mx-auto pb-12">
@@ -160,10 +155,9 @@ export default function UsuariosView() {
           <div className="flex-1 flex flex-col gap-1">
             <label className="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Filtrar por Rol</label>
             <select className="w-full px-4 py-2.5 bg-surface-solid border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300 cursor-pointer" value={filterRol} onChange={e => setFilterRol(e.target.value)}>
-              <option value="">Todos los roles</option>
-              <option value="Administrador">Administrador</option>
-              <option value="Instructor">Instructor</option>
               <option value="Alumno">Alumno</option>
+              <option value="Instructor">Instructor</option>
+              <option value="Administrador">Administrador</option>
             </select>
           </div>
           <div className="flex-1 flex flex-col gap-1">
@@ -178,17 +172,18 @@ export default function UsuariosView() {
         </div>
 
         <div className="flex flex-col gap-5 mt-6">
-          {filteredUsuarios.length === 0 ? (
+          {usuarios.length === 0 ? (
             <div className="py-20 text-center bg-surface backdrop-blur-md rounded-3xl border border-gray-200/60 shadow-sm">
               <div className="w-16 h-16 bg-surface-solid rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
                 <svg className="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
               </div>
-              <p className="text-gray-500 font-bold text-lg m-0">No hay usuarios registrados en el sistema.</p>
+              <p className="text-gray-500 font-bold text-lg m-0">No hay usuarios registrados en el sistema bajo este rol.</p>
             </div>
           ) : (
-            filteredUsuarios.map((u, i) => (
+            <>
+            {usuarios.map((u, i) => (
               <div key={u.id || i} className="bg-surface backdrop-blur-xl border border-gray-200/60 rounded-3xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-400 hover:-translate-y-1.5 hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] flex flex-col md:flex-row items-center gap-6 relative overflow-hidden group">
                 <div className="absolute top-0 left-0 w-1.5 h-full bg-brand-gradient opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 
@@ -238,7 +233,20 @@ export default function UsuariosView() {
                   </div>
                 </div>
               </div>
-            ))
+            ))}
+            
+            {hasNextPage && (
+              <div className="flex justify-center mt-6">
+                <button 
+                  className="bg-surface-solid border-2 border-gray-200 text-brand-primary py-3 px-8 rounded-xl text-sm font-bold transition-all hover:bg-brand-primary/5 hover:border-brand-primary/30 cursor-pointer shadow-sm"
+                  onClick={() => fetchNextPage()}
+                  disabled={isFetchingNextPage}
+                >
+                  {isFetchingNextPage ? 'Cargando más...' : 'Cargar más usuarios'}
+                </button>
+              </div>
+            )}
+            </>
           )}
         </div>
       </div>
