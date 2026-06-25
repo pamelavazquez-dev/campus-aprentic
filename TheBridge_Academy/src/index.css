@@ -100,6 +100,7 @@
   /* Ajustar sombras para dark mode (más sutiles oscuras) */
   --shadow-md: 0px 22px 40px rgba(0, 0, 0, 0.4);
   --shadow-sm: 0px 10px 24px rgba(0, 0, 0, 0.3);
+  --surface-card-dark: linear-gradient(135deg, rgba(15, 23, 42, 0.96) 0%, rgba(62, 12, 21, 0.9) 100%);
 }
 
 .dark .logo-image {
@@ -179,4 +180,17 @@ p {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* Dark mode card surfaces */
+.dark .bg-surface,
+.dark .bg-surface-solid:is(.rounded-xl, .rounded-2xl, .rounded-3xl),
+.dark :is(.bg-white\/70, .bg-white\/50, .bg-white\/40),
+.dark :is(.bg-gray-50\/50, .bg-gray-50\/40) {
+  background: var(--surface-card-dark) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark :is(.bg-white, .bg-gray-50) {
+  background-color: var(--surface-solid) !important;
 }
