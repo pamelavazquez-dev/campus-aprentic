@@ -34,19 +34,25 @@ export default function EditarCampusForm({ onClose, onUpdated, initialData }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
-      <div className="bg-surface-solid rounded-2xl p-10 w-full max-w-[500px] shadow-xl transform transition-all duration-400">
-        <div className="flex justify-between items-center mb-8">
-          <h3 className="m-0 text-text-strong font-black text-2xl">Editar Sede</h3>
-          <button className="bg-gray150 text-text-strong border-none cursor-pointer p-2 rounded-full w-8 h-8 flex justify-center items-center transition-all duration-300 hover:bg-[#FFE5E8] hover:text-brand-primary hover:rotate-90" onClick={onClose}>✕</button>
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+      <div className="bg-surface border border-border-default rounded-3xl w-full max-w-md shadow-2xl transform transition-all duration-400 overflow-hidden">
+        <div className="px-8 py-6 border-b border-border-default bg-gray-50/50 flex justify-between items-center">
+          <h3 className="m-0 text-xl font-black text-text-strong">Editar Sede</h3>
+          <button 
+            type="button" 
+            className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-text-secondary hover:bg-red-50 hover:text-brand-primary transition-colors border-none cursor-pointer" 
+            onClick={onClose}
+          >
+            ✕
+          </button>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="mb-6 text-left">
-            <label>Nombre de la Sede</label>
+        <form onSubmit={handleSubmit} className="p-8 flex flex-col gap-6">
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-bold text-text-strong">Nombre de la Sede</label>
             <input 
               type="text" 
-              className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
+              className="w-full px-4 py-3 bg-surface-solid border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300"
               value={formData.nombre}
               onChange={e => setFormData({...formData, nombre: e.target.value})}
               required 
@@ -54,11 +60,11 @@ export default function EditarCampusForm({ onClose, onUpdated, initialData }) {
             />
           </div>
           
-          <div className="mb-6 text-left">
-            <label>Ciudad / Ubicación</label>
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-bold text-text-strong">Ciudad / Ubicación</label>
             <input 
               type="text" 
-              className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
+              className="w-full px-4 py-3 bg-surface-solid border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300"
               value={formData.sede}
               onChange={e => setFormData({...formData, sede: e.target.value})}
               required
@@ -66,11 +72,19 @@ export default function EditarCampusForm({ onClose, onUpdated, initialData }) {
             />
           </div>
 
-          <div style={{ display: 'flex', gap: '12px', marginTop: '32px' }}>
-            <button type="button" className="bg-transparent text-danger border border-danger/30 py-3 px-6 rounded-lg text-sm font-black cursor-pointer transition-all duration-300 hover:bg-[#FFE5E8] hover:border-danger hover:-translate-y-0.5" onClick={onClose} style={{ flex: 1 }}>
+          <div className="flex gap-3 pt-4 mt-2 border-t border-border-default">
+            <button 
+              type="button" 
+              className="flex-1 bg-gray-100 text-gray-600 py-3 rounded-xl text-sm font-bold transition-colors hover:bg-gray-200 border-none cursor-pointer" 
+              onClick={onClose}
+            >
               Cancelar
             </button>
-            <button type="submit" className="bg-brand-gradient text-white py-3 px-6 rounded-lg text-sm font-black transition-all duration-300 hover:-translate-y-0.5 shadow-glow inline-flex items-center justify-center gap-2 border-none cursor-pointer disabled:bg-gray300 disabled:shadow-none disabled:text-gray500 disabled:cursor-not-allowed disabled:transform-none" disabled={loading} style={{ flex: 1 }}>
+            <button 
+              type="submit" 
+              className="flex-1 bg-brand-gradient text-white py-3 rounded-xl text-sm font-bold transition-all hover:shadow-lg hover:-translate-y-0.5 border-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed" 
+              disabled={loading}
+            >
               {loading ? 'Guardando...' : 'Guardar Cambios'}
             </button>
           </div>
