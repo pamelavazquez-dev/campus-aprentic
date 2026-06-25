@@ -1,13 +1,34 @@
 import { useState, useContext } from 'react';
 import { DataContext } from '../context/DataContext';
 import CrearPromocionForm from '../components/forms/CrearPromocionForm';
+import { deletePromocion } from '../services/promociones.service';
+import toast from 'react-hot-toast';
 
 export default function PromocionesView() {
   const { promociones, campuses, loading } = useContext(DataContext);
   const [showModal, setShowModal] = useState(false);
+  const [promoToEdit, setPromoToEdit] = useState(null);
 
   const handlePromocionCreated = () => {
     setShowModal(false);
+    setPromoToEdit(null);
+  };
+
+  const handleEdit = (promo) => {
+    setPromoToEdit(promo);
+    setShowModal(true);
+  };
+
+  const handleDelete = async (id) => {
+    if (window.confirm("¿Estás seguro de que deseas eliminar esta promoción de forma permanente?")) {
+      try {
+        await deletePromocion(id);
+        toast.success("Promoción eliminada correctamente");
+      } catch (error) {
+        console.error("Error al eliminar promoción:", error);
+        toast.error("Hubo un error al eliminar la promoción");
+      }
+    }
   };
 
   // Helper para sacar el ID seguro del campus desde la promoción
@@ -73,7 +94,7 @@ export default function PromocionesView() {
                       Editar Sede
                     </button>
                     <button 
-                      onClick={() => setShowModal(true)} 
+                      onClick={() => { setPromoToEdit(null); setShowModal(true); }} 
                       className="px-5 py-2.5 rounded-xl font-bold text-sm bg-brand-primary text-white hover:bg-red-600 transition-colors shadow-sm"
                     >
                       + Añadir Promoción
@@ -94,9 +115,22 @@ export default function PromocionesView() {
                             ID: {promo.id.substring(0, 8)}...
                           </div>
                         </div>
-                        <button className="text-brand-primary bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
-                        </button>
+                        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button 
+                            onClick={() => handleEdit(promo)}
+                            className="text-brand-primary bg-brand-primary/10 hover:bg-brand-primary/20 p-2 rounded-lg transition-colors cursor-pointer border-none"
+                            title="Editar"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                          </button>
+                          <button 
+                            onClick={() => handleDelete(promo.id)}
+                            className="text-danger bg-danger/10 hover:bg-danger/20 p-2 rounded-lg transition-colors cursor-pointer border-none"
+                            title="Eliminar"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                          </button>
+                        </div>
                       </div>
                     ))}
                     
@@ -115,8 +149,9 @@ export default function PromocionesView() {
 
       {showModal && (
         <CrearPromocionForm 
-          onClose={() => setShowModal(false)} 
-          onCreated={handlePromocionCreated} 
+          onClose={() => { setShowModal(false); setPromoToEdit(null); }} 
+          onCreated={handlePromocionCreated}
+          initialData={promoToEdit}
         />
       )}
     </div>
