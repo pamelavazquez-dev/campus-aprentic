@@ -1,6 +1,7 @@
 import { useState, useContext } from 'react';
 import { DataContext } from '../context/DataContext';
 import CrearPromocionForm from '../components/forms/CrearPromocionForm';
+import EditarCampusForm from '../components/forms/EditarCampusForm';
 import { deletePromocion } from '../services/promociones.service';
 import toast from 'react-hot-toast';
 
@@ -8,6 +9,7 @@ export default function PromocionesView() {
   const { promociones, campuses, loading } = useContext(DataContext);
   const [showModal, setShowModal] = useState(false);
   const [promoToEdit, setPromoToEdit] = useState(null);
+  const [campusToEdit, setCampusToEdit] = useState(null);
 
   const handlePromocionCreated = () => {
     setShowModal(false);
@@ -90,7 +92,10 @@ export default function PromocionesView() {
                   </div>
                   
                   <div className="flex gap-3">
-                    <button className="px-5 py-2.5 rounded-xl font-bold text-sm bg-surface-solid border border-border-default text-text-secondary hover:bg-surface hover:text-text-strong transition-colors shadow-sm">
+                    <button 
+                      onClick={() => setCampusToEdit(campus)}
+                      className="px-5 py-2.5 rounded-xl font-bold text-sm bg-surface-solid border border-border-default text-text-secondary hover:bg-surface hover:text-text-strong transition-colors shadow-sm"
+                    >
                       Editar Sede
                     </button>
                     <button 
@@ -152,6 +157,20 @@ export default function PromocionesView() {
           onClose={() => { setShowModal(false); setPromoToEdit(null); }} 
           onCreated={handlePromocionCreated}
           initialData={promoToEdit}
+        />
+      )}
+
+      {campusToEdit && (
+        <EditarCampusForm 
+          onClose={() => setCampusToEdit(null)}
+          onUpdated={() => {
+            // Ideally, we'd update the specific campus in context, but setting it to null closes modal.
+            // DataContext might have a refresh function, but for now we rely on the realtime listener or manually reload.
+            // If the listener in DataContext is active, it updates automatically.
+            setCampusToEdit(null);
+            toast.success("Sede actualizada correctamente");
+          }}
+          initialData={campusToEdit}
         />
       )}
     </div>
