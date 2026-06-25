@@ -37,8 +37,13 @@ export default function AlumnoLayout({ user }) {
           }
         }
 
-        if (currentAlumno && currentAlumno.promociones_id && currentAlumno.promociones_id.length > 0) {
-          const promoId = currentAlumno.promociones_id[0];
+        const rawPromo = currentAlumno?.promociones_id || currentAlumno?.promocion_id;
+        const promocionesArray = Array.isArray(rawPromo) 
+          ? rawPromo 
+          : (rawPromo ? [rawPromo] : []);
+
+        if (currentAlumno && promocionesArray.length > 0) {
+          const promoId = promocionesArray[0];
           
           unsubscribe = onSnapshot(doc(db, 'promociones', promoId), (docSnap) => {
             if (docSnap.exists()) {
