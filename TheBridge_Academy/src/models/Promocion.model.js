@@ -1,5 +1,5 @@
 export class Promocion {
-  constructor(id, nombre, fechaInicio, fechaFin, campus_id, alumnos_id, profesor_id) {
+  constructor(id, nombre, fechaInicio, fechaFin, campus_id, alumnos_id, profesor_id, estado = 'activa') {
     this.id = id;
     this.nombre = nombre;
     this.fechaInicio = fechaInicio;
@@ -7,6 +7,7 @@ export class Promocion {
     this.campus_id = campus_id;
     this.alumnos_id = alumnos_id;
     this.profesor_id = profesor_id;
+    this.estado = estado;
   }
 
   get formatoFechaCorta() {
@@ -45,6 +46,7 @@ export const promocionConverter = {
     campus_id: promo.campus_id,
     alumnos_id: promo.alumnos_id,
     profesor_id: promo.profesor_id,
+    estado: promo.estado || 'activa',
   }),
   fromFirestore: (snapshot, options) => {
     const data = snapshot.data(options);
@@ -56,7 +58,8 @@ export const promocionConverter = {
       parseDate(data.fechaFin),
       parseReference(data.campus_id || data.campus),
       data.alumnos_id || [],
-      data.profesor_id || []
+      data.profesor_id || [],
+      data.estado || 'activa'
     );
   },
 };

@@ -30,6 +30,7 @@ export const promocionSchema = z.object({
   campus_id: requiredText('La sede'),
   alumnos_id: z.array(z.string()).default([]),
   profesor_id: z.array(z.string()).default([]),
+  estado: z.enum(['activa', 'completada']).default('activa'),
 });
 
 export const alumnoSchema = z.object({
