@@ -66,6 +66,7 @@ export const leccionSchema = z.object({
   titulo: requiredText('El titulo'),
   descripcion: requiredText('La descripcion'),
   contenido_url: optionalUrl.default(''),
+  contenido_markdown: z.string().optional().default(''),
   videos_url: z.array(z.string()).default([]),
 });
 

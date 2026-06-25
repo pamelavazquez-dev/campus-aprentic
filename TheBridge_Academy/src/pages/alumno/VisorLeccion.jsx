@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getModuloById } from '../../services/modulos.service';
 import { getAllLecciones } from '../../services/lecciones.service';
 import { useRBAC } from '../../hooks/useRBAC';
+import ReactMarkdown from 'react-markdown';
 
 export default function VisorLeccion() {
   const { id: moduloId } = useParams();
@@ -184,6 +185,18 @@ export default function VisorLeccion() {
                 </p>
               </div>
 
+              {/* Contenido Markdown */}
+              {selectedLeccion.contenido_markdown && (
+                <div style={{ marginBottom: '24px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '32px' }}>
+                  <div style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '24px', borderBottom: '1px solid var(--border)', paddingBottom: '12px' }}>
+                    📖 Apuntes de la lección
+                  </div>
+                  <div className="prose prose-invert max-w-none prose-p:leading-relaxed prose-headings:font-black prose-a:text-brand-primary" style={{ color: 'var(--text-strong)' }}>
+                    <ReactMarkdown>{selectedLeccion.contenido_markdown}</ReactMarkdown>
+                  </div>
+                </div>
+              )}
+
               {/* Material */}
               {selectedLeccion.contenido_url && (
                 <div style={{ marginBottom: '24px', background: 'var(--surface-solid)', border: '1px solid var(--border)', borderRadius: '12px', padding: '24px' }}>
@@ -218,7 +231,7 @@ export default function VisorLeccion() {
               )}
 
               {/* Sin contenido */}
-              {!selectedLeccion.contenido_url && (!selectedLeccion.videos_url || selectedLeccion.videos_url.length === 0) && (
+              {!selectedLeccion.contenido_url && (!selectedLeccion.videos_url || selectedLeccion.videos_url.length === 0) && !selectedLeccion.contenido_markdown && (
                 <div style={{ marginBottom: '24px', background: 'var(--surface-solid)', border: '1px dashed var(--border)', borderRadius: '12px', padding: '48px', textAlign: 'center' }}>
                   <div style={{ fontSize: '48px', marginBottom: '12px' }}>📝</div>
                   <p style={{ color: 'var(--text-secondary)', margin: '0 0 4px 0', fontSize: '16px', fontWeight: 700 }}>Contenido pendiente</p>
