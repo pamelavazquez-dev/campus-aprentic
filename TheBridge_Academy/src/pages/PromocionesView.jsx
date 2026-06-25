@@ -46,8 +46,10 @@ export default function PromocionesView() {
 
   const executeToggleEstado = async (promo) => {
     const nuevoEstado = promo.estado === 'completada' ? 'activa' : 'completada';
+    const nuevaFechaFin = nuevoEstado === 'completada' ? new Date().toISOString().split('T')[0] : null;
+    
     try {
-      await updatePromocion(promo.id, { ...promo, estado: nuevoEstado });
+      await updatePromocion(promo.id, { ...promo, estado: nuevoEstado, fechaFin: nuevaFechaFin });
       toast.success(`Promoción ${nuevoEstado === 'completada' ? 'desactivada' : 'activada'} correctamente`);
       setPromoToDeactivate(null);
     } catch (error) {

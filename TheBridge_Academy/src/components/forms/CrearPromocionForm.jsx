@@ -9,6 +9,7 @@ export default function CrearPromocionForm({ onClose, onCreated, initialData = n
     nombre: '',
     campus: 'Madrid',
     fechaInicio: '',
+    fechaFin: '',
     estado: 'activa'
   });
   const [loading, setLoading] = useState(false);
@@ -19,6 +20,7 @@ export default function CrearPromocionForm({ onClose, onCreated, initialData = n
         nombre: initialData.nombre || '',
         campus: initialData.campus_id || 'Madrid',
         fechaInicio: initialData.fechaInicio || '',
+        fechaFin: initialData.fechaFin || '',
         estado: initialData.estado || 'activa'
       });
     }
@@ -107,6 +109,16 @@ export default function CrearPromocionForm({ onClose, onCreated, initialData = n
               value={formData.fechaInicio}
               onChange={e => setFormData({...formData, fechaInicio: e.target.value})}
               required 
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-bold text-text-strong">Fecha de Fin (Opcional)</label>
+            <input 
+              type="date" 
+              className="w-full px-4 py-3 bg-surface-solid border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300"
+              value={formData.fechaFin}
+              onChange={e => setFormData({...formData, fechaFin: e.target.value})}
             />
           </div>
 
