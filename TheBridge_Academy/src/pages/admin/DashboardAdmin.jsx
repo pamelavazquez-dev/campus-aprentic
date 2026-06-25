@@ -1,14 +1,43 @@
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { DataContext } from '../../context/DataContext';
 import { useNavigate } from 'react-router-dom';
 import ValoracionesTab from './ValoracionesTab';
 import DirectorioTab from './DirectorioTab';
 import Avatar from '../../components/ui/Avatar';
+import { collection, getCountFromServer } from 'firebase/firestore';
+import { db } from '../../config/firebase';
+import { useUsuarios } from '../../hooks/useUsuarios';
 
 export default function DashboardAdmin() {
-  const { usuarios, equipo, promociones, modulos, loading } = useContext(DataContext);
+  const { promociones, modulos, loading } = useContext(DataContext);
   const [activeTab, setActiveTab] = useState('resumen');
   const navigate = useNavigate();
+  const [counts, setCounts] = useState({ alumnos: 0, profes: 0, admin: 0 });
+
+  const { data: profesData } = useUsuarios('Instructor');
+  const equipo = profesData?.docs || [];
+
+  useEffect(() => {
+    const fetchCounts = async () => {
+      try {
+        const [al, pr, ad] = await Promise.all([
+          getCountFromServer(collection(db, 'alumnos')),
+          getCountFromServer(collection(db, 'profesores')),
+          getCountFromServer(collection(db, 'admin'))
+        ]);
+        setCounts({
+          alumnos: al.data().count,
+          profes: pr.data().count,
+          admin: ad.data().count
+        });
+      } catch (error) {
+        console.error("Error al obtener conteo de usuarios:", error);
+      }
+    };
+    fetchCounts();
+  }, []);
+
+  const totalUsuarios = counts.alumnos + counts.profes + counts.admin;
 
   if (loading) return <div>Cargando panel...</div>;
 
@@ -57,7 +86,7 @@ export default function DashboardAdmin() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
           <div className="bg-gradient-to-br from-[#0f172a] to-[#3e0c15] rounded-2xl p-6 shadow-xl relative overflow-hidden transition-all duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-1.5 hover:shadow-2xl hover:border-brand-primary/30 flex flex-col cursor-pointer border border-white/10" onClick={() => navigate('/admin/usuarios')}>
             <div style={{ fontSize: '48px', fontWeight: 900, color: 'white', marginBottom: '8px', lineHeight: 1 }}>
-              {usuarios.length}
+              {totalUsuarios || '-'}
             </div>
             <div style={{ fontSize: '16px', fontWeight: 700, color: '#B9C0CA' }}>Usuarios Registrados</div>
             <div style={{ marginTop: 'auto', paddingTop: '24px', display: 'flex', justifyContent: 'space-between', color: 'var(--brand-primary)', fontWeight: 'bold', fontSize: '14px' }}>

@@ -2,15 +2,32 @@ import toast from 'react-hot-toast';
 import { useState, useEffect, useContext } from 'react';
 import { DataContext } from '../../context/DataContext';
 import { getAllNotas, createNota, updateNota } from '../../services/notas.service';
+import { useQuery } from '@tanstack/react-query';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../../config/firebase';
 
 export default function CalificacionesView() {
-  const { usuarios, modulos, loading } = useContext(DataContext);
+  const { modulos, loading } = useContext(DataContext);
   const [notas, setNotas] = useState([]);
   const [loadingNotas, setLoadingNotas] = useState(true);
   const [selectedModulo, setSelectedModulo] = useState('');
   const [notaForm, setNotaForm] = useState({ id: null, alumnoId: '', valor: '', comentario: '' });
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  const { data: alumnosDelModulo = [], isLoading: loadingAlumnos } = useQuery({
+    queryKey: ['alumnos', 'modulo', selectedModulo],
+    queryFn: async () => {
+      if (!selectedModulo) return [];
+      const q = query(
+        collection(db, 'alumnos'), 
+        where('modulos_id', 'array-contains', selectedModulo)
+      );
+      const snap = await getDocs(q);
+      return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    },
+    enabled: !!selectedModulo,
+  });
 
   const fetchNotas = async () => {
     try {
@@ -27,10 +44,6 @@ export default function CalificacionesView() {
     fetchNotas();
   }, []);
 
-  // Alumnos matriculados en el módulo seleccionado
-  const alumnosDelModulo = usuarios.filter(u => 
-    u.rol === 'Alumno' && u.modulos_id && u.modulos_id.includes(selectedModulo)
-  );
 
   const handleOpenGrade = (alumno) => {
     // Buscar si ya tiene nota para este módulo (usando moduloId en lugar de proyectoId)
@@ -107,7 +120,9 @@ export default function CalificacionesView() {
             Alumnos Matriculados ({alumnosDelModulo.length})
           </h3>
 
-          {alumnosDelModulo.length === 0 ? (
+          {loadingAlumnos ? (
+            <p style={{ color: 'var(--text-secondary)' }}>Cargando alumnos matriculados...</p>
+          ) : alumnosDelModulo.length === 0 ? (
             <p style={{ color: 'var(--text-secondary)' }}>No hay alumnos matriculados en este módulo.</p>
           ) : (
             alumnosDelModulo.map(alumno => {

@@ -1,7 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuth } from './hooks/useAuth';
 import { ThemeProvider } from './context/ThemeContext';
 import { Toaster } from 'react-hot-toast';
+
+const queryClient = new QueryClient();
 
 // Componentes
 import Login from './components/Login';
@@ -44,8 +47,9 @@ function App() {
   }
 
   return (
-    <ThemeProvider>
-      <Toaster 
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <Toaster 
         position="top-right" 
         toastOptions={{
           style: {
@@ -124,6 +128,7 @@ function App() {
         </ErrorBoundary>
       </BrowserRouter>
     </ThemeProvider>
+    </QueryClientProvider>
   )
 }
 
