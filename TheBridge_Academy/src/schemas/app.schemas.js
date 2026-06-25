@@ -36,7 +36,7 @@ export const alumnoSchema = z.object({
   nombre: requiredText('El nombre'),
   email: z.email('Introduce un email valido').trim(),
   avatar: z.string().default(''),
-  promociones_id: z.array(z.string()).min(1, 'Selecciona una promocion'),
+  promociones_id: z.array(z.string()).default([]),
   modulos_id: z.array(z.string()).default([]),
 });
 
@@ -45,7 +45,7 @@ export const profesorSchema = z.object({
   email: z.email('Introduce un email valido').trim(),
   avatar: z.string().default(''),
   campus_id: requiredText('El campus'),
-  promocion_id: z.array(z.string()).min(1, 'Selecciona una promocion'),
+  promocion_id: z.array(z.string()).default([]),
   isActive: z.boolean().default(true),
 });
 
@@ -66,4 +66,16 @@ export const leccionSchema = z.object({
   descripcion: requiredText('La descripcion'),
   contenido_url: optionalUrl.default(''),
   videos_url: z.array(z.string()).default([]),
+});
+
+export const adminSchema = z.object({
+  nombre: requiredText('El nombre'),
+  email: z.email('Introduce un email valido').trim(),
+  avatar: z.string().default(''),
+  campus_asignados: z.array(z.string()).default([]),
+  isActive: z.boolean().default(true),
+});
+
+export const adminEstadoSchema = z.object({
+  isActive: z.boolean(),
 });

@@ -81,15 +81,20 @@ export const DataProvider = ({ children }) => {
   }, []);
 
   // Consolidar todos los usuarios (deduplicar por ID para evitar claves React duplicadas)
-  const allUsers = [...adminsList, ...profesoresList, ...alumnosList];
-  const seenIds = new Set();
-  const usuarios = allUsers.filter(u => {
-    if (seenIds.has(u.id)) return false;
-    seenIds.add(u.id);
-    return true;
-  });
+  const usuarios = React.useMemo(() => {
+    const allUsers = [...adminsList, ...profesoresList, ...alumnosList];
+    const seenIds = new Set();
+    return allUsers.filter(u => {
+      if (seenIds.has(u.id)) return false;
+      seenIds.add(u.id);
+      return true;
+    });
+  }, [adminsList, profesoresList, alumnosList]);
+
   // Equipo: solo admins e instructores
-  const equipo = [...adminsList, ...profesoresList].filter((u, i, arr) => arr.findIndex(x => x.id === u.id) === i);
+  const equipo = React.useMemo(() => {
+    return [...adminsList, ...profesoresList].filter((u, i, arr) => arr.findIndex(x => x.id === u.id) === i);
+  }, [adminsList, profesoresList]);
 
   return (
     <DataContext.Provider value={{ modulos, promociones, campuses, usuarios, equipo, loading }}>

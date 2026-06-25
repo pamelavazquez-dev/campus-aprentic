@@ -2,8 +2,10 @@ import { useState, useEffect, useMemo } from 'react';
 import { getAllModulos, updateModulo } from '../../services/modulos.service';
 import { getAllLecciones, createLeccion, deleteLeccion } from '../../services/lecciones.service';
 import { useNavigate } from 'react-router-dom';
+import { useRBAC } from '../../hooks/useRBAC';
+import { ROLES } from '../../utils/rbac';
 
-export default function WizardCurso({ isAdmin }) {
+export default function WizardCurso() {
   const [modulos, setModulos] = useState([]);
   const [lecciones, setLecciones] = useState([]);
   const [selectedModulo, setSelectedModulo] = useState('');
@@ -14,6 +16,8 @@ export default function WizardCurso({ isAdmin }) {
   const [nuevaLeccion, setNuevaLeccion] = useState({ titulo: '', descripcion: '', contenido_url: '', videos_url: '' });
   const [mensaje, setMensaje] = useState({ text: '', type: '' });
   const navigate = useNavigate();
+  const { isAuthorized } = useRBAC();
+  const isAdmin = isAuthorized(ROLES.ADMIN);
 
   const fetchData = async () => {
     try {

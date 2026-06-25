@@ -15,28 +15,21 @@ export const AuthProvider = ({ children }) => {
       if (currentUser) {
         setUser(currentUser);
         try {
-          const adminDoc = await getDoc(doc(db, 'admin', currentUser.uid));
+          const [adminDoc, profDoc, alumnoDoc] = await Promise.all([
+            getDoc(doc(db, 'admin', currentUser.uid)),
+            getDoc(doc(db, 'profesores', currentUser.uid)),
+            getDoc(doc(db, 'alumnos', currentUser.uid))
+          ]);
+
           if (adminDoc.exists()) {
             setRole('admin');
-            setLoading(false);
-            return;
-          }
-          
-          const profDoc = await getDoc(doc(db, 'profesores', currentUser.uid));
-          if (profDoc.exists()) {
+          } else if (profDoc.exists()) {
             setRole('instructor');
-            setLoading(false);
-            return;
-          }
-
-          const alumnoDoc = await getDoc(doc(db, 'alumnos', currentUser.uid));
-          if (alumnoDoc.exists()) {
+          } else if (alumnoDoc.exists()) {
             setRole('alumno');
-            setLoading(false);
-            return;
+          } else {
+            setRole(null);
           }
-          
-          setRole(null);
         } catch (error) {
           console.error("Error al obtener el rol del usuario:", error);
           setRole(null);

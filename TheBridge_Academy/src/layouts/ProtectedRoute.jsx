@@ -1,19 +1,17 @@
 import { Navigate } from 'react-router-dom';
+import { useRBAC } from '../hooks/useRBAC';
 
-export default function ProtectedRoute({ user, role, requiredRole, children }) {
+export default function ProtectedRoute({ requiredRole, children }) {
+  const { user, loading, isAuthorized, fallbackRoute } = useRBAC();
+
+  if (loading) return null; // Wait for auth to initialize
+  
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  // Si se requiere un rol específico y no coincide, redirigimos a una ruta segura
-  if (requiredRole && role !== requiredRole) {
-    // Redirigir según su rol real
-    switch (role) {
-      case 'admin': return <Navigate to="/admin" replace />;
-      case 'instructor': return <Navigate to="/instructor" replace />;
-      case 'alumno': return <Navigate to="/alumno" replace />;
-      default: return <Navigate to="/login" replace />;
-    }
+  if (requiredRole && !isAuthorized(requiredRole)) {
+    return <Navigate to={fallbackRoute} replace />;
   }
 
   return children;

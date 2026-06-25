@@ -7,6 +7,8 @@ import { Toaster } from 'react-hot-toast';
 import Login from './components/Login';
 import ProtectedRoute from './layouts/ProtectedRoute';
 
+import ErrorBoundary from './components/ErrorBoundary';
+
 // Layouts
 import AdminLayout from './layouts/AdminLayout';
 import InstructorLayout from './layouts/InstructorLayout';
@@ -70,12 +72,13 @@ function App() {
         }}
       />
       <BrowserRouter>
-      <Routes>
+        <ErrorBoundary>
+        <Routes>
         <Route path="/login" element={!user ? <Login /> : <Navigate to={`/${role || 'login'}`} replace />} />
         
         {/* Rutas de Administrador */}
         <Route path="/admin/*" element={
-          <ProtectedRoute user={user} role={role} requiredRole="admin">
+          <ProtectedRoute requiredRole="admin">
             <DataProvider>
               <AdminLayout user={user} />
             </DataProvider>
@@ -87,13 +90,13 @@ function App() {
           <Route path="campus" element={<PromocionesView />} />
           <Route path="modulos" element={<AdminModulosView />} />
           <Route path="inscripciones" element={<InscripcionesView />} />
-          <Route path="modulos/nuevo" element={<WizardCurso isAdmin={true} />} />
-          <Route path="modulos/ver/:id" element={<VisorLeccion isAdmin={true} />} />
+          <Route path="modulos/nuevo" element={<WizardCurso />} />
+          <Route path="modulos/ver/:id" element={<VisorLeccion />} />
         </Route>
 
         {/* Rutas de Instructor */}
         <Route path="/instructor/*" element={
-          <ProtectedRoute user={user} role={role} requiredRole="instructor">
+          <ProtectedRoute requiredRole="instructor">
             <InstructorLayout user={user} />
           </ProtectedRoute>
         }>
@@ -106,7 +109,7 @@ function App() {
 
         {/* Rutas de Alumno */}
         <Route path="/alumno/*" element={
-          <ProtectedRoute user={user} role={role} requiredRole="alumno">
+          <ProtectedRoute requiredRole="alumno">
             <AlumnoLayout user={user} />
           </ProtectedRoute>
         }>
@@ -118,6 +121,7 @@ function App() {
         {/* Redirección por defecto */}
         <Route path="*" element={<Navigate to={user ? `/${role}` : "/login"} replace />} />
       </Routes>
+        </ErrorBoundary>
       </BrowserRouter>
     </ThemeProvider>
   )
