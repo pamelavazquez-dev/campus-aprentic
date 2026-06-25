@@ -2,7 +2,7 @@ import { signOut } from 'firebase/auth';
 import { auth, db } from '../config/firebase';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { doc, getDoc, collection, query, where, limit, getDocs } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, limit, getDocs, onSnapshot } from 'firebase/firestore';
 import Logo from '../components/Logo';
 import Avatar from '../components/ui/Avatar';
 import ThemeToggle from '../components/ui/ThemeToggle';
@@ -20,7 +20,9 @@ export default function AlumnoLayout({ user }) {
   ];
 
   useEffect(() => {
-    async function checkAccess() {
+    let unsubscribe = null;
+
+    async function setupAccessListener() {
       if (!user) return;
       try {
         let currentAlumno = null;
@@ -37,21 +39,34 @@ export default function AlumnoLayout({ user }) {
 
         if (currentAlumno && currentAlumno.promociones_id && currentAlumno.promociones_id.length > 0) {
           const promoId = currentAlumno.promociones_id[0];
-          const promoDoc = await getDoc(doc(db, 'promociones', promoId));
-          if (promoDoc.exists()) {
-            const promoData = promoDoc.data();
-            if (promoData.estado === 'completada' && promoData.fechaFin) {
-              setAccessDenied(true);
+          
+          unsubscribe = onSnapshot(doc(db, 'promociones', promoId), (docSnap) => {
+            if (docSnap.exists()) {
+              const promoData = docSnap.data();
+              if (promoData.estado === 'completada' && promoData.fechaFin) {
+                setAccessDenied(true);
+              } else {
+                setAccessDenied(false);
+              }
             }
-          }
+            setLoadingAccess(false);
+          }, (err) => {
+            console.error("Error listening to promo:", err);
+            setLoadingAccess(false);
+          });
+        } else {
+          setLoadingAccess(false);
         }
       } catch (error) {
-        console.error("Error checking access", error);
-      } finally {
+        console.error("Error setup access listener", error);
         setLoadingAccess(false);
       }
     }
-    checkAccess();
+    setupAccessListener();
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, [user]);
 
   const handleLogout = async () => {
