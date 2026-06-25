@@ -1,24 +1,66 @@
 import { signOut } from 'firebase/auth';
-import { auth } from '../config/firebase';
+import { auth, db } from '../config/firebase';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { doc, getDoc, collection, query, where, limit, getDocs } from 'firebase/firestore';
 import Logo from '../components/Logo';
 import Avatar from '../components/ui/Avatar';
 import ThemeToggle from '../components/ui/ThemeToggle';
+import ConfirmModal from '../components/ui/ConfirmModal';
 
 export default function AlumnoLayout({ user }) {
   const navigate = useNavigate();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [accessDenied, setAccessDenied] = useState(false);
+  const [loadingAccess, setLoadingAccess] = useState(true);
+
   const menuItems = [
     { path: '/alumno', label: 'Mis Módulos', exact: true },
     { path: '/alumno/notas', label: 'Mis Notas' }
   ];
+
+  useEffect(() => {
+    async function checkAccess() {
+      if (!user) return;
+      try {
+        let currentAlumno = null;
+        const alumnoDoc = await getDoc(doc(db, 'alumnos', user.uid));
+        if (alumnoDoc.exists()) {
+          currentAlumno = { id: alumnoDoc.id, ...alumnoDoc.data() };
+        } else if (user.email) {
+          const q = query(collection(db, 'alumnos'), where('email', '==', user.email), limit(1));
+          const snap = await getDocs(q);
+          if (!snap.empty) {
+            currentAlumno = { id: snap.docs[0].id, ...snap.docs[0].data() };
+          }
+        }
+
+        if (currentAlumno && currentAlumno.promociones_id && currentAlumno.promociones_id.length > 0) {
+          const promoId = currentAlumno.promociones_id[0];
+          const promoDoc = await getDoc(doc(db, 'promociones', promoId));
+          if (promoDoc.exists()) {
+            const promoData = promoDoc.data();
+            if (promoData.estado === 'completada' && promoData.fechaFin) {
+              setAccessDenied(true);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error checking access", error);
+      } finally {
+        setLoadingAccess(false);
+      }
+    }
+    checkAccess();
+  }, [user]);
 
   const handleLogout = async () => {
     await signOut(auth);
     navigate('/login');
   };
 
-  // Removed local getInitials as it is handled by Avatar component
   const userName = user?.displayName || user?.email?.split('@')[0] || 'Alumno';
+
 
   return (
     <div className="flex flex-col min-h-screen w-full bg-transparent">
@@ -54,7 +96,7 @@ export default function AlumnoLayout({ user }) {
             </div>
           </div>
           <button 
-            onClick={handleLogout} 
+            onClick={() => setShowLogoutConfirm(true)} 
             title="Cerrar Sesión"
             className="bg-transparent border-none text-[#B9C0CA] cursor-pointer flex items-center justify-center p-2 rounded-lg transition-all duration-200 hover:text-brand-primary hover:bg-brand-primary/10"
           >
@@ -66,9 +108,44 @@ export default function AlumnoLayout({ user }) {
         </div>
       </header>
 
-      <main className="flex-1 p-12 overflow-y-auto w-full box-border">
-        <Outlet />
+      <main className="flex-1 p-12 overflow-y-auto w-full box-border relative">
+        {loadingAccess ? (
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              <div className="w-12 h-12 border-4 border-gray200 border-t-brand-primary rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-text-secondary text-sm">Verificando acceso...</p>
+            </div>
+          </div>
+        ) : accessDenied ? (
+          <div className="flex flex-col items-center justify-center min-h-[50vh] text-center max-w-lg mx-auto bg-surface-solid border border-border-default p-12 rounded-3xl shadow-lg mt-12">
+            <div className="w-20 h-20 bg-red-100 text-red-500 rounded-full flex items-center justify-center mb-6">
+              <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </div>
+            <h2 className="text-3xl font-black text-text-strong mb-4">Acceso Restringido</h2>
+            <p className="text-text-secondary mb-8 leading-relaxed">
+              Tu promoción ha finalizado y ya no tienes acceso activo a la plataforma. 
+              Si crees que esto es un error, por favor contacta con tu instructor o coordinador.
+            </p>
+            <button 
+              onClick={() => setShowLogoutConfirm(true)}
+              className="bg-brand-gradient text-white border-none py-3 px-8 rounded-xl font-bold cursor-pointer transition-all hover:shadow-lg hover:-translate-y-0.5"
+            >
+              Cerrar Sesión
+            </button>
+          </div>
+        ) : (
+          <Outlet />
+        )}
       </main>
+
+      <ConfirmModal 
+        isOpen={showLogoutConfirm}
+        title="¿Cerrar Sesión?"
+        message="Estás a punto de salir de The Bridge Academy. Tendrás que volver a iniciar sesión para acceder."
+        confirmText="Salir"
+        onConfirm={handleLogout}
+        onCancel={() => setShowLogoutConfirm(false)}
+      />
     </div>
   );
 }

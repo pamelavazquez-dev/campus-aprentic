@@ -1,12 +1,16 @@
 import { signOut } from 'firebase/auth';
 import { auth } from '../config/firebase';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import Logo from '../components/Logo';
 import Avatar from '../components/ui/Avatar';
 import ThemeToggle from '../components/ui/ThemeToggle';
+import ConfirmModal from '../components/ui/ConfirmModal';
 
 export default function InstructorLayout({ user }) {
   const navigate = useNavigate();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  
   const menuItems = [
     { path: '/instructor', label: 'Dashboard', exact: true },
     { path: '/instructor/wizard', label: 'Módulos/Lecciones' },
@@ -55,7 +59,7 @@ export default function InstructorLayout({ user }) {
             </div>
           </div>
           <button 
-            onClick={handleLogout} 
+            onClick={() => setShowLogoutConfirm(true)} 
             title="Cerrar Sesión"
             className="bg-transparent border-none text-[#B9C0CA] cursor-pointer flex items-center justify-center p-2 rounded-lg transition-all duration-200 hover:text-brand-primary hover:bg-brand-primary/10"
           >
@@ -70,6 +74,15 @@ export default function InstructorLayout({ user }) {
       <main className="flex-1 p-12 overflow-y-auto w-full box-border">
         <Outlet />
       </main>
+
+      <ConfirmModal 
+        isOpen={showLogoutConfirm}
+        title="¿Cerrar Sesión?"
+        message="Estás a punto de salir del panel de instructores."
+        confirmText="Salir"
+        onConfirm={handleLogout}
+        onCancel={() => setShowLogoutConfirm(false)}
+      />
     </div>
   );
 }

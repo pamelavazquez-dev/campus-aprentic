@@ -2,6 +2,7 @@ import { useState, useContext } from 'react';
 import { DataContext } from '../context/DataContext';
 import CrearPromocionForm from '../components/forms/CrearPromocionForm';
 import EditarCampusForm from '../components/forms/EditarCampusForm';
+import ConfirmModal from '../components/ui/ConfirmModal';
 import { deletePromocion, updatePromocion } from '../services/promociones.service';
 import toast from 'react-hot-toast';
 
@@ -11,6 +12,7 @@ export default function PromocionesView() {
   const [promoToEdit, setPromoToEdit] = useState(null);
   const [campusToEdit, setCampusToEdit] = useState(null);
   const [selectedCampusForModal, setSelectedCampusForModal] = useState(null);
+  const [promoToDeactivate, setPromoToDeactivate] = useState(null);
 
   const handlePromocionCreated = () => {
     setShowModal(false);
@@ -34,11 +36,20 @@ export default function PromocionesView() {
     }
   };
 
-  const handleToggleEstado = async (promo) => {
+  const handleToggleEstadoClick = (promo) => {
+    if (promo.estado === 'activa') {
+      setPromoToDeactivate(promo);
+    } else {
+      executeToggleEstado(promo);
+    }
+  };
+
+  const executeToggleEstado = async (promo) => {
     const nuevoEstado = promo.estado === 'completada' ? 'activa' : 'completada';
     try {
       await updatePromocion(promo.id, { ...promo, estado: nuevoEstado });
       toast.success(`Promoción ${nuevoEstado === 'completada' ? 'desactivada' : 'activada'} correctamente`);
+      setPromoToDeactivate(null);
     } catch (error) {
       console.error("Error al cambiar estado:", error);
       toast.error("Error al actualizar el estado de la promoción");
@@ -198,7 +209,7 @@ export default function PromocionesView() {
                         
                         <div className="mt-auto pt-4 border-t border-border-default flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
                           <button 
-                            onClick={() => handleToggleEstado(promo)}
+                            onClick={() => handleToggleEstadoClick(promo)}
                             className={`${promo.estado === 'completada' ? 'text-green-600 bg-green-50 hover:bg-green-100' : 'text-amber-600 bg-amber-50 hover:bg-amber-100'} p-2 rounded-xl transition-colors cursor-pointer border-none flex-1 flex justify-center`}
                             title={promo.estado === 'completada' ? "Reactivar Promoción" : "Desactivar Promoción"}
                           >
@@ -242,6 +253,16 @@ export default function PromocionesView() {
           </div>
         </div>
       )}
+
+      <ConfirmModal 
+        isOpen={!!promoToDeactivate}
+        title="¿Desactivar Promoción?"
+        message={`Estás a punto de marcar la promoción "${promoToDeactivate?.nombre}" como completada/inactiva. Si tiene fecha de fin guardada, los alumnos perderán el acceso a la plataforma de esta promoción.`}
+        confirmText="Desactivar"
+        onConfirm={() => executeToggleEstado(promoToDeactivate)}
+        onCancel={() => setPromoToDeactivate(null)}
+        isDanger={true}
+      />
     </div>
   );
 }
