@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import { useEffect, useState } from 'react';
 import { createAlumno, updateAlumno } from '../../services/alumnos.service';
 import { getAllPromociones } from '../../services/promociones.service';
@@ -76,7 +77,7 @@ export default function CrearAlumnoForm({ alumno = null, onClose, onSaved }) {
       }
 
       console.error('Error guardando alumno', error.code || error.name, error.message, error);
-      alert(`No se pudo guardar el alumno. ${error.code || error.message || 'Revisa permisos de Firestore.'}`);
+      toast.error(`No se pudo guardar el alumno. ${error.code || error.message || 'Revisa permisos de Firestore.'}`);
     } finally {
       setLoading(false);
     }
@@ -105,7 +106,7 @@ export default function CrearAlumnoForm({ alumno = null, onClose, onSaved }) {
           <div className="flex flex-col gap-2">
             <label className="text-sm font-bold text-text-strong">Nombre del Alumno</label>
             <input
-              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300"
+              className="w-full px-4 py-3 bg-surface-solid border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300"
               value={formData.nombre}
               onChange={(event) => updateField('nombre', event.target.value)}
               placeholder="Nombre y apellidos"
@@ -117,7 +118,7 @@ export default function CrearAlumnoForm({ alumno = null, onClose, onSaved }) {
           <div className="flex flex-col gap-2">
             <label className="text-sm font-bold text-text-strong">Correo Electrónico</label>
             <input
-              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300"
+              className="w-full px-4 py-3 bg-surface-solid border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300"
               type="email"
               value={formData.email}
               onChange={(event) => updateField('email', event.target.value)}
@@ -131,7 +132,7 @@ export default function CrearAlumnoForm({ alumno = null, onClose, onSaved }) {
             <label className="text-sm font-bold text-text-strong">Promoción Asignada</label>
             <div className="relative">
               <select
-                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300 cursor-pointer appearance-none"
+                className="w-full px-4 py-3 bg-surface-solid border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300 cursor-pointer appearance-none"
                 value={formData.promocion_id}
                 onChange={(event) => updateField('promocion_id', event.target.value)}
               >

@@ -2,8 +2,10 @@ import { useState, useEffect, useMemo } from 'react';
 import { getAllModulos, updateModulo } from '../../services/modulos.service';
 import { getAllLecciones, createLeccion, deleteLeccion } from '../../services/lecciones.service';
 import { useNavigate } from 'react-router-dom';
+import { useRBAC } from '../../hooks/useRBAC';
+import { ROLES } from '../../utils/rbac';
 
-export default function WizardCurso({ isAdmin }) {
+export default function WizardCurso() {
   const [modulos, setModulos] = useState([]);
   const [lecciones, setLecciones] = useState([]);
   const [selectedModulo, setSelectedModulo] = useState('');
@@ -14,6 +16,8 @@ export default function WizardCurso({ isAdmin }) {
   const [nuevaLeccion, setNuevaLeccion] = useState({ titulo: '', descripcion: '', contenido_url: '', videos_url: '' });
   const [mensaje, setMensaje] = useState({ text: '', type: '' });
   const navigate = useNavigate();
+  const { isAuthorized } = useRBAC();
+  const isAdmin = isAuthorized(ROLES.ADMIN);
 
   const fetchData = async () => {
     try {
@@ -145,7 +149,7 @@ export default function WizardCurso({ isAdmin }) {
             Seleccionar módulo
           </label>
           <select
-            className="w-full px-4 py-3 bg-white border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
+            className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
             value={selectedModulo}
             onChange={e => { setSelectedModulo(e.target.value); setExpandedLeccion(null); setShowCrear(false); }}
             style={{ fontSize: '15px', fontWeight: 600, padding: '12px 16px', cursor: 'pointer', width: '100%' }}
@@ -242,7 +246,7 @@ export default function WizardCurso({ isAdmin }) {
             <div style={{ gridColumn: '1 / -1' }}>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '6px' }}>Título de la lección *</label>
               <input
-                className="w-full px-4 py-3 bg-white border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
+                className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
                 value={nuevaLeccion.titulo}
                 onChange={e => setNuevaLeccion({ ...nuevaLeccion, titulo: e.target.value })}
                 placeholder="Ej: Introducción a React Hooks"
@@ -252,7 +256,7 @@ export default function WizardCurso({ isAdmin }) {
             <div style={{ gridColumn: '1 / -1' }}>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '6px' }}>Descripción</label>
               <textarea
-                className="w-full px-4 py-3 bg-white border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
+                className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
                 value={nuevaLeccion.descripcion}
                 onChange={e => setNuevaLeccion({ ...nuevaLeccion, descripcion: e.target.value })}
                 placeholder="Descripción del contenido de esta lección..."
@@ -263,7 +267,7 @@ export default function WizardCurso({ isAdmin }) {
             <div>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '6px' }}>URL del contenido (PDF, Markdown...)</label>
               <input
-                className="w-full px-4 py-3 bg-white border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
+                className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
                 value={nuevaLeccion.contenido_url}
                 onChange={e => setNuevaLeccion({ ...nuevaLeccion, contenido_url: e.target.value })}
                 placeholder="assets/lecciones/temario/leccion.md"
@@ -273,7 +277,7 @@ export default function WizardCurso({ isAdmin }) {
             <div>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '6px' }}>URLs de vídeos (separados por coma)</label>
               <input
-                className="w-full px-4 py-3 bg-white border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
+                className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
                 value={nuevaLeccion.videos_url}
                 onChange={e => setNuevaLeccion({ ...nuevaLeccion, videos_url: e.target.value })}
                 placeholder="url1.mp4, url2.mp4"

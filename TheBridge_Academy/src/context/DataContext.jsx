@@ -31,10 +31,13 @@ export const DataProvider = ({ children }) => {
     };
 
     // Helper to normalize data and add role
-    const normalize = (doc, role) => ({
-      id: doc.id,
+    // IMPORTANT: rol goes AFTER spread so stored data can't overwrite it.
+    // _collection tracks the source collection for reliable CRUD writes.
+    const normalize = (docSnap, role, collectionName) => ({
+      id: docSnap.id,
+      ...docSnap.data(),
       rol: role,
-      ...doc.data()
+      _collection: collectionName,
     });
 
     const unsubModulos = onSnapshot(collection(db, 'modulos'), (snapshot) => {
@@ -48,17 +51,17 @@ export const DataProvider = ({ children }) => {
     }, (error) => console.error(error));
 
     const unsubAlumnos = onSnapshot(collection(db, 'alumnos'), (snapshot) => {
-      setAlumnosList(snapshot.docs.map(doc => normalize(doc, 'Alumno')));
+      setAlumnosList(snapshot.docs.map(doc => normalize(doc, 'Alumno', 'alumnos')));
       if (loadedCount < TOTAL_COLLECTIONS) checkLoading();
     }, (error) => console.error(error));
 
     const unsubProfes = onSnapshot(collection(db, 'profesores'), (snapshot) => {
-      setProfesoresList(snapshot.docs.map(doc => normalize(doc, 'Instructor')));
+      setProfesoresList(snapshot.docs.map(doc => normalize(doc, 'Instructor', 'profesores')));
       if (loadedCount < TOTAL_COLLECTIONS) checkLoading();
     }, (error) => console.error(error));
 
     const unsubAdmins = onSnapshot(collection(db, 'admin'), (snapshot) => {
-      setAdminsList(snapshot.docs.map(doc => normalize(doc, 'Administrador')));
+      setAdminsList(snapshot.docs.map(doc => normalize(doc, 'Administrador', 'admin')));
       if (loadedCount < TOTAL_COLLECTIONS) checkLoading();
     }, (error) => console.error(error));
 
@@ -77,10 +80,21 @@ export const DataProvider = ({ children }) => {
     };
   }, []);
 
-  // Consolidar todos los usuarios
-  const usuarios = [...adminsList, ...profesoresList, ...alumnosList];
+  // Consolidar todos los usuarios (deduplicar por ID para evitar claves React duplicadas)
+  const usuarios = React.useMemo(() => {
+    const allUsers = [...adminsList, ...profesoresList, ...alumnosList];
+    const seenIds = new Set();
+    return allUsers.filter(u => {
+      if (seenIds.has(u.id)) return false;
+      seenIds.add(u.id);
+      return true;
+    });
+  }, [adminsList, profesoresList, alumnosList]);
+
   // Equipo: solo admins e instructores
-  const equipo = [...adminsList, ...profesoresList];
+  const equipo = React.useMemo(() => {
+    return [...adminsList, ...profesoresList].filter((u, i, arr) => arr.findIndex(x => x.id === u.id) === i);
+  }, [adminsList, profesoresList]);
 
   return (
     <DataContext.Provider value={{ modulos, promociones, campuses, usuarios, equipo, loading }}>

@@ -11,96 +11,64 @@ import {
 } from 'firebase/firestore';
 
 /**
- * Normaliza las referencias y los timestamps de Firestore para que
- * sean más fáciles de usar en React.
+ * Conversor genérico por defecto de Firestore.
+ * Abstrae la normalización de fechas y referencias.
  */
-function normalizeDocData(document) {
-  const data = document.data();
-  const normalized = { id: document.id };
-  
-  for (const [key, value] of Object.entries(data)) {
-    // Convertir Timestamps de Firestore a cadenas ISO
-    if (value && typeof value === 'object' && 'seconds' in value && 'nanoseconds' in value) {
-      normalized[key] = new Date(value.seconds * 1000).toISOString();
-    } 
-    // Convertir DocumentReferences a sus rutas (strings)
-    else if (value && typeof value === 'object' && value.type === 'document') {
-      normalized[key] = value.path;
-    } 
-    else {
-      normalized[key] = value;
+export const defaultConverter = {
+  toFirestore(data) {
+    const prepared = { ...data };
+    for (const [key, value] of Object.entries(prepared)) {
+      if (typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)) {
+        prepared[key] = new Date(value);
+      }
     }
-  }
-  
-  return normalized;
-}
-
-/**
- * Prepara los datos antes de guardarlos (por ahora pasa los datos directamente,
- * pero se puede ampliar para inyectar referencias si fuera necesario).
- */
-function prepareDocData(data) {
-  // Aquí podríamos convertir fechas de vuelta a Timestamps si Firebase lo exige,
-  // pero Firebase v9 acepta objetos Date nativos directamente.
-  const prepared = { ...data };
-  
-  for (const [key, value] of Object.entries(prepared)) {
-    if (typeof value === 'string' && value.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)) {
-      prepared[key] = new Date(value);
+    return prepared;
+  },
+  fromFirestore(snapshot, options) {
+    const data = snapshot.data(options);
+    const normalized = { id: snapshot.id };
+    
+    for (const [key, value] of Object.entries(data)) {
+      if (value && typeof value === 'object' && 'seconds' in value && 'nanoseconds' in value) {
+        normalized[key] = new Date(value.seconds * 1000).toISOString();
+      } else if (value && typeof value === 'object' && value.type === 'document') {
+        normalized[key] = value.path;
+      } else {
+        normalized[key] = value;
+      }
     }
+    return normalized;
   }
-  
-  return prepared;
-}
+};
 
-export const getDoc = async (collectionName, id, converter = null) => {
+export const getDoc = async (collectionName, id, converter = defaultConverter) => {
   if (!id) return null;
-  let docRef = doc(db, collectionName, id);
-  if (converter) docRef = docRef.withConverter(converter);
-  
+  const docRef = doc(db, collectionName, id).withConverter(converter);
   const document = await firestoreGetDoc(docRef);
-  
-  if (!document.exists()) return null;
-  return converter ? document.data() : normalizeDocData(document);
+  return document.exists() ? document.data() : null;
 };
 
-export const getAll = async (collectionName, converter = null) => {
-  if (!db) throw new Error("Firebase DB not initialized. Missing API keys.");
-  let collRef = collection(db, collectionName);
-  if (converter) collRef = collRef.withConverter(converter);
-  
+export const getAll = async (collectionName, converter = defaultConverter) => {
+  if (!db) throw new Error("Firebase DB not initialized.");
+  const collRef = collection(db, collectionName).withConverter(converter);
   const snapshot = await firestoreGetDocs(collRef);
-  return converter ? snapshot.docs.map(doc => doc.data()) : snapshot.docs.map(normalizeDocData);
+  return snapshot.docs.map(doc => doc.data());
 };
 
-export const createDoc = async (collectionName, id, data, converter = null) => {
+export const createDoc = async (collectionName, id, data, converter = defaultConverter) => {
   if (!id) {
-    let collRef = collection(db, collectionName);
-    if (converter) collRef = collRef.withConverter(converter);
-
-    const preparedData = converter ? data : prepareDocData(data);
-    const docRef = await addDoc(collRef, preparedData);
+    const collRef = collection(db, collectionName).withConverter(converter);
+    const docRef = await addDoc(collRef, data);
     return { ...data, id: docRef.id };
   }
-
-  let docRef = doc(db, collectionName, id);
-  if (converter) docRef = docRef.withConverter(converter);
-  
-  const preparedData = converter ? data : prepareDocData(data);
-  await setDoc(docRef, preparedData);
-  return { ...data, id }; // Retornamos los datos para feedback
+  const docRef = doc(db, collectionName, id).withConverter(converter);
+  await setDoc(docRef, data);
+  return { ...data, id };
 };
 
-export const updateDoc = async (collectionName, id, data, converter = null) => {
-  let docRef = doc(db, collectionName, id);
-  if (converter) docRef = docRef.withConverter(converter);
-  
-  const preparedData = converter ? data : prepareDocData(data);
-  if (converter) {
-    await setDoc(docRef, preparedData, { merge: true });
-  } else {
-    await firestoreUpdateDoc(docRef, preparedData);
-  }
+export const updateDoc = async (collectionName, id, data, converter = defaultConverter) => {
+  const docRef = doc(db, collectionName, id).withConverter(converter);
+  await setDoc(docRef, data, { merge: true });
   return { id, ...data };
 };
 

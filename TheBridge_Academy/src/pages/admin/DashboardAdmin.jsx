@@ -18,7 +18,7 @@ export default function DashboardAdmin() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
       
       {/* SaaS Page Header & Sub-Nav */}
-      <div style={{ margin: '-48px -48px 32px -48px', background: '#F8FAFC', borderBottom: '1px solid var(--border)' }}>
+      <div style={{ margin: '-48px -48px 32px -48px', background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}>
         <div style={{ padding: '32px 48px 0 48px', width: '100%', margin: '0 auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
             <div>

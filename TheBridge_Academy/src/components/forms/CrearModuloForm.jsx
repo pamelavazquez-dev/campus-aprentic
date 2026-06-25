@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import { useState } from 'react';
 import { createModulo, updateModulo } from '../../services/modulos.service';
 import { moduloSchema } from '../../schemas/app.schemas';
@@ -57,7 +58,7 @@ export default function CrearModuloForm({ modulo = null, onClose, onSaved }) {
       }
 
       console.error('Error guardando modulo', error.code || error.name, error.message, error);
-      alert(`No se pudo guardar el modulo. ${error.code || error.message || ''}`);
+      toast.error(`No se pudo guardar el modulo. ${error.code || error.message || ''}`);
     } finally {
       setLoading(false);
     }
@@ -86,7 +87,7 @@ export default function CrearModuloForm({ modulo = null, onClose, onSaved }) {
           <div className="flex flex-col gap-2">
             <label className="text-sm font-bold text-text-strong">Nombre del Módulo</label>
             <input
-              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300"
+              className="w-full px-4 py-3 bg-surface-solid border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300"
               value={formData.nombre}
               onChange={(event) => updateField('nombre', event.target.value)}
               placeholder="Ej. FS - Módulo 1: Frontend"
@@ -99,7 +100,7 @@ export default function CrearModuloForm({ modulo = null, onClose, onSaved }) {
             <label className="text-sm font-bold text-text-strong">Especialidad</label>
             <div className="relative">
               <select
-                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300 cursor-pointer appearance-none"
+                className="w-full px-4 py-3 bg-surface-solid border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300 cursor-pointer appearance-none"
                 value={formData.tipo}
                 onChange={(event) => updateField('tipo', event.target.value)}
               >
@@ -116,7 +117,7 @@ export default function CrearModuloForm({ modulo = null, onClose, onSaved }) {
           <div className="flex flex-col gap-2">
             <label className="text-sm font-bold text-text-strong">Duración (Horas)</label>
             <input
-              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300"
+              className="w-full px-4 py-3 bg-surface-solid border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300"
               type="number"
               min="1"
               value={formData.horas}

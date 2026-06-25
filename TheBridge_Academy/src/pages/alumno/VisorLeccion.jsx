@@ -2,8 +2,9 @@ import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getModuloById } from '../../services/modulos.service';
 import { getAllLecciones } from '../../services/lecciones.service';
+import { useRBAC } from '../../hooks/useRBAC';
 
-export default function VisorLeccion({ isAdmin }) {
+export default function VisorLeccion() {
   const { id: moduloId } = useParams();
   const navigate = useNavigate();
   const [modulo, setModulo] = useState(null);
@@ -11,6 +12,7 @@ export default function VisorLeccion({ isAdmin }) {
   const [selectedLeccion, setSelectedLeccion] = useState(null);
   const [loading, setLoading] = useState(true);
   const [completadas, setCompletadas] = useState({});
+  const { canEditModules } = useRBAC();
 
   useEffect(() => {
     async function fetchData() {
@@ -40,8 +42,8 @@ export default function VisorLeccion({ isAdmin }) {
     setCompletadas(prev => ({ ...prev, [lecId]: true }));
   };
 
-  const backUrl = isAdmin ? '/admin/modulos' : '/alumno';
-  const backText = isAdmin ? '← Volver a Gestión de Módulos' : '← Volver a Mis Módulos';
+  const backUrl = canEditModules ? '/admin/modulos' : '/alumno';
+  const backText = canEditModules ? '← Volver a Gestión de Módulos' : '← Volver a Mis Módulos';
 
   const completadasCount = Object.keys(completadas).length;
   const progreso = lecciones.length > 0 ? Math.round((completadasCount / lecciones.length) * 100) : 0;
@@ -225,7 +227,7 @@ export default function VisorLeccion({ isAdmin }) {
               )}
 
               {/* Botón marcar como completada */}
-              {!isAdmin && (
+              {!canEditModules && (
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', paddingTop: '16px', borderTop: '1px solid var(--border)' }}>
                   {completadas[selectedLeccion.id] ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#10B981', fontWeight: 700, fontSize: '14px' }}>

@@ -1,10 +1,13 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import { ThemeProvider } from './context/ThemeContext';
+import { Toaster } from 'react-hot-toast';
 
 // Componentes
 import Login from './components/Login';
 import ProtectedRoute from './layouts/ProtectedRoute';
+
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Layouts
 import AdminLayout from './layouts/AdminLayout';
@@ -42,13 +45,40 @@ function App() {
 
   return (
     <ThemeProvider>
+      <Toaster 
+        position="top-right" 
+        toastOptions={{
+          style: {
+            background: 'var(--surface-solid)',
+            color: 'var(--text-strong)',
+            border: '1px solid var(--border-default)',
+            borderRadius: '12px',
+            boxShadow: '0 10px 24px rgba(0,0,0,0.1)',
+            fontWeight: 600,
+            fontSize: '14px',
+          },
+          success: {
+            iconTheme: {
+              primary: '#10B981',
+              secondary: 'white',
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: '#EF4444',
+              secondary: 'white',
+            },
+          },
+        }}
+      />
       <BrowserRouter>
-      <Routes>
+        <ErrorBoundary>
+        <Routes>
         <Route path="/login" element={!user ? <Login /> : <Navigate to={`/${role || 'login'}`} replace />} />
         
         {/* Rutas de Administrador */}
         <Route path="/admin/*" element={
-          <ProtectedRoute user={user} role={role} requiredRole="admin">
+          <ProtectedRoute requiredRole="admin">
             <DataProvider>
               <AdminLayout user={user} />
             </DataProvider>
@@ -60,13 +90,13 @@ function App() {
           <Route path="campus" element={<PromocionesView />} />
           <Route path="modulos" element={<AdminModulosView />} />
           <Route path="inscripciones" element={<InscripcionesView />} />
-          <Route path="modulos/nuevo" element={<WizardCurso isAdmin={true} />} />
-          <Route path="modulos/ver/:id" element={<VisorLeccion isAdmin={true} />} />
+          <Route path="modulos/nuevo" element={<WizardCurso />} />
+          <Route path="modulos/ver/:id" element={<VisorLeccion />} />
         </Route>
 
         {/* Rutas de Instructor */}
         <Route path="/instructor/*" element={
-          <ProtectedRoute user={user} role={role} requiredRole="instructor">
+          <ProtectedRoute requiredRole="instructor">
             <InstructorLayout user={user} />
           </ProtectedRoute>
         }>
@@ -79,7 +109,7 @@ function App() {
 
         {/* Rutas de Alumno */}
         <Route path="/alumno/*" element={
-          <ProtectedRoute user={user} role={role} requiredRole="alumno">
+          <ProtectedRoute requiredRole="alumno">
             <AlumnoLayout user={user} />
           </ProtectedRoute>
         }>
@@ -91,6 +121,7 @@ function App() {
         {/* Redirección por defecto */}
         <Route path="*" element={<Navigate to={user ? `/${role}` : "/login"} replace />} />
       </Routes>
+        </ErrorBoundary>
       </BrowserRouter>
     </ThemeProvider>
   )
