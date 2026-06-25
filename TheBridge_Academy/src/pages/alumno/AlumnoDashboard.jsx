@@ -3,7 +3,7 @@ import { getAllModulos } from '../../services/modulos.service';
 import { getAllLecciones } from '../../services/lecciones.service';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, limit, getDocs } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 
 export default function AlumnoDashboard() {
@@ -21,10 +21,22 @@ export default function AlumnoDashboard() {
         setModulos(mods.filter(m => m.activo !== false));
         setLecciones(lecs);
         
-        if (user?.uid) {
+        if (user) {
+          let currentAlumno = null;
           const alumnoDoc = await getDoc(doc(db, 'alumnos', user.uid));
           if (alumnoDoc.exists()) {
-            setAlumnoActual({ id: alumnoDoc.id, ...alumnoDoc.data() });
+            currentAlumno = { id: alumnoDoc.id, ...alumnoDoc.data() };
+          } else if (user.email) {
+            const q = query(collection(db, 'alumnos'), where('email', '==', user.email), limit(1));
+            const snap = await getDocs(q);
+            if (!snap.empty) {
+              const d = snap.docs[0];
+              currentAlumno = { id: d.id, ...d.data() };
+            }
+          }
+          
+          if (currentAlumno) {
+            setAlumnoActual(currentAlumno);
           }
         }
       } catch (error) {

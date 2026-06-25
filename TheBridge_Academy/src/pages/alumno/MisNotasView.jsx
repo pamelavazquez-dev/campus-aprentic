@@ -2,12 +2,15 @@ import { useState, useEffect, useContext, useMemo } from 'react';
 import { DataContext } from '../../context/DataContext';
 import { useAuth } from '../../hooks/useAuth';
 import { getAllNotas } from '../../services/notas.service';
+import { doc, getDoc, collection, query, where, limit, getDocs } from 'firebase/firestore';
+import { db } from '../../config/firebase';
 
 export default function MisNotasView() {
   const { user } = useAuth();
   const { modulos, loading: dataLoading } = useContext(DataContext);
   const [notas, setNotas] = useState([]);
   const [loadingNotas, setLoadingNotas] = useState(true);
+  const [alumnoActual, setAlumnoActual] = useState(null);
 
   const fetchNotas = async () => {
     try {
@@ -22,13 +25,38 @@ export default function MisNotasView() {
 
   useEffect(() => {
     fetchNotas();
-  }, []);
+    
+    const fetchAlumno = async () => {
+      if (user) {
+        try {
+          let currentAlumno = null;
+          const alumnoDoc = await getDoc(doc(db, 'alumnos', user.uid));
+          if (alumnoDoc.exists()) {
+            currentAlumno = { id: alumnoDoc.id, ...alumnoDoc.data() };
+          } else if (user.email) {
+            const q = query(collection(db, 'alumnos'), where('email', '==', user.email), limit(1));
+            const snap = await getDocs(q);
+            if (!snap.empty) {
+              const d = snap.docs[0];
+              currentAlumno = { id: d.id, ...d.data() };
+            }
+          }
+          if (currentAlumno) {
+            setAlumnoActual(currentAlumno);
+          }
+        } catch (error) {
+          console.error("Error cargando perfil de alumno:", error);
+        }
+      }
+    };
+    fetchAlumno();
+  }, [user]);
 
   // Filtrar notas para el alumno actual
   const misNotas = useMemo(() => {
-    if (!user) return [];
-    return notas.filter(n => n.alumnoId === user.uid);
-  }, [notas, user]);
+    if (!alumnoActual) return [];
+    return notas.filter(n => n.alumnoId === alumnoActual.id);
+  }, [notas, alumnoActual]);
 
   if (dataLoading || loadingNotas) return <div>Cargando tus notas...</div>;
 
