@@ -59,7 +59,7 @@ export default function WizardCurso() {
       await createLeccion(lecId, {
         modulo_id: selectedModulo,
         titulo: nuevaLeccion.titulo.trim(),
-        descripcion: nuevaLeccion.descripcion.trim(),
+        descripcion: nuevaLeccion.descripcion.trim() || 'Sin descripción',
         contenido_url: nuevaLeccion.contenido_url.trim(),
         contenido_markdown: nuevaLeccion.contenido_markdown,
         videos_url: videosArray
