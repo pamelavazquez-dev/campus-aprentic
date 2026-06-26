@@ -47,6 +47,8 @@ export const moduloSchema = z.object({
   tipo: z.enum(['fs', 'ciber'], 'Selecciona un tipo de modulo'),
   horas: z.coerce.number().int('Las horas deben ser un numero entero').min(1, 'Las horas deben ser mayores que 0'),
   lecciones_Id: z.array(z.string()).default([]),
+  activo: z.boolean().default(true),
+  profesor_id: z.union([z.string(), z.array(z.string())]).default(''),
 });
 
 export const leccionSchema = z.object({
@@ -56,6 +58,24 @@ export const leccionSchema = z.object({
   contenido_url: optionalUrl.default(''),
   contenido_markdown: z.string().optional().default(''),
   videos_url: z.array(z.string()).default([]),
+});
+
+export const proyectoEntregaSchema = z.object({
+  titulo: requiredText('El titulo'),
+  descripcion: z.string().trim().max(500, 'La descripcion no puede superar 500 caracteres').default(''),
+  alumnoId: requiredText('El alumno'),
+  alumnoEmail: z.email('Introduce un email valido').trim(),
+  alumnoAuthUid: requiredText('El usuario autenticado'),
+  moduloId: requiredText('El modulo'),
+  leccionId: requiredText('La leccion'),
+  promocionId: z.string().trim().default(''),
+  archivoUrl: optionalUrl.refine(Boolean, 'El archivo es obligatorio'),
+  archivoNombre: requiredText('El nombre del archivo'),
+  estado: z.enum(['entregado', 'revisado']).default('entregado'),
+  alumnoIds: z.array(z.string()).default([]),
+  notas: z.array(z.string()).default([]),
+  entregadoEn: requiredText('La fecha de entrega'),
+  actualizadoEn: requiredText('La fecha de actualizacion'),
 });
 
 export const adminSchema = z.object({

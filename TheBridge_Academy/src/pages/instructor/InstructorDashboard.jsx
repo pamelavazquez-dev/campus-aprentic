@@ -1,18 +1,27 @@
 import { useState, useEffect } from 'react';
-import Card from '../../components/Card';
 import { getAllModulos } from '../../services/modulos.service';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
+import { useContext, useMemo } from 'react';
+import { DataContext } from '../../context/DataContext';
+import { filterModulesByTracks, getProfesorTracks, getUniqueModulesByName } from '../../utils/academicFilters';
 
 export default function InstructorDashboard() {
   const [modulos, setModulos] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { profile } = useAuth();
+  const { promociones } = useContext(DataContext);
+  const profesorTracks = useMemo(
+    () => getProfesorTracks(profile, promociones),
+    [profile, promociones]
+  );
 
   useEffect(() => {
     async function fetchModulos() {
       try {
         const mods = await getAllModulos();
-        setModulos(mods);
+        setModulos(getUniqueModulesByName(filterModulesByTracks(mods, profesorTracks)));
       } catch (error) {
         console.error("Error al cargar modulos:", error);
       } finally {
@@ -20,7 +29,7 @@ export default function InstructorDashboard() {
       }
     }
     fetchModulos();
-  }, []);
+  }, [profesorTracks.join('|')]);
 
   if (loading) return <div>Cargando tus módulos...</div>;
 

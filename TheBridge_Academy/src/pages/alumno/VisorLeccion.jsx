@@ -1,9 +1,12 @@
+import toast from 'react-hot-toast';
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getModuloById } from '../../services/modulos.service';
 import { getAllLecciones } from '../../services/lecciones.service';
+import { getAllProyectos, guardarEntregaProyecto } from '../../services/proyectos.service';
 import { useRBAC } from '../../hooks/useRBAC';
 import ReactMarkdown from 'react-markdown';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function VisorLeccion() {
   const { id: moduloId } = useParams();
@@ -13,16 +16,22 @@ export default function VisorLeccion() {
   const [selectedLeccion, setSelectedLeccion] = useState(null);
   const [loading, setLoading] = useState(true);
   const [completadas, setCompletadas] = useState({});
+  const [proyectos, setProyectos] = useState([]);
+  const [entregaForm, setEntregaForm] = useState({ titulo: '', descripcion: '', archivoUrl: '' });
+  const [subiendoEntrega, setSubiendoEntrega] = useState(false);
   const { canEditModules } = useRBAC();
+  const { user, profile: alumnoActual } = useAuth();
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const [mod, allLecs] = await Promise.all([
+        const [mod, allLecs, allProyectos] = await Promise.all([
           moduloId ? getModuloById(moduloId) : null,
-          getAllLecciones()
+          getAllLecciones(),
+          getAllProyectos()
         ]);
         setModulo(mod);
+        setProyectos(allProyectos);
         // Filtrar lecciones de este módulo
         const filtered = allLecs.filter(l => {
           const modId = typeof l.modulo_id === 'string' ? l.modulo_id : (l.modulo_id?.id || '');
@@ -41,6 +50,69 @@ export default function VisorLeccion() {
 
   const handleCompletar = (lecId) => {
     setCompletadas(prev => ({ ...prev, [lecId]: true }));
+  };
+
+  const selectedEntrega = useMemo(() => {
+    if (!alumnoActual || !selectedLeccion) return null;
+    return proyectos.find(proyecto => (
+      proyecto.alumnoId === alumnoActual.id &&
+      proyecto.moduloId === moduloId &&
+      proyecto.leccionId === selectedLeccion.id
+    ));
+  }, [alumnoActual, moduloId, proyectos, selectedLeccion]);
+
+  useEffect(() => {
+    setEntregaForm({
+      titulo: selectedEntrega?.titulo || selectedLeccion?.titulo || '',
+      descripcion: selectedEntrega?.descripcion || '',
+      archivoUrl: selectedEntrega?.archivoUrl || ''
+    });
+  }, [selectedEntrega, selectedLeccion]);
+
+  const refreshProyectos = async () => {
+    const allProyectos = await getAllProyectos();
+    setProyectos(allProyectos);
+  };
+
+  const handleSubmitEntrega = async (event) => {
+    event.preventDefault();
+
+    if (!alumnoActual || !selectedLeccion || !modulo) {
+      toast.error('No se pudo preparar la entrega.');
+      return;
+    }
+
+    if (!entregaForm.archivoUrl.trim()) {
+      toast.error('Pega el enlace de tu proyecto.');
+      return;
+    }
+
+    setSubiendoEntrega(true);
+
+    try {
+      await guardarEntregaProyecto({
+        proyectoId: selectedEntrega?.id,
+        titulo: entregaForm.titulo,
+        descripcion: entregaForm.descripcion,
+        alumnoId: alumnoActual.id,
+        alumnoEmail: alumnoActual.email,
+        alumnoAuthUid: user.uid,
+        moduloId,
+        leccionId: selectedLeccion.id,
+        archivoUrl: entregaForm.archivoUrl.trim(),
+        archivoNombre: entregaForm.archivoUrl.trim(),
+        promocionId: alumnoActual.promociones_id?.[0] || '',
+        entregadoEn: selectedEntrega?.entregadoEn,
+      });
+
+      await refreshProyectos();
+      toast.success(selectedEntrega ? 'Entrega actualizada correctamente.' : 'Proyecto entregado correctamente.');
+    } catch (error) {
+      console.error('Error subiendo proyecto:', error);
+      toast.error(error.message || 'No se pudo subir el proyecto.');
+    } finally {
+      setSubiendoEntrega(false);
+    }
   };
 
   const backUrl = canEditModules ? '/admin/modulos' : '/alumno';
@@ -72,28 +144,28 @@ export default function VisorLeccion() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0', margin: '-48px', minHeight: 'calc(100vh - 64px)' }}>
+    <div className="lesson-view-shell animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1260px', margin: '0 auto' }}>
       
       {/* Header del módulo */}
-      <div style={{ background: 'var(--surface-solid)', borderBottom: '1px solid var(--border)', padding: '20px 48px' }}>
+      <div className="lesson-view-header bg-gradient-to-br from-[#0f172a] to-[#3e0c15] rounded-2xl relative overflow-hidden border border-white/10" style={{ padding: '28px 36px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <button
               onClick={() => navigate(backUrl)}
-              style={{ background: 'none', border: 'none', color: 'var(--brand-primary)', cursor: 'pointer', fontWeight: 700, fontSize: '14px', padding: '4px 0' }}
+              style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.14)', borderRadius: '10px', color: 'white', cursor: 'pointer', fontWeight: 800, fontSize: '13px', padding: '10px 14px' }}
             >
               {backText}
             </button>
-            <div style={{ width: '1px', height: '24px', background: 'var(--border)' }}></div>
-            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 900, color: 'var(--text-strong)' }}>
+            <div style={{ width: '1px', height: '32px', background: 'rgba(255,255,255,0.16)' }}></div>
+            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 900, color: 'white' }}>
               {modulo.nombre}
             </h3>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>
+            <span style={{ fontSize: '13px', fontWeight: 700, color: '#B9C0CA' }}>
               {completadasCount}/{lecciones.length} completadas
             </span>
-            <div style={{ width: '120px', height: '6px', background: 'var(--gray200)', borderRadius: '3px', overflow: 'hidden' }}>
+            <div style={{ width: '120px', height: '6px', background: 'rgba(255,255,255,0.16)', borderRadius: '3px', overflow: 'hidden' }}>
               <div style={{ width: `${progreso}%`, height: '100%', background: 'linear-gradient(90deg, var(--brand-primary), #FF6B7A)', transition: 'width 0.5s ease', borderRadius: '3px' }}></div>
             </div>
             <span style={{ fontSize: '13px', fontWeight: 800, color: progreso === 100 ? '#10B981' : 'var(--brand-primary)' }}>
@@ -104,14 +176,34 @@ export default function VisorLeccion() {
       </div>
 
       {/* Layout principal: Sidebar + Contenido */}
-      <div style={{ display: 'flex', flex: 1 }}>
+      <div className="lesson-view-main" style={{ display: 'grid', gridTemplateColumns: '380px minmax(0, 1fr)', gap: '24px', alignItems: 'flex-start' }}>
         
         {/* Sidebar de lecciones */}
-        <div style={{
-          width: '320px', flexShrink: 0,
-          background: 'var(--surface-solid)', borderRight: '1px solid var(--border)',
-          overflowY: 'auto', padding: '16px 0'
+        <div className="lesson-sidebar" style={{
+          background: 'var(--surface)', border: '1px solid var(--border)',
+          borderRadius: '18px', overflowY: 'auto', padding: '20px',
+          boxShadow: 'var(--shadow-sm)', backdropFilter: 'blur(14px)',
+          position: 'sticky', top: '96px', maxHeight: 'calc(100vh - 120px)'
         }}>
+          <div style={{ background: 'var(--gray100)', border: '1px solid var(--border)', borderRadius: '14px', padding: '18px', marginBottom: '18px' }}>
+            <span style={{ fontSize: '11px', fontWeight: 900, color: 'var(--brand-primary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              Ruta del modulo
+            </span>
+            <h4 style={{ margin: '8px 0 14px 0', fontSize: '18px', lineHeight: 1.2, fontWeight: 900, color: 'var(--text-strong)' }}>
+              {modulo.nombre}
+            </h4>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <span style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-secondary)' }}>Progreso</span>
+              <span style={{ fontSize: '13px', fontWeight: 900, color: progreso === 100 ? '#10B981' : 'var(--brand-primary)' }}>{progreso}%</span>
+            </div>
+            <div style={{ height: '8px', background: 'var(--gray200)', borderRadius: '999px', overflow: 'hidden' }}>
+              <div style={{ width: `${progreso}%`, height: '100%', background: 'linear-gradient(90deg, var(--brand-primary), #FF6B7A)', transition: 'width 0.5s ease', borderRadius: '999px' }}></div>
+            </div>
+            <p style={{ margin: '10px 0 0 0', color: 'var(--text-secondary)', fontSize: '13px', fontWeight: 700 }}>
+              {completadasCount} de {lecciones.length} lecciones completadas
+            </p>
+          </div>
+
           <div style={{ padding: '0 16px 12px 16px' }}>
             <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
               Contenido del módulo
@@ -132,16 +224,18 @@ export default function VisorLeccion() {
                   onClick={() => setSelectedLeccion(lec)}
                   style={{
                     display: 'flex', alignItems: 'center', gap: '12px',
-                    padding: '12px 16px', cursor: 'pointer',
+                    padding: '14px', cursor: 'pointer', borderRadius: '12px',
                     background: isSelected ? 'var(--gray100)' : 'transparent',
-                    borderLeft: `3px solid ${isSelected ? 'var(--brand-primary)' : 'transparent'}`,
-                    transition: 'all 0.15s ease'
+                    border: `1px solid ${isSelected ? 'var(--brand-primary)' : 'transparent'}`,
+                    boxShadow: isSelected ? '0 10px 24px rgba(255,48,69,0.10)' : 'none',
+                    transition: 'all 0.2s ease',
+                    marginBottom: '8px'
                   }}
                   onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = 'var(--gray50)'; }}
                   onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = 'transparent'; }}
                 >
                   <div style={{
-                    width: '28px', height: '28px', flexShrink: 0, borderRadius: '50%',
+                    width: '34px', height: '34px', flexShrink: 0, borderRadius: '10px',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: '12px', fontWeight: 800,
                     background: isComplete ? '#10B981' : (isSelected ? 'var(--brand-primary)' : 'var(--gray200)'),
@@ -151,9 +245,9 @@ export default function VisorLeccion() {
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{
-                      fontSize: '14px', fontWeight: isSelected ? 800 : 600,
+                      fontSize: '14px', fontWeight: isSelected ? 900 : 700,
                       color: isSelected ? 'var(--text-strong)' : 'var(--text-secondary)',
-                      whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
+                      lineHeight: 1.35
                     }}>
                       {lec.titulo}
                     </div>
@@ -165,11 +259,11 @@ export default function VisorLeccion() {
         </div>
 
         {/* Panel de contenido de la lección */}
-        <div style={{ flex: 1, padding: '32px 48px', overflowY: 'auto', background: '#F8FAFC' }}>
+        <div className="lesson-content" style={{ flex: 1, minWidth: 0 }}>
           {selectedLeccion ? (
-            <div style={{ maxWidth: '800px', animation: 'fadeSlideDown 0.3s ease' }}>
+            <div style={{ animation: 'fadeSlideDown 0.3s ease' }}>
               {/* Título y meta */}
-              <div style={{ marginBottom: '32px' }}>
+              <div className="bg-surface backdrop-blur-lg border border-border-default rounded-xl p-8 shadow-sm" style={{ marginBottom: '24px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
                   {completadas[selectedLeccion.id] && (
                     <span style={{ fontSize: '11px', fontWeight: 700, background: '#D1FAE5', color: '#065F46', padding: '4px 10px', borderRadius: '6px' }}>
@@ -237,6 +331,110 @@ export default function VisorLeccion() {
                   <p style={{ color: 'var(--text-secondary)', margin: '0 0 4px 0', fontSize: '16px', fontWeight: 700 }}>Contenido pendiente</p>
                   <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: '14px' }}>El instructor aún no ha añadido material a esta lección.</p>
                 </div>
+              )}
+
+              {!canEditModules && (
+                <form
+                  onSubmit={handleSubmitEntrega}
+                  style={{
+                    marginBottom: '24px',
+                    background: 'var(--surface-solid)',
+                    border: '1px solid var(--border)',
+                    borderRadius: '12px',
+                    padding: '24px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '16px'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+                    <div>
+                      <div style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px' }}>
+                        Entrega del proyecto
+                      </div>
+                      <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '14px' }}>
+                        Pega el enlace de tu proyecto, repositorio o documento compartido.
+                      </p>
+                    </div>
+
+                    {selectedEntrega && (
+                      <a
+                        href={selectedEntrega.archivoUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-brand-primary font-black text-sm no-underline hover:underline"
+                      >
+                        Ver entrega actual
+                      </a>
+                    )}
+                  </div>
+
+                  {selectedEntrega && (
+                    <div style={{ background: 'var(--gray100)', border: '1px solid var(--border)', borderRadius: '10px', padding: '12px 14px' }}>
+                      <div style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-strong)', marginBottom: '4px' }}>
+                        {selectedEntrega.titulo}
+                      </div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                        Entregado el {selectedEntrega.entregadoEn ? new Date(selectedEntrega.entregadoEn).toLocaleDateString() : 'sin fecha'}.
+                        Puedes actualizar el enlace si necesitas corregirlo.
+                      </div>
+                    </div>
+                  )}
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                        Titulo
+                      </label>
+                      <input
+                        className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
+                        value={entregaForm.titulo}
+                        onChange={event => setEntregaForm(prev => ({ ...prev, titulo: event.target.value }))}
+                        placeholder="Nombre de tu entrega"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                        Enlace del proyecto
+                      </label>
+                      <input
+                        type="url"
+                        className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
+                        value={entregaForm.archivoUrl}
+                        onChange={event => setEntregaForm(prev => ({ ...prev, archivoUrl: event.target.value }))}
+                        placeholder="https://github.com/usuario/proyecto"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                      Comentario para el instructor
+                    </label>
+                    <textarea
+                      className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
+                      value={entregaForm.descripcion}
+                      onChange={event => setEntregaForm(prev => ({ ...prev, descripcion: event.target.value }))}
+                      placeholder="Puedes indicar enlace a GitHub, detalles de ejecucion o cualquier nota importante."
+                      rows={3}
+                      style={{ resize: 'vertical' }}
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <button
+                      type="submit"
+                      className="bg-brand-gradient text-white py-3 px-6 rounded-lg text-sm font-black transition-all duration-300 hover:-translate-y-0.5 shadow-glow inline-flex items-center justify-center gap-2 border-none cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                      disabled={subiendoEntrega || !entregaForm.titulo.trim() || !entregaForm.archivoUrl.trim()}
+                      style={{ width: 'auto', padding: '12px 24px' }}
+                    >
+                      {subiendoEntrega ? 'Guardando...' : selectedEntrega ? 'Actualizar entrega' : 'Entregar proyecto'}
+                    </button>
+                  </div>
+                </form>
               )}
 
               {/* Botón marcar como completada */}

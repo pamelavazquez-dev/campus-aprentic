@@ -97,9 +97,10 @@
   --text-secondary: #FFFFFF; /* Force all text to white */
   --border-default: var(--border);
   
-  /* Ajustar sombras para dark mode (más sutiles oscuras) */
+  /* Ajustar sombras para dark mode */
   --shadow-md: 0px 22px 40px rgba(0, 0, 0, 0.8);
   --shadow-sm: 0px 10px 24px rgba(0, 0, 0, 0.5);
+  --surface-card-dark: linear-gradient(135deg, rgba(15, 23, 42, 0.96) 0%, rgba(62, 12, 21, 0.9) 100%);
 }
 
 /* Transforma cualquier botón gris/secundario en un botón de cristal transparente premium */
@@ -119,7 +120,7 @@
 }
 
 .dark .logo-image {
-  filter: invert(1) hue-rotate(180deg);
+  filter: none;
 }
 
 body, html {
@@ -146,6 +147,7 @@ body, html {
   max-width: none;
   padding: 0;
   box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 /* Typography from style-guide.svg */
@@ -197,3 +199,59 @@ p {
   to { transform: rotate(360deg); }
 }
 @plugin "@tailwindcss/typography";
+
+/* Dark mode card surfaces */
+.dark .bg-surface,
+.dark .bg-surface-solid:is(.rounded-xl, .rounded-2xl, .rounded-3xl),
+.dark :is(.bg-white\/70, .bg-white\/50, .bg-white\/40),
+.dark :is(.bg-gray-50\/50, .bg-gray-50\/40) {
+  background: var(--surface-card-dark) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark :is(.bg-white, .bg-gray-50) {
+  background-color: var(--surface-solid) !important;
+}
+
+@media (max-width: 768px) {
+  h1 { font-size: 36px; }
+  h2 { font-size: 28px; }
+  h3 { font-size: 22px; }
+
+  table {
+    min-width: 680px;
+  }
+
+  .lesson-view-shell {
+    margin: 0 auto !important;
+    min-height: auto !important;
+  }
+
+  .lesson-view-header {
+    padding: 16px !important;
+  }
+
+  .lesson-view-header > div {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+
+  .lesson-view-main {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .lesson-sidebar {
+    width: 100% !important;
+    position: static !important;
+    max-height: 260px;
+    border-right: 0 !important;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .lesson-content {
+    padding: 0 !important;
+    overflow-x: hidden;
+  }
+}

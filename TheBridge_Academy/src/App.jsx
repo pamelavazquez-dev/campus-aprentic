@@ -39,6 +39,7 @@ import { DataProvider } from './context/DataContext';
 
 function App() {
   const { user, role, loading } = useAuth();
+  const homePath = user && role ? `/${role}` : '/login';
 
   if (loading) {
     return (
@@ -79,6 +80,7 @@ function App() {
       />
       <BrowserRouter>
         <ErrorBoundary>
+        <DataProvider>
         <Routes>
         <Route path="/login" element={
           !user ? <Login /> : 
@@ -94,9 +96,7 @@ function App() {
         {/* Rutas de Administrador */}
         <Route path="/admin/*" element={
           <ProtectedRoute requiredRole="admin">
-            <DataProvider>
-              <AdminLayout user={user} />
-            </DataProvider>
+            <AdminLayout user={user} />
           </ProtectedRoute>
         }>
           <Route index element={<DashboardAdmin />} />
@@ -134,8 +134,9 @@ function App() {
         </Route>
 
         {/* Redirección por defecto */}
-        <Route path="*" element={<Navigate to={user ? `/${role}` : "/login"} replace />} />
+        <Route path="*" element={<Navigate to={homePath} replace />} />
       </Routes>
+        </DataProvider>
         </ErrorBoundary>
       </BrowserRouter>
     </ThemeProvider>
