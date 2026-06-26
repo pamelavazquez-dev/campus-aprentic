@@ -288,8 +288,6 @@ export default function WizardCurso() {
             </span>
           </div>
         )}
-          </div>
-        )}
 
         {/* Botón Crear Lección */}
         {!isAdmin && (
