@@ -35,8 +35,8 @@ export default function InscripcionesView() {
   if (loading) return <div>Cargando inscripciones...</div>;
 
   return (
-    <div className="animate-fade-in" style={{ maxWidth: '1000px', margin: '0 auto' }}>
-      <div className="bg-gradient-to-br from-[#0f172a] to-[#3e0c15] rounded-2xl relative overflow-hidden border border-white/10" style={{ padding: '32px 48px', marginBottom: '32px' }}>
+    <div className="admin-inscripciones-view animate-fade-in" style={{ maxWidth: '1000px', margin: '0 auto' }}>
+      <div className="admin-page-hero bg-gradient-to-br from-[#0f172a] to-[#3e0c15] rounded-2xl relative overflow-hidden border border-white/10" style={{ padding: '32px 48px', marginBottom: '32px' }}>
         <h2 style={{ fontSize: '32px', fontWeight: 900, margin: 0, color: 'white' }}>Inscripciones Recibidas</h2>
         <p style={{ color: '#B9C0CA', margin: '8px 0 0 0', fontSize: '16px' }}>Gestiona las solicitudes de alumnos a los campus.</p>
       </div>
@@ -46,17 +46,17 @@ export default function InscripcionesView() {
           <p>No hay inscripciones pendientes.</p>
         ) : (
           inscripciones.map((insc, i) => (
-            <div key={insc.id || i} className="bg-surface backdrop-blur-lg border border-border-default rounded-xl p-8 shadow-sm transition-all duration-400 hover:-translate-y-[6px] hover:shadow-md" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div key={insc.id || i} className="admin-inscripcion-card bg-surface backdrop-blur-lg border border-border-default rounded-xl p-8 shadow-sm transition-all duration-400 hover:-translate-y-[6px] hover:shadow-md" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div className="admin-inscripcion-user" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                 <div style={{ width: '48px', height: '48px', background: 'var(--gray100)', border: '2px solid var(--border-default)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--brand-primary)', fontWeight: 'bold' }}>
                   {insc.nombre ? insc.nombre[0].toUpperCase() : 'U'}
                 </div>
-                <div>
+                <div className="admin-inscripcion-text">
                   <div style={{ fontSize: '16px', fontWeight: 800, color: 'var(--text-strong)' }}>{insc.nombre} {insc.apellidos}</div>
                   <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>{insc.email} | DNI: {insc.dni}</div>
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
+              <div className="admin-inscripcion-actions" style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
                 <div style={{ textAlign: 'right' }}>
                   <span style={{ 
                     background: insc.aceptada ? '#D1FAE5' : '#FEF3C7', 

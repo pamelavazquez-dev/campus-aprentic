@@ -285,7 +285,7 @@ export default function VisorLeccion() {
                   <div style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '24px', borderBottom: '1px solid var(--border)', paddingBottom: '12px' }}>
                     📖 Apuntes de la lección
                   </div>
-                  <div className="prose prose-invert max-w-none prose-p:leading-relaxed prose-headings:font-black prose-a:text-brand-primary" style={{ color: 'var(--text-strong)' }}>
+                  <div className="prose prose-invert max-w-none prose-p:leading-relaxed prose-headings:font-black prose-a:text-brand-primary" style={{ color: 'var(--text-strong)', textAlign: 'justify' }}>
                     <ReactMarkdown>{selectedLeccion.contenido_markdown}</ReactMarkdown>
                   </div>
                 </div>

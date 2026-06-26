@@ -109,13 +109,65 @@ export default function AdminModulosView() {
         )}
       />
 
-      <DataTable
-        columns={columns}
-        rows={modulos}
-        loading={loading}
-        loadingMessage="Cargando modulos..."
-        emptyMessage="No hay modulos registrados."
-      />
+      <div className="admin-modulos-data-table">
+        <DataTable
+          columns={columns}
+          rows={modulos}
+          loading={loading}
+          loadingMessage="Cargando modulos..."
+          emptyMessage="No hay modulos registrados."
+        />
+      </div>
+
+      <div className="admin-modulos-card-list">
+        {loading ? (
+          <div className="admin-modulos-state-card">
+            Cargando modulos...
+          </div>
+        ) : modulos.length === 0 ? (
+          <div className="admin-modulos-state-card">
+            No hay modulos registrados.
+          </div>
+        ) : (
+          modulos.map((modulo) => (
+            <article key={modulo.id} className="admin-modulos-card bg-surface backdrop-blur-xl border border-border-default shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+              <div className="admin-modulos-card-top">
+                <div>
+                  <span className="admin-modulos-card-eyebrow">{getTipoLabel(modulo.tipo)}</span>
+                  <h3>{modulo.nombre}</h3>
+                </div>
+                <Badge variant={modulo.tipo ? 'success' : 'neutral'}>{getTipoLabel(modulo.tipo)}</Badge>
+              </div>
+
+              <div className="admin-modulos-card-meta">
+                <div>
+                  <span>UID</span>
+                  <strong>{shortId(modulo.id)}</strong>
+                </div>
+                <div>
+                  <span>Horas</span>
+                  <strong>{modulo.horas}</strong>
+                </div>
+                <div>
+                  <span>Lecciones</span>
+                  <strong>{modulo.lecciones_Id?.length || 0}</strong>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                className="admin-modulos-card-action"
+                onClick={() => {
+                  setSelectedModulo(modulo);
+                  setShowForm(true);
+                }}
+              >
+                Editar modulo
+              </button>
+            </article>
+          ))
+        )}
+      </div>
 
       {showForm && (
         <CrearModuloForm

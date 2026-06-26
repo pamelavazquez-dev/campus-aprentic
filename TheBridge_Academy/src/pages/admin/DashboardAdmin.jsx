@@ -65,8 +65,8 @@ export default function DashboardAdmin() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
       
       {/* SaaS Page Header & Sub-Nav */}
-      <div style={{ margin: '-48px -48px 32px -48px', background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}>
-        <div style={{ padding: '32px 48px 0 48px', width: '100%', margin: '0 auto' }}>
+      <div className="admin-dashboard-header" style={{ margin: '-48px -48px 32px -48px', background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}>
+        <div className="admin-dashboard-header-inner" style={{ padding: '32px 48px 0 48px', width: '100%', margin: '0 auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
             <div>
               <h2 style={{ fontSize: '32px', fontWeight: 900, margin: '0 0 4px 0', color: 'var(--text-strong)', letterSpacing: '-0.5px' }}>Dashboard</h2>
@@ -75,7 +75,7 @@ export default function DashboardAdmin() {
           </div>
           
           {/* Tabs */}
-          <div style={{ display: 'flex', gap: '24px' }}>
+          <div className="admin-dashboard-tabs" style={{ display: 'flex', gap: '24px' }}>
             <div 
               onClick={() => setActiveTab('resumen')}
               style={{ padding: '12px 0', borderBottom: `2px solid ${activeTab === 'resumen' ? 'var(--brand-primary)' : 'transparent'}`, color: activeTab === 'resumen' ? 'var(--text-strong)' : 'var(--text-secondary)', fontWeight: activeTab === 'resumen' ? 700 : 600, fontSize: '14px', cursor: 'pointer', transition: 'all 0.2s' }}>
@@ -101,7 +101,7 @@ export default function DashboardAdmin() {
           <>
         
         {/* Grid de Estadísticas (Premium Dark Cards) */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
+        <div className="admin-dashboard-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
           <div className="bg-gradient-to-br from-[#0f172a] to-[#3e0c15] rounded-2xl p-6 shadow-xl relative overflow-hidden transition-all duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-1.5 hover:shadow-2xl hover:border-brand-primary/30 flex flex-col cursor-pointer border border-white/10" onClick={() => navigate('/admin/usuarios')}>
             <div style={{ fontSize: '48px', fontWeight: 900, color: 'white', marginBottom: '8px', lineHeight: 1 }}>
               {totalUsuarios || '-'}
@@ -143,9 +143,9 @@ export default function DashboardAdmin() {
             <button className="bg-transparent text-[#64748B] border-none py-2 px-4 rounded-md text-sm font-black cursor-pointer transition-colors duration-300 hover:bg-black/5 hover:text-brand-primary inline-flex items-center justify-center gap-2" onClick={() => navigate('/admin/usuarios')}>Ver todos</button>
           </div>
           
-          <div style={{ background: 'var(--surface-solid)', border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+          <div className="admin-recent-users" style={{ background: 'var(--surface-solid)', border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
             {/* Header de la lista */}
-            <div style={{ display: 'grid', gridTemplateColumns: '3fr 2fr 2fr 1fr', gap: '16px', padding: '12px 24px', background: 'var(--gray50)', borderBottom: '1px solid var(--border)', fontSize: '11px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+            <div className="admin-recent-users-head" style={{ display: 'grid', gridTemplateColumns: '3fr 2fr 2fr 1fr', gap: '16px', padding: '12px 24px', background: 'var(--gray50)', borderBottom: '1px solid var(--border)', fontSize: '11px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
               <div>Miembro</div>
               <div>Rol</div>
               <div>Campus</div>
@@ -162,14 +162,14 @@ export default function DashboardAdmin() {
               </div>
             ) : (
               equipo.map((miembro, index) => (
-                <div key={miembro.id || index} style={{ display: 'grid', gridTemplateColumns: '3fr 2fr 2fr 1fr', gap: '16px', padding: '16px 24px', alignItems: 'center', borderBottom: index < equipo.length - 1 ? '1px solid var(--border)' : 'none', transition: 'background 0.2s', cursor: 'pointer' }} onMouseEnter={(e) => e.currentTarget.style.background = 'var(--gray100)'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
+                <div key={miembro.id || index} className="admin-recent-user-row" style={{ display: 'grid', gridTemplateColumns: '3fr 2fr 2fr 1fr', gap: '16px', padding: '16px 24px', alignItems: 'center', borderBottom: index < equipo.length - 1 ? '1px solid var(--border)' : 'none', transition: 'background 0.2s', cursor: 'pointer' }} onMouseEnter={(e) => e.currentTarget.style.background = 'var(--gray100)'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
                   
                   {/* Columna 1: Info del Usuario */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+                  <div className="admin-recent-user-member" style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
                     <Avatar src={miembro.avatar} name={miembro.nombre || miembro.email || ''} size="md" />
-                    <div style={{ minWidth: 0 }}>
-                      <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-strong)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{miembro.nombre || 'Usuario Sin Nombre'}</div>
-                      <div style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{miembro.email || 'Sin email'}</div>
+                    <div className="admin-recent-user-text" style={{ minWidth: 0 }}>
+                      <div className="admin-recent-user-name" style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-strong)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{miembro.nombre || 'Usuario Sin Nombre'}</div>
+                      <div className="admin-recent-user-email" style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{miembro.email || 'Sin email'}</div>
                     </div>
                   </div>
                   

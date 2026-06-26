@@ -161,7 +161,7 @@ export default function WizardCurso() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
 
       {/* Page Header */}
-      <div style={{ margin: '-48px -48px 0 -48px', background: 'var(--surface-solid)', borderBottom: '1px solid var(--border)' }}>
+      <div className="instructor-page-hero" style={{ margin: '-48px -48px 0 -48px', background: 'var(--surface-solid)', borderBottom: '1px solid var(--border)' }}>
         <div style={{ padding: '32px 48px 32px 48px', width: '100%' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>

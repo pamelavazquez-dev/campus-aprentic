@@ -49,8 +49,8 @@ export default function ModulosView() {
   };
 
   return (
-    <div className="animate-fade-in" style={{ maxWidth: '1100px', margin: '0 auto' }}>
-      <div className="bg-gradient-to-br from-[#0f172a] to-[#3e0c15] rounded-2xl relative overflow-hidden border border-white/10" style={{ padding: '32px 48px', marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div className="admin-modulos-view animate-fade-in" style={{ maxWidth: '1100px', margin: '0 auto' }}>
+      <div className="admin-page-hero admin-modulos-hero bg-gradient-to-br from-[#0f172a] to-[#3e0c15] rounded-2xl relative overflow-hidden border border-white/10" style={{ padding: '32px 48px', marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h2 style={{ fontSize: '32px', fontWeight: 900, marginBottom: '8px', color: 'white' }}>Gestión de Módulos</h2>
           <p style={{ margin: 0, color: '#B9C0CA' }}>Control global de todos los cursos, asignación de profesores y temarios.</p>
@@ -73,7 +73,7 @@ export default function ModulosView() {
         </div>
       )}
 
-      <div className="w-full overflow-x-auto bg-surface-solid rounded-xl shadow-sm border border-border-default">
+      <div className="admin-modulos-table w-full overflow-x-auto bg-surface-solid rounded-xl shadow-sm border border-border-default">
         {loading ? (
           <div style={{ padding: '32px', textAlign: 'center' }}>Cargando módulos...</div>
         ) : (
@@ -173,6 +173,56 @@ export default function ModulosView() {
               )}
             </tbody>
           </table>
+        )}
+      </div>
+
+      <div className="admin-modulos-mobile-list">
+        {loading ? (
+          <div className="bg-surface border border-border-default rounded-xl p-6 text-center">Cargando módulos...</div>
+        ) : modulos.length === 0 ? (
+          <div className="bg-surface border border-border-default rounded-xl p-6 text-center">No hay módulos registrados.</div>
+        ) : (
+          modulos.map(mod => (
+            <article key={mod.id} className="admin-modulo-card bg-surface backdrop-blur-lg border border-border-default rounded-xl shadow-sm">
+              <div className="admin-modulo-card-header">
+                <div>
+                  <h3>{mod.nombre || 'Sin nombre'}</h3>
+                  <p>{mod.horas || 'N/A'} horas · {mod.lecciones_Id ? mod.lecciones_Id.length : 0} lecciones</p>
+                </div>
+                <span className={mod.activo !== false ? 'is-active' : 'is-inactive'}>
+                  {mod.activo !== false ? 'Activo' : 'Inactivo'}
+                </span>
+              </div>
+
+              <div className="admin-modulo-card-section">
+                <span>Profesor asignado</span>
+                {asignando === mod.id ? (
+                  <div className="admin-modulo-card-assign">
+                    <select
+                      className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
+                      defaultValue={mod.profesor_id || ''}
+                      onChange={e => handleAsignar(mod.id, e.target.value)}
+                    >
+                      <option value="">Sin asignar</option>
+                      {profesores.map(p => (
+                        <option key={p.id} value={p.id}>{p.nombre || p.email}</option>
+                      ))}
+                    </select>
+                    <button type="button" onClick={() => setAsignando(null)}>Cancelar</button>
+                  </div>
+                ) : (
+                  <button type="button" className="admin-modulo-profesor-button" onClick={() => setAsignando(mod.id)}>
+                    {getProfesorNombre(mod.profesor_id)}
+                  </button>
+                )}
+              </div>
+
+              <div className="admin-modulo-card-actions">
+                <button type="button" onClick={() => navigate(`/admin/modulos/ver/${mod.id}`)}>Visualizar</button>
+                <button type="button" onClick={() => handleDelete(mod.id)}>Eliminar</button>
+              </div>
+            </article>
+          ))
         )}
       </div>
     </div>

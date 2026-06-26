@@ -213,6 +213,477 @@ p {
   background-color: var(--surface-solid) !important;
 }
 
+.admin-modulos-mobile-list {
+  display: none;
+}
+
+.admin-modulos-card-list {
+  display: none;
+}
+
+.app-shell-header {
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 5000;
+}
+
+.app-shell-main {
+  padding-top: calc(72px + 1.5rem) !important;
+}
+
+.app-shell-desktop-nav,
+.app-shell-desktop-actions {
+  display: flex;
+}
+
+.app-shell-mobile-actions,
+.app-shell-mobile-menu-wrap {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .app-shell-desktop-nav,
+  .app-shell-desktop-actions {
+    display: none !important;
+  }
+
+  .app-shell-mobile-actions {
+    display: flex !important;
+  }
+
+  .app-shell-mobile-menu-wrap {
+    display: block !important;
+  }
+
+  .app-shell-main {
+    padding-top: calc(72px + 1.5rem) !important;
+  }
+}
+
+.instructor-page-hero {
+  background: linear-gradient(to right, var(--surface), rgba(255, 48, 69, 0.1)) !important;
+  border: 1px solid var(--border-default) !important;
+  border-radius: 24px !important;
+  box-shadow: var(--shadow-sm) !important;
+  margin: 0 0 32px 0 !important;
+  overflow: hidden !important;
+  padding: 32px 48px !important;
+  position: relative !important;
+}
+
+.instructor-page-hero::before {
+  background: rgba(255, 48, 69, 0.2);
+  border-radius: 999px;
+  content: "";
+  filter: blur(48px);
+  height: 256px;
+  pointer-events: none;
+  position: absolute;
+  right: -96px;
+  top: -96px;
+  width: 256px;
+}
+
+.instructor-page-hero > div {
+  padding: 0 !important;
+}
+
+.instructor-page-hero > div > div {
+  margin: 0 !important;
+}
+
+.instructor-page-hero h2 {
+  color: var(--text-strong) !important;
+  font-size: 32px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0 !important;
+  margin: 0 !important;
+  position: relative;
+  z-index: 1;
+}
+
+.instructor-page-hero p {
+  color: var(--text-secondary) !important;
+  font-size: 16px !important;
+  margin: 8px 0 0 0 !important;
+  position: relative;
+  z-index: 1;
+}
+
+.dark .instructor-page-hero {
+  background: linear-gradient(to bottom right, #0f172a, #3e0c15) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark .instructor-page-hero h2 {
+  color: white !important;
+}
+
+.dark .instructor-page-hero p {
+  color: #B9C0CA !important;
+}
+
+@media (max-width: 1024px) {
+  .admin-modulos-view,
+  section:has(.admin-modulos-card-list),
+  .admin-dashboard-header,
+  .admin-recent-users {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .admin-page-hero {
+    padding: 26px 22px !important;
+  }
+
+  .admin-modulos-hero {
+    align-items: stretch !important;
+    flex-direction: column !important;
+    gap: 18px !important;
+  }
+
+  .admin-modulos-hero button {
+    width: 100% !important;
+  }
+
+  .admin-modulos-table {
+    display: none !important;
+  }
+
+  .admin-modulos-data-table {
+    display: none !important;
+  }
+
+  .admin-modulos-mobile-list {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+    width: 100%;
+  }
+
+  .admin-modulo-card {
+    overflow: hidden;
+    padding: 20px;
+    position: relative;
+  }
+
+  .admin-modulo-card::before {
+    background: var(--brand-gradient);
+    content: "";
+    height: 4px;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  .admin-modulo-card-header {
+    align-items: flex-start;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-bottom: 16px;
+  }
+
+  .admin-modulo-card-header h3 {
+    color: var(--text-strong);
+    font-size: 18px;
+    line-height: 1.25;
+    margin: 0 0 6px 0;
+    overflow-wrap: anywhere;
+  }
+
+  .admin-modulo-card-header p {
+    color: var(--text-secondary);
+    font-size: 13px;
+    margin: 0;
+  }
+
+  .admin-modulo-card-header .is-active,
+  .admin-modulo-card-header .is-inactive {
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 900;
+    padding: 6px 12px;
+  }
+
+  .admin-modulo-card-header .is-active {
+    background: #D1FAE5;
+    color: #065F46;
+  }
+
+  .admin-modulo-card-header .is-inactive {
+    background: #FEE2E2;
+    color: #991B1B;
+  }
+
+  .admin-modulo-card-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px 0;
+  }
+
+  .admin-modulo-card-section > span {
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .admin-modulo-profesor-button,
+  .admin-modulo-card-assign button,
+  .admin-modulo-card-actions button {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 900;
+    padding: 11px 12px;
+    text-align: center;
+    width: 100%;
+  }
+
+  .admin-modulo-profesor-button,
+  .admin-modulo-card-assign button {
+    background: var(--gray100);
+    color: var(--text-strong);
+  }
+
+  .admin-modulo-card-assign {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .admin-modulo-card-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .admin-modulo-card-actions button:first-child {
+    background: var(--gray150);
+    color: var(--text-strong);
+  }
+
+  .admin-modulo-card-actions button:last-child {
+    background: #FFE5E8;
+    color: var(--brand-primary);
+  }
+
+  .admin-modulos-card-list {
+    display: grid !important;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    width: 100%;
+  }
+
+  .admin-modulos-card,
+  .admin-modulos-state-card {
+    border-radius: 24px;
+    overflow: hidden;
+    padding: 20px;
+    position: relative;
+  }
+
+  .admin-modulos-card::before {
+    background: var(--brand-gradient);
+    content: "";
+    height: 4px;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  .admin-modulos-card-top {
+    align-items: flex-start;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-bottom: 16px;
+  }
+
+  .admin-modulos-card-eyebrow {
+    color: var(--brand-primary);
+    display: block;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+
+  .admin-modulos-card h3 {
+    color: var(--text-strong);
+    font-size: 20px;
+    line-height: 1.2;
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .admin-modulos-card-meta {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: 1fr;
+    padding: 16px 0;
+  }
+
+  .admin-modulos-card-meta div {
+    align-items: center;
+    background: var(--gray100);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 14px;
+  }
+
+  .admin-modulos-card-meta span {
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .admin-modulos-card-meta strong {
+    color: var(--text-strong);
+    font-size: 14px;
+    font-weight: 900;
+    max-width: 60%;
+    overflow-wrap: anywhere;
+    text-align: right;
+  }
+
+  .admin-modulos-card-action {
+    background: var(--brand-gradient);
+    border: 0;
+    border-radius: 12px;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 900;
+    padding: 13px 16px;
+    width: 100%;
+  }
+
+  .admin-modulos-state-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-weight: 800;
+    text-align: center;
+  }
+
+  .admin-dashboard-header {
+    margin: -32px -24px 24px -24px !important;
+  }
+
+  .admin-dashboard-header-inner {
+    padding: 26px 24px 0 24px !important;
+    text-align: left !important;
+  }
+
+  .admin-dashboard-header-inner > div:first-child {
+    justify-content: flex-start !important;
+  }
+
+  .admin-dashboard-tabs {
+    gap: 18px !important;
+    justify-content: flex-start !important;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  .admin-dashboard-stats {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
+  }
+
+  .admin-recent-users {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .admin-recent-users-head {
+    display: none !important;
+  }
+
+  .admin-recent-user-row {
+    align-items: stretch !important;
+    background: var(--surface);
+    border: 1px solid var(--border) !important;
+    border-radius: 16px;
+    display: flex !important;
+    flex-direction: column;
+    gap: 14px !important;
+    padding: 18px !important;
+    text-align: left !important;
+  }
+
+  .admin-recent-user-member {
+    align-items: center !important;
+    display: flex;
+    flex-direction: row !important;
+    gap: 12px !important;
+    width: 100%;
+  }
+
+  .admin-recent-user-text {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .admin-recent-user-name,
+  .admin-recent-user-email {
+    overflow: visible !important;
+    overflow-wrap: anywhere;
+    text-overflow: clip !important;
+    white-space: normal !important;
+  }
+
+  .admin-recent-user-row > div:not(.admin-recent-user-member) {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .admin-recent-user-row > div:nth-child(2)::before {
+    color: var(--text-secondary);
+    content: "Rol";
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .admin-recent-user-row > div:nth-child(3)::before {
+    color: var(--text-secondary);
+    content: "Campus";
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .admin-recent-user-row > div:nth-child(4)::before {
+    color: var(--text-secondary);
+    content: "Estado";
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+}
+
 @media (max-width: 768px) {
   h1 { font-size: 36px; }
   h2 { font-size: 28px; }
@@ -220,6 +691,234 @@ p {
 
   table {
     min-width: 680px;
+  }
+
+  .admin-page-hero {
+    padding: 24px 20px !important;
+    margin-bottom: 24px !important;
+  }
+
+  .admin-page-hero h2 {
+    font-size: 28px !important;
+    line-height: 1.15 !important;
+  }
+
+  .admin-page-hero p {
+    font-size: 14px !important;
+  }
+
+  .admin-inscripcion-card {
+    align-items: stretch !important;
+    flex-direction: column !important;
+    gap: 18px !important;
+    padding: 20px !important;
+  }
+
+  .admin-inscripcion-user {
+    align-items: flex-start !important;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .admin-inscripcion-text {
+    min-width: 0;
+    word-break: break-word;
+  }
+
+  .admin-inscripcion-text > div {
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+  }
+
+  .admin-inscripcion-actions {
+    align-items: stretch !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    width: 100%;
+  }
+
+  .admin-inscripcion-actions > div,
+  .admin-inscripcion-actions span,
+  .admin-inscripcion-actions button {
+    width: 100%;
+    box-sizing: border-box;
+    justify-content: center;
+    text-align: center !important;
+  }
+
+  .admin-modulos-hero {
+    align-items: stretch !important;
+    flex-direction: column !important;
+    gap: 18px !important;
+  }
+
+  .admin-modulos-hero button {
+    width: 100% !important;
+  }
+
+  .admin-modulos-table {
+    display: none !important;
+  }
+
+  .admin-modulos-mobile-list {
+    display: flex !important;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .admin-modulo-card {
+    padding: 20px;
+    overflow: hidden;
+  }
+
+  .admin-modulo-card-header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .admin-modulo-card-header h3 {
+    margin: 0 0 6px 0;
+    font-size: 18px;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  .admin-modulo-card-header p {
+    margin: 0;
+    font-size: 13px;
+  }
+
+  .admin-modulo-card-header .is-active,
+  .admin-modulo-card-header .is-inactive {
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 6px 12px;
+  }
+
+  .admin-modulo-card-header .is-active {
+    background: #D1FAE5;
+    color: #065F46;
+  }
+
+  .admin-modulo-card-header .is-inactive {
+    background: #FEE2E2;
+    color: #991B1B;
+  }
+
+  .admin-modulo-card-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px 0;
+  }
+
+  .admin-modulo-card-section > span {
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .admin-modulo-profesor-button,
+  .admin-modulo-card-assign button,
+  .admin-modulo-card-actions button {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 900;
+    padding: 11px 12px;
+    text-align: center;
+    width: 100%;
+  }
+
+  .admin-modulo-profesor-button,
+  .admin-modulo-card-assign button {
+    background: var(--gray100);
+    color: var(--text-strong);
+  }
+
+  .admin-modulo-card-assign {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .admin-modulo-card-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .admin-modulo-card-actions button:first-child {
+    background: var(--gray150);
+    color: var(--text-strong);
+  }
+
+  .admin-modulo-card-actions button:last-child {
+    background: #FFE5E8;
+    color: var(--brand-primary);
+  }
+
+  .admin-dashboard-header {
+    margin: -24px -16px 24px -16px !important;
+  }
+
+  .admin-dashboard-header-inner {
+    padding: 24px 16px 0 16px !important;
+    text-align: left !important;
+  }
+
+  .admin-dashboard-header-inner > div:first-child {
+    justify-content: flex-start !important;
+  }
+
+  .admin-dashboard-tabs {
+    justify-content: flex-start !important;
+    gap: 16px !important;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  .admin-dashboard-stats {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-recent-users-head {
+    display: none !important;
+  }
+
+  .admin-recent-user-row {
+    display: flex !important;
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 12px !important;
+    padding: 22px 18px !important;
+    text-align: left !important;
+  }
+
+  .admin-recent-user-member {
+    flex-direction: row !important;
+    gap: 10px !important;
+    width: 100%;
+  }
+
+  .admin-recent-user-text {
+    width: 100%;
+  }
+
+  .admin-recent-user-name,
+  .admin-recent-user-email {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    overflow-wrap: anywhere;
   }
 
   .lesson-view-shell {
