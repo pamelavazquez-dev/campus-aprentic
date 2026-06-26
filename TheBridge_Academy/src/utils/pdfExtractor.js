@@ -1,5 +1,5 @@
 import * as pdfjsLib from 'pdfjs-dist';
-import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.js?url';
 
 // Configuramos el worker utilizando el archivo local proporcionado por pdfjs-dist
 // Vite permite importar URLs estáticas con ?url
