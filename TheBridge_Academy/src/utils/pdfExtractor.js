@@ -1,13 +1,17 @@
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
 import pdfWorkerUrl from 'pdfjs-dist/legacy/build/pdf.worker.min.js?url';
 
+const pdfjs = pdfjsLib.default || pdfjsLib;
+
 // Configuramos el worker utilizando el archivo local proporcionado por pdfjs-dist
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+if (pdfjs && pdfjs.GlobalWorkerOptions) {
+  pdfjs.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+}
 
 
 export const extractTextFromPDF = async (file) => {
   const arrayBuffer = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
   let fullMarkdown = '';
   
   for (let i = 1; i <= pdf.numPages; i++) {
