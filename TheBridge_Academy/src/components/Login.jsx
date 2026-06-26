@@ -44,9 +44,14 @@ export default function Login() {
       <div className="bg-surface backdrop-blur-2xl border border-border-default rounded-3xl max-w-[440px] w-[90%] p-10 sm:p-12 shadow-xl hover:shadow-2xl transition-all duration-500 animate-fade-in relative z-10">
         
         <div className="text-center mb-10 flex flex-col items-center">
-          <div className="flex justify-center mb-6 transform hover:scale-105 transition-transform duration-500">
+          <a 
+            href="https://thebridge.tech/" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="flex justify-center mb-6 transform hover:scale-105 transition-transform duration-500 cursor-pointer"
+          >
             <Logo size="xl" />
-          </div>
+          </a>
           <h2 className="text-2xl font-black text-text-strong mb-2 tracking-tight">Bienvenido de nuevo</h2>
           <p className="text-text-secondary text-[15px] font-medium">Accede a tu plataforma educativa</p>
         </div>
