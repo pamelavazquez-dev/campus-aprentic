@@ -16,7 +16,13 @@ export default function AlumnoDashboard() {
     async function fetchData() {
       try {
         const [mods, lecs] = await Promise.all([getAllModulos(), getAllLecciones()]);
-        setModulos(mods.filter(m => m.activo !== false));
+        setModulos(mods.filter(m => {
+          const studentPromos = profile?.promociones_id || [];
+          if (m.promociones_activas && m.promociones_activas.length > 0) {
+            return m.promociones_activas.some(p => studentPromos.includes(p));
+          }
+          return m.activo !== false;
+        }));
         setLecciones(lecs);
         setAlumnoActual(profile);
       } catch (error) {

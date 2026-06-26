@@ -25,11 +25,25 @@ export default function VisorLeccion() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [mod, allLecs, allProyectos] = await Promise.all([
-          moduloId ? getModuloById(moduloId) : null,
+        const mod = moduloId ? await getModuloById(moduloId) : null;
+        if (mod && !canEditModules) {
+          const studentPromos = alumnoActual?.promociones_id || [];
+          const isBlocked = mod.promociones_activas && mod.promociones_activas.length > 0 
+            ? !mod.promociones_activas.some(p => studentPromos.includes(p))
+            : mod.activo === false;
+          
+          if (isBlocked) {
+             toast.error('Este módulo no está disponible');
+             navigate('/dashboard');
+             return;
+          }
+        }
+        
+        const [allLecs, allProyectos] = await Promise.all([
           getAllLecciones(),
           getAllProyectos()
         ]);
+        
         setModulo(mod);
         setProyectos(allProyectos);
         // Filtrar lecciones de este módulo

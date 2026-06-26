@@ -13,6 +13,7 @@ import { filterModulesByTracks, getProfesorTracks, getUniqueModulesByName, infer
 export default function WizardCurso() {
   const [modulos, setModulos] = useState([]);
   const [lecciones, setLecciones] = useState([]);
+  const [selectedPromocion, setSelectedPromocion] = useState('');
   const [selectedModulo, setSelectedModulo] = useState('');
   const [expandedLeccion, setExpandedLeccion] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -29,6 +30,18 @@ export default function WizardCurso() {
     () => getProfesorTracks(profile, promociones),
     [profile, promociones]
   );
+  const profesorPromociones = useMemo(() => {
+    if (isAdmin) return promociones;
+    const ids = Array.isArray(profile?.promocion_id) ? profile.promocion_id : [profile?.promocion_id].filter(Boolean);
+    return promociones.filter(p => ids.includes(p.id));
+  }, [isAdmin, profile, promociones]);
+
+  // Set default promotion
+  useEffect(() => {
+    if (!selectedPromocion && profesorPromociones.length > 0) {
+      setSelectedPromocion(profesorPromociones[0].id);
+    }
+  }, [profesorPromociones, selectedPromocion]);
 
   const fetchData = async () => {
     try {
@@ -39,7 +52,7 @@ export default function WizardCurso() {
 
       setModulos(visibleMods);
       setLecciones(lecs);
-      if ((!selectedModulo || !visibleMods.some((modulo) => modulo.id === selectedModulo)) && visibleMods.length > 0) {
+      if (!selectedModulo && visibleMods.length > 0) {
         setSelectedModulo(visibleMods[0].id);
       }
     } catch (e) {
@@ -192,11 +205,29 @@ export default function WizardCurso() {
         </div>
       )}
 
-      {/* Selector de Módulo */}
+      {/* Selectores */}
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: '16px', flexWrap: 'wrap' }}>
+        <div style={{ flex: 1, minWidth: '240px' }}>
+          <label style={{ display: 'block', fontSize: '13px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>
+            1. Seleccionar promoción
+          </label>
+          <select
+            className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
+            value={selectedPromocion}
+            onChange={e => { setSelectedPromocion(e.target.value); }}
+            style={{ fontSize: '15px', fontWeight: 600, padding: '12px 16px', cursor: 'pointer', width: '100%' }}
+          >
+            {profesorPromociones.map(p => (
+              <option key={p.id} value={p.id}>
+                {p.nombre || p.id}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div style={{ flex: 1, minWidth: '280px' }}>
           <label style={{ display: 'block', fontSize: '13px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>
-            Seleccionar módulo
+            2. Seleccionar módulo
           </label>
           <select
             className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
@@ -213,20 +244,20 @@ export default function WizardCurso() {
         </div>
 
         {/* Toggle Activo/Inactivo */}
-        {!isAdmin && moduloActual && (
+        {!isAdmin && moduloActual && selectedPromocion && (
           <div
             onClick={async () => {
-              const newState = !(moduloActual.activo !== false);
+              const isCurrentlyActive = moduloActual.promociones_activas?.includes(selectedPromocion);
+              const newPromocionesActivas = isCurrentlyActive 
+                ? (moduloActual.promociones_activas || []).filter(id => id !== selectedPromocion)
+                : [...(moduloActual.promociones_activas || []), selectedPromocion];
+              
               try {
                 await updateModulo(moduloActual.id, {
-                  nombre: moduloActual.nombre,
-                  tipo: moduloActual.tipo || inferModuleTrack(moduloActual),
-                  horas: moduloActual.horas,
-                  lecciones_Id: moduloActual.lecciones_Id || [],
-                  profesor_id: moduloActual.profesor_id || '',
-                  activo: newState
+                  ...moduloActual,
+                  promociones_activas: newPromocionesActivas
                 });
-                setMensaje({ text: `Módulo ${newState ? 'activado' : 'desactivado'} correctamente.`, type: 'success' });
+                setMensaje({ text: `Módulo ${isCurrentlyActive ? 'bloqueado' : 'desbloqueado'} para esta promoción.`, type: 'success' });
                 await fetchData();
               } catch (e) {
                 console.error(e);
@@ -236,25 +267,27 @@ export default function WizardCurso() {
             style={{
               display: 'flex', alignItems: 'center', gap: '10px',
               padding: '10px 20px', borderRadius: '10px', cursor: 'pointer',
-              border: `1px solid ${moduloActual.activo !== false ? '#A7F3D0' : '#FECACA'}`,
-              background: moduloActual.activo !== false ? '#D1FAE5' : '#FEE2E2',
+              border: `1px solid ${moduloActual.promociones_activas?.includes(selectedPromocion) ? '#A7F3D0' : '#FECACA'}`,
+              background: moduloActual.promociones_activas?.includes(selectedPromocion) ? '#D1FAE5' : '#FEE2E2',
               transition: 'all 0.2s', whiteSpace: 'nowrap'
             }}
           >
             <div style={{
               width: '36px', height: '20px', borderRadius: '10px', position: 'relative',
-              background: moduloActual.activo !== false ? '#10B981' : '#EF4444', transition: 'background 0.3s'
+              background: moduloActual.promociones_activas?.includes(selectedPromocion) ? '#10B981' : '#EF4444', transition: 'background 0.3s'
             }}>
               <div style={{
                 width: '16px', height: '16px', borderRadius: '50%', background: 'white',
                 position: 'absolute', top: '2px', transition: 'left 0.3s',
-                left: moduloActual.activo !== false ? '18px' : '2px',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+                left: moduloActual.promociones_activas?.includes(selectedPromocion) ? '18px' : '2px',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
               }}></div>
             </div>
-            <span style={{ fontSize: '13px', fontWeight: 700, color: moduloActual.activo !== false ? '#065F46' : '#991B1B' }}>
-              {moduloActual.activo !== false ? 'Activo' : 'Inactivo'}
+            <span style={{ fontSize: '13px', fontWeight: 700, color: moduloActual.promociones_activas?.includes(selectedPromocion) ? '#065F46' : '#991B1B' }}>
+              {moduloActual.promociones_activas?.includes(selectedPromocion) ? 'Activo' : 'Inactivo'}
             </span>
+          </div>
+        )}
           </div>
         )}
 

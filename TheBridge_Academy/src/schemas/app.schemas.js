@@ -49,6 +49,7 @@ export const moduloSchema = z.object({
   lecciones_Id: z.array(z.string()).default([]),
   activo: z.boolean().default(true),
   profesor_id: z.union([z.string(), z.array(z.string())]).default(''),
+  promociones_activas: z.array(z.string()).default([]),
 });
 
 export const leccionSchema = z.object({
