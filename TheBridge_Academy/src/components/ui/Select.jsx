@@ -56,7 +56,7 @@ export default function Select({
                 className={`px-4 py-2.5 text-sm cursor-pointer transition-colors duration-200 flex items-center justify-between
                   ${value === opt.value 
                     ? 'bg-brand-primary/10 text-brand-primary font-bold' 
-                    : 'text-text-strong hover:bg-gray-100 dark:hover:bg-gray-800'
+                    : 'text-text-strong hover:bg-brand-primary/5 hover:text-brand-primary'
                   }`}
               >
                 {opt.label}
