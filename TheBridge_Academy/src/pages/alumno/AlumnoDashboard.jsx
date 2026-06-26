@@ -101,40 +101,36 @@ export default function AlumnoDashboard() {
                 return (
                   <div
                     key={mod.id}
-                    className="bg-gradient-to-br from-[#0f172a] to-[#3e0c15] rounded-2xl p-6 shadow-xl relative overflow-hidden transition-all duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-1.5 hover:shadow-2xl hover:border-brand-primary/30 flex flex-col cursor-pointer border border-white/10"
+                    className="bg-gradient-to-br from-surface to-brand-primary/5 rounded-2xl p-6 shadow-sm relative overflow-hidden transition-all duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-1.5 hover:shadow-md hover:border-brand-primary/30 flex flex-col cursor-pointer border border-border-default"
                     onClick={() => navigate(`/alumno/visor/${mod.id}`)}
                     style={{ display: 'flex', flexDirection: 'column', cursor: 'pointer', transition: 'all 0.3s ease', padding: '24px' }}
                     onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-4px)'}
                     onMouseLeave={e => e.currentTarget.style.transform = 'none'}
                   >
                     <div style={{ display: 'flex', gap: '16px', marginBottom: '20px' }}>
-                      <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(255, 255, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+                      <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'var(--gray100)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-strong)' }}>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
                           <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
                         </svg>
                       </div>
                       <div style={{ flex: 1 }}>
-                        <h4 style={{ margin: '0 0 4px 0', fontSize: '18px', fontWeight: 800, color: 'white', lineHeight: 1.2 }}>
+                        <h4 className="text-text-strong" style={{ margin: '0 0 4px 0', fontSize: '18px', fontWeight: 800, lineHeight: 1.2 }}>
                           {mod.nombre || 'Sin título'}
                         </h4>
-                        <span style={{ fontSize: '12px', fontWeight: 600, color: '#B9C0CA' }}>
+                        <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>
                           {numLecciones} {numLecciones === 1 ? 'lección' : 'lecciones'} · {mod.horas || 0}h
                         </span>
                       </div>
                     </div>
                     
-                    <div style={{ fontSize: '14px', fontWeight: 500, color: '#B9C0CA', marginBottom: '24px', flexGrow: 1, lineHeight: 1.5 }}>
+                    <div style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-secondary)', marginBottom: '24px', flexGrow: 1, lineHeight: 1.5 }}>
                       {mod.descripcion || `Módulo formativo con ${numLecciones} lecciones disponibles.`}
                     </div>
                     
-                    <div style={{ background: 'rgba(0,0,0,0.2)', padding: '16px', borderRadius: '12px', marginTop: 'auto' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: 'white', fontWeight: 700, fontSize: '14px' }}>
-                        <span>Ver Lecciones</span>
-                        <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '28px', height: '28px', borderRadius: '50%', background: 'var(--brand-primary)' }}>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                        </span>
-                      </div>
+                    <div style={{ marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid var(--border-default)', display: 'flex', justifyContent: 'space-between', color: 'var(--brand-primary)', fontWeight: 'bold', fontSize: '14px' }}>
+                      <span>Continuar Aprendiendo</span>
+                      <span>&rarr;</span>
                     </div>
                   </div>
                 );

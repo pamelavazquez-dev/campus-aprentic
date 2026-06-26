@@ -2,6 +2,7 @@ import { useContext, useState } from 'react';
 import { DataContext } from '../../context/DataContext';
 import { deleteModulo, updateModulo } from '../../services/modulos.service';
 import { useNavigate } from 'react-router-dom';
+import PageHeader from '../../components/ui/PageHeader';
 
 export default function ModulosView() {
   const { modulos, equipo, loading } = useContext(DataContext);
@@ -50,15 +51,15 @@ export default function ModulosView() {
 
   return (
     <div className="animate-fade-in" style={{ maxWidth: '1100px', margin: '0 auto' }}>
-      <div className="bg-gradient-to-br from-[#0f172a] to-[#3e0c15] rounded-2xl relative overflow-hidden border border-white/10" style={{ padding: '32px 48px', marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <h2 style={{ fontSize: '32px', fontWeight: 900, marginBottom: '8px', color: 'white' }}>Gestión de Módulos</h2>
-          <p style={{ margin: 0, color: '#B9C0CA' }}>Control global de todos los cursos, asignación de profesores y temarios.</p>
-        </div>
-        <button className="bg-surface-solid text-brand-primary py-3 px-6 rounded-lg text-sm font-black transition-all duration-300 hover:-translate-y-0.5 shadow-glow inline-flex items-center justify-center gap-2 border-none cursor-pointer" style={{ width: 'auto', boxShadow: '0 8px 16px rgba(0,0,0,0.1)' }} onClick={() => navigate('/admin/modulos/nuevo')}>
-          + Nuevo Módulo
-        </button>
-      </div>
+      <PageHeader 
+        title="Gestión de Módulos"
+        description="Control global de todos los cursos, asignación de profesores y temarios."
+        actions={
+          <button className="bg-brand-primary text-white py-3 px-6 rounded-lg text-sm font-black transition-all duration-300 hover:-translate-y-0.5 shadow-glow inline-flex items-center justify-center gap-2 border-none cursor-pointer" style={{ width: 'auto' }} onClick={() => navigate('/admin/modulos/nuevo')}>
+            + Nuevo Módulo
+          </button>
+        }
+      />
 
       {/* Mensaje feedback */}
       {mensaje && (

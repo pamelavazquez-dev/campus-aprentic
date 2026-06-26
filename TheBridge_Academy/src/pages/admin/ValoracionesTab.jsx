@@ -30,14 +30,14 @@ export default function ValoracionesTab() {
       
       {/* Resumen */}
       <div style={{ display: 'flex', gap: '24px' }}>
-        <div className="bg-gradient-to-br from-[#0f172a] to-[#3e0c15] rounded-2xl relative overflow-hidden transition-all duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-1.5 hover:shadow-2xl hover:border-brand-primary/30 border border-white/10 flex-1 flex flex-col items-center justify-center p-8 shadow-xl">
-          <div style={{ fontSize: '64px', fontWeight: 900, color: 'white', lineHeight: 1 }}>{averageRating}</div>
+        <div className="bg-gradient-to-br from-surface to-brand-primary/5 rounded-2xl relative overflow-hidden transition-all duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-1.5 hover:shadow-md hover:border-brand-primary/30 border border-border-default flex-1 flex flex-col items-center justify-center p-8 shadow-sm">
+          <div className="text-text-strong" style={{ fontSize: '64px', fontWeight: 900, lineHeight: 1 }}>{averageRating}</div>
           <div style={{ fontSize: '24px', margin: '8px 0' }}>{'⭐'.repeat(Math.round(averageRating))}</div>
-          <div style={{ fontSize: '16px', fontWeight: 700, color: '#B9C0CA' }}>Media Global de Satisfacción</div>
+          <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-secondary)' }}>Media Global de Satisfacción</div>
         </div>
-        <div className="bg-gradient-to-br from-[#0f172a] to-[#3e0c15] rounded-2xl relative overflow-hidden transition-all duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-1.5 hover:shadow-2xl hover:border-brand-primary/30 border border-white/10 flex-1 flex flex-col items-center justify-center p-8 shadow-xl">
-          <div style={{ fontSize: '64px', fontWeight: 900, color: 'white', lineHeight: 1 }}>{reviews.length}</div>
-          <div style={{ fontSize: '16px', fontWeight: 700, color: '#B9C0CA', marginTop: '16px' }}>Valoraciones Totales recibidas</div>
+        <div className="bg-gradient-to-br from-surface to-brand-primary/5 rounded-2xl relative overflow-hidden transition-all duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-1.5 hover:shadow-md hover:border-brand-primary/30 border border-border-default flex-1 flex flex-col items-center justify-center p-8 shadow-sm">
+          <div className="text-text-strong" style={{ fontSize: '64px', fontWeight: 900, lineHeight: 1 }}>{reviews.length}</div>
+          <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-secondary)', marginTop: '16px' }}>Valoraciones Totales recibidas</div>
         </div>
       </div>
 

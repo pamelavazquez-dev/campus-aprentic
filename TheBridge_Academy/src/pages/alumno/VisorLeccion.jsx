@@ -144,21 +144,20 @@ export default function VisorLeccion() {
   }
 
   return (
-    <div className="lesson-view-shell animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1260px', margin: '0 auto' }}>
-      
-      {/* Header del módulo */}
-      <div className="lesson-view-header bg-gradient-to-br from-[#0f172a] to-[#3e0c15] rounded-2xl relative overflow-hidden border border-white/10" style={{ padding: '28px 36px' }}>
+    <div className="lesson-view-shell animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1260px', margin: '0 auto' }}>      {/* Header del módulo */}
+      <div className="lesson-view-header bg-gradient-to-br from-surface to-brand-primary/10 rounded-2xl relative overflow-hidden border border-border-default shadow-sm" style={{ padding: '28px 36px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <button
               onClick={() => navigate(backUrl)}
-              style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.14)', borderRadius: '10px', color: 'white', cursor: 'pointer', fontWeight: 800, fontSize: '13px', padding: '10px 14px' }}
+              className="text-text-strong"
+              style={{ background: 'var(--gray150)', border: '1px solid var(--border-default)', borderRadius: '10px', cursor: 'pointer', fontWeight: 800, fontSize: '13px', padding: '10px 14px' }}
             >
               {backText}
             </button>
-            <div style={{ width: '1px', height: '32px', background: 'rgba(255,255,255,0.16)' }}></div>
-            <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 900, color: 'white' }}>
-              {modulo.nombre}
+            <div style={{ width: '1px', height: '32px', background: 'var(--border-default)' }}></div>
+            <h3 className="text-text-strong" style={{ margin: 0, fontSize: '18px', fontWeight: 900 }}>
+              {modulo?.nombre || modulo?.titulo || 'Cargando...'}
             </h3>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>

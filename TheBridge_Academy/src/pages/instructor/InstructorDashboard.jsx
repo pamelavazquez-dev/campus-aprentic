@@ -62,7 +62,7 @@ export default function InstructorDashboard() {
             </div>
           ) : (
             modulos.map(mod => (
-              <div key={mod.id} className="bg-gradient-to-br from-[#0f172a] to-[#3e0c15] rounded-2xl relative overflow-hidden transition-all duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-1.5 hover:shadow-2xl hover:border-brand-primary/30 border border-white/10 p-6 flex flex-col gap-4 cursor-pointer" onClick={() => navigate('/instructor/wizard')}>
+              <div key={mod.id} className="bg-gradient-to-br from-surface to-brand-primary/5 rounded-2xl relative overflow-hidden transition-all duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-1.5 hover:shadow-md hover:border-brand-primary/30 border border-border-default p-6 flex flex-col gap-4 cursor-pointer" onClick={() => navigate('/instructor/wizard')}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                   <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'rgba(255, 48, 69, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--brand-primary)' }}>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -71,7 +71,7 @@ export default function InstructorDashboard() {
                     </svg>
                   </div>
                   <div>
-                    <h4 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: 'white' }}>{mod.nombre || mod.titulo || 'Sin título'}</h4>
+                    <h4 className="text-text-strong" style={{ margin: 0, fontSize: '18px', fontWeight: 800 }}>{mod.nombre || mod.titulo || 'Sin título'}</h4>
                     <span style={{ fontSize: '13px', color: 'var(--brand-primary)', fontWeight: 600 }}>ID: {mod.id ? mod.id.toString().substring(0, 6) : 'N/A'}</span>
                   </div>
                 </div>

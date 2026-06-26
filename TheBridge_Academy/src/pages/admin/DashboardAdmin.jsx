@@ -102,33 +102,33 @@ export default function DashboardAdmin() {
         
         {/* Grid de Estadísticas (Premium Dark Cards) */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
-          <div className="bg-gradient-to-br from-[#0f172a] to-[#3e0c15] rounded-2xl p-6 shadow-xl relative overflow-hidden transition-all duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-1.5 hover:shadow-2xl hover:border-brand-primary/30 flex flex-col cursor-pointer border border-white/10" onClick={() => navigate('/admin/usuarios')}>
-            <div style={{ fontSize: '48px', fontWeight: 900, color: 'white', marginBottom: '8px', lineHeight: 1 }}>
+          <div className="bg-gradient-to-br from-surface to-brand-primary/5 rounded-2xl p-6 shadow-sm relative overflow-hidden transition-all duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-1.5 hover:shadow-md hover:border-brand-primary/30 flex flex-col cursor-pointer border border-border-default" onClick={() => navigate('/admin/usuarios')}>
+            <div className="text-5xl font-black text-text-strong mb-2 leading-none">
               {totalUsuarios || '-'}
             </div>
-            <div style={{ fontSize: '16px', fontWeight: 700, color: '#B9C0CA' }}>Usuarios Registrados</div>
+            <div className="text-base font-bold text-text-secondary">Usuarios Registrados</div>
             <div style={{ marginTop: 'auto', paddingTop: '24px', display: 'flex', justifyContent: 'space-between', color: 'var(--brand-primary)', fontWeight: 'bold', fontSize: '14px' }}>
               <span>Gestionar Directorio</span>
               <span>&rarr;</span>
             </div>
           </div>
           
-          <div className="bg-gradient-to-br from-[#0f172a] to-[#3e0c15] rounded-2xl p-6 shadow-xl relative overflow-hidden transition-all duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-1.5 hover:shadow-2xl hover:border-brand-primary/30 flex flex-col cursor-pointer border border-white/10" onClick={() => navigate('/admin/campus')}>
-            <div style={{ fontSize: '48px', fontWeight: 900, color: 'white', marginBottom: '8px', lineHeight: 1 }}>
+          <div className="bg-gradient-to-br from-surface to-brand-primary/5 rounded-2xl p-6 shadow-sm relative overflow-hidden transition-all duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-1.5 hover:shadow-md hover:border-brand-primary/30 flex flex-col cursor-pointer border border-border-default" onClick={() => navigate('/admin/campus')}>
+            <div className="text-5xl font-black text-text-strong mb-2 leading-none">
               {promociones.length}
             </div>
-            <div style={{ fontSize: '16px', fontWeight: 700, color: '#B9C0CA' }}>Campus Activos</div>
+            <div className="text-base font-bold text-text-secondary">Campus Activos</div>
             <div style={{ marginTop: 'auto', paddingTop: '24px', display: 'flex', justifyContent: 'space-between', color: 'var(--brand-primary)', fontWeight: 'bold', fontSize: '14px' }}>
               <span>Ver Localizaciones</span>
               <span>&rarr;</span>
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-[#0f172a] to-[#3e0c15] rounded-2xl p-6 shadow-xl relative overflow-hidden transition-all duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-1.5 hover:shadow-2xl hover:border-brand-primary/30 flex flex-col cursor-pointer border border-white/10" onClick={() => navigate('/admin/modulos')}>
-            <div style={{ fontSize: '48px', fontWeight: 900, color: 'white', marginBottom: '8px', lineHeight: 1 }}>
+          <div className="bg-gradient-to-br from-surface to-brand-primary/5 rounded-2xl p-6 shadow-sm relative overflow-hidden transition-all duration-400 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-1.5 hover:shadow-md hover:border-brand-primary/30 flex flex-col cursor-pointer border border-border-default" onClick={() => navigate('/admin/modulos')}>
+            <div className="text-5xl font-black text-text-strong mb-2 leading-none">
               {modulos.length}
             </div>
-            <div style={{ fontSize: '16px', fontWeight: 700, color: '#B9C0CA' }}>Módulos Educativos</div>
+            <div className="text-base font-bold text-text-secondary">Módulos Educativos</div>
             <div style={{ marginTop: 'auto', paddingTop: '24px', display: 'flex', justifyContent: 'space-between', color: 'var(--brand-primary)', fontWeight: 'bold', fontSize: '14px' }}>
               <span>Administrar Contenido</span>
               <span>&rarr;</span>
