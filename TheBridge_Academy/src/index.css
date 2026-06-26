@@ -196,4 +196,4 @@ p {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
-@plugin \" "@tailwindcss/typography\; 
+@plugin "@tailwindcss/typography";
