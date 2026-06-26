@@ -4,6 +4,8 @@ import { getAllLecciones, createLeccion, deleteLeccion } from '../../services/le
 import { useNavigate } from 'react-router-dom';
 import { useRBAC } from '../../hooks/useRBAC';
 import { ROLES } from '../../utils/rbac';
+import { extractTextFromPDF } from '../../utils/pdfExtractor';
+import toast from 'react-hot-toast';
 
 export default function WizardCurso() {
   const [modulos, setModulos] = useState([]);
@@ -13,7 +15,7 @@ export default function WizardCurso() {
   const [loading, setLoading] = useState(true);
   const [showCrear, setShowCrear] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [nuevaLeccion, setNuevaLeccion] = useState({ titulo: '', descripcion: '', contenido_url: '', videos_url: '' });
+  const [nuevaLeccion, setNuevaLeccion] = useState({ titulo: '', descripcion: '', contenido_url: '', videos_url: '', contenido_markdown: '' });
   const [mensaje, setMensaje] = useState({ text: '', type: '' });
   const navigate = useNavigate();
   const { isAuthorized } = useRBAC();
@@ -59,10 +61,11 @@ export default function WizardCurso() {
         titulo: nuevaLeccion.titulo.trim(),
         descripcion: nuevaLeccion.descripcion.trim(),
         contenido_url: nuevaLeccion.contenido_url.trim(),
+        contenido_markdown: nuevaLeccion.contenido_markdown,
         videos_url: videosArray
       });
       setMensaje({ text: `Lección "${nuevaLeccion.titulo}" creada con éxito.`, type: 'success' });
-      setNuevaLeccion({ titulo: '', descripcion: '', contenido_url: '', videos_url: '' });
+      setNuevaLeccion({ titulo: '', descripcion: '', contenido_url: '', videos_url: '', contenido_markdown: '' });
       setShowCrear(false);
       // Refrescar datos
       await fetchData();
@@ -85,6 +88,38 @@ export default function WizardCurso() {
     } catch (e) {
       console.error('Error al eliminar lección:', e);
       setMensaje({ text: 'Error al eliminar la lección.', type: 'error' });
+    }
+  };
+
+  const handlePDFUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (file.type !== 'application/pdf') {
+      toast.error('Por favor, selecciona un archivo PDF válido.');
+      return;
+    }
+
+    setSaving(true);
+    toast.loading('Extrayendo texto del PDF...', { id: 'pdf-wizard' });
+    
+    try {
+      const markdown = await extractTextFromPDF(file);
+      const sizeInKB = new Blob([markdown]).size / 1024;
+      if (sizeInKB > 800) {
+        toast.error(`El texto extraído pesa más de 800 KB (${Math.round(sizeInKB)} KB). Demasiado texto.`, { id: 'pdf-wizard' });
+        setSaving(false);
+        return;
+      }
+
+      setNuevaLeccion(curr => ({ ...curr, contenido_markdown: markdown }));
+      toast.success('PDF importado como Markdown correctamente.', { id: 'pdf-wizard' });
+    } catch (error) {
+      console.error('Error extrayendo PDF:', error);
+      toast.error('Error al procesar el PDF. Revisa la consola.', { id: 'pdf-wizard' });
+    } finally {
+      setSaving(false);
+      event.target.value = '';
     }
   };
 
@@ -265,12 +300,12 @@ export default function WizardCurso() {
               />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '6px' }}>URL del contenido (PDF, Markdown...)</label>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '6px' }}>URL del contenido (Opcional)</label>
               <input
                 className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
                 value={nuevaLeccion.contenido_url}
                 onChange={e => setNuevaLeccion({ ...nuevaLeccion, contenido_url: e.target.value })}
-                placeholder="assets/lecciones/temario/leccion.md"
+                placeholder="https://... o assets/lecciones/..."
                 style={{ width: '100%', padding: '12px 16px', fontSize: '14px' }}
               />
             </div>
@@ -282,6 +317,34 @@ export default function WizardCurso() {
                 onChange={e => setNuevaLeccion({ ...nuevaLeccion, videos_url: e.target.value })}
                 placeholder="url1.mp4, url2.mp4"
                 style={{ width: '100%', padding: '12px 16px', fontSize: '14px' }}
+              />
+            </div>
+            <div style={{ gridColumn: '1 / -1' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                <label style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)' }}>Contenido Markdown</label>
+                <div style={{ position: 'relative' }}>
+                  <input 
+                    type="file" 
+                    accept="application/pdf" 
+                    onChange={handlePDFUpload} 
+                    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }}
+                    title="Importar texto de PDF"
+                  />
+                  <button 
+                    type="button" 
+                    style={{ background: 'rgba(255,48,69,0.1)', color: 'var(--brand-primary)', border: '1px solid rgba(255,48,69,0.2)', padding: '6px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 700, pointerEvents: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}
+                  >
+                    📄 Importar de PDF
+                  </button>
+                </div>
+              </div>
+              <textarea
+                className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
+                value={nuevaLeccion.contenido_markdown}
+                onChange={e => setNuevaLeccion({ ...nuevaLeccion, contenido_markdown: e.target.value })}
+                placeholder="# Título Principal\n\nEl texto de tu lección aquí..."
+                rows={6}
+                style={{ width: '100%', padding: '12px 16px', fontSize: '14px', resize: 'vertical', fontFamily: 'monospace' }}
               />
             </div>
           </div>

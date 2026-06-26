@@ -4,19 +4,7 @@ const requiredText = (fieldName) => (
   z.string().trim().min(1, `${fieldName} es obligatorio`)
 );
 
-const optionalUrl = z
-  .string()
-  .trim()
-  .refine((value) => {
-    if (!value) return true;
-
-    try {
-      new URL(value);
-      return true;
-    } catch {
-      return false;
-    }
-  }, 'Introduce una URL valida');
+const optionalUrl = z.string().trim();
 
 export const loginSchema = z.object({
   email: z.email('Introduce un email valido').trim(),
