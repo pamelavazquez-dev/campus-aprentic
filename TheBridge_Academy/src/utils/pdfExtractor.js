@@ -1,10 +1,7 @@
-import * as pdfjsLib from 'pdfjs-dist';
-
-// Vite envuelve los imports de CommonJS en default
-const pdfjs = pdfjsLib.default || pdfjsLib;
+import { GlobalWorkerOptions, getDocument } from 'pdfjs-dist';
 
 // Configurar el worker usando new URL + import.meta.url para Vite (Compatible con v3.x)
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.js',
   import.meta.url
 ).toString();
@@ -12,8 +9,8 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 export const extractTextFromPDF = async (file) => {
   const arrayBuffer = await file.arrayBuffer();
   
-  // Inicializar el documento usando el objeto correcto
-  const loadingTask = pdfjs.getDocument({ data: arrayBuffer });
+  // Inicializar el documento
+  const loadingTask = getDocument({ data: arrayBuffer });
   const pdf = await loadingTask.promise;
   
   let fullMarkdown = '';
