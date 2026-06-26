@@ -76,13 +76,13 @@ export default function InstructorDashboard() {
                   </div>
                 </div>
                 
-                <p style={{ margin: 0, color: '#B9C0CA', fontSize: '14px', lineHeight: 1.5, flexGrow: 1 }}>
+                <p className="text-text-secondary" style={{ margin: 0, fontSize: '14px', lineHeight: 1.5, flexGrow: 1 }}>
                   {mod.descripcion || (mod.horas ? `Duración: ${mod.horas} horas` : 'Sin descripción disponible para este módulo.')}
                 </p>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                  <span style={{ color: '#B9C0CA', fontSize: '13px', fontWeight: 500 }}>Última act. hoy</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'white', fontSize: '13px', fontWeight: 600 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '16px', borderTop: '1px solid var(--border-default)' }}>
+                  <span className="text-text-secondary" style={{ fontSize: '13px', fontWeight: 500 }}>Última act. hoy</span>
+                  <div className="text-text-strong" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', fontWeight: 600 }}>
                     Editar <span style={{ color: 'var(--brand-primary)' }}>&rarr;</span>
                   </div>
                 </div>

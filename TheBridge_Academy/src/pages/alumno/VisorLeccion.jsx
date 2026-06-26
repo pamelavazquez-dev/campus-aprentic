@@ -161,7 +161,7 @@ export default function VisorLeccion() {
             </h3>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <span style={{ fontSize: '13px', fontWeight: 700, color: '#B9C0CA' }}>
+            <span className="text-text-secondary" style={{ fontSize: '13px', fontWeight: 700 }}>
               {completadasCount}/{lecciones.length} completadas
             </span>
             <div style={{ width: '120px', height: '6px', background: 'rgba(255,255,255,0.16)', borderRadius: '3px', overflow: 'hidden' }}>
