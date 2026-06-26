@@ -20,7 +20,8 @@ const buildPromocion = (id, data) => {
       promocionData.fechaFin || null,
       promocionData.campus_id,
       promocionData.alumnos_id,
-      promocionData.profesor_id
+      promocionData.profesor_id,
+      promocionData.estado || data.estado || 'activa'
     );
 };
 

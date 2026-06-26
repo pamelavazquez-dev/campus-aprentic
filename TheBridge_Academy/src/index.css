@@ -198,6 +198,7 @@ p {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+@plugin "@tailwindcss/typography";
 
 /* Dark mode card surfaces */
 .dark .bg-surface,

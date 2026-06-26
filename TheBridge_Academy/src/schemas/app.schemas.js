@@ -4,19 +4,7 @@ const requiredText = (fieldName) => (
   z.string().trim().min(1, `${fieldName} es obligatorio`)
 );
 
-const optionalUrl = z
-  .string()
-  .trim()
-  .refine((value) => {
-    if (!value) return true;
-
-    try {
-      new URL(value);
-      return true;
-    } catch {
-      return false;
-    }
-  }, 'Introduce una URL valida');
+const optionalUrl = z.string().trim();
 
 export const loginSchema = z.object({
   email: z.email('Introduce un email valido').trim(),
@@ -30,6 +18,7 @@ export const promocionSchema = z.object({
   campus_id: requiredText('La sede'),
   alumnos_id: z.array(z.string()).default([]),
   profesor_id: z.array(z.string()).default([]),
+  estado: z.enum(['activa', 'completada']).default('activa'),
 });
 
 export const alumnoSchema = z.object({
@@ -67,6 +56,7 @@ export const leccionSchema = z.object({
   titulo: requiredText('El titulo'),
   descripcion: requiredText('La descripcion'),
   contenido_url: optionalUrl.default(''),
+  contenido_markdown: z.string().optional().default(''),
   videos_url: z.array(z.string()).default([]),
 });
 

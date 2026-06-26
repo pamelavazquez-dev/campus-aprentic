@@ -23,10 +23,10 @@ const getUserByEmail = async (collectionName, email) => {
 export async function getUserRole(uid, email = '') {
   if (!uid) return null;
 
-  const admin = await getAdminById(uid);
+  const admin = await getAdminById(uid) || await getUserByEmail('admin', email);
   if (admin) return { name: 'admin', profile: admin };
 
-  const profesor = await getProfesorById(uid);
+  const profesor = await getProfesorById(uid) || await getUserByEmail('profesores', email);
   if (profesor) return { name: 'instructor', profile: profesor };
 
   const alumno = await getAlumnoById(uid) || await getUserByEmail('alumnos', email);

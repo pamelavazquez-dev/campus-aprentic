@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../config/firebase';
+import { useAuth } from '../hooks/useAuth';
 
 export const DataContext = createContext({
   modulos: [],
@@ -15,9 +16,18 @@ export const DataProvider = ({ children }) => {
   const [campuses, setCampuses] = useState([]);
   
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
-    if (!db) return;
+    if (!db || !user) {
+      if (!user) {
+        setModulos([]);
+        setPromociones([]);
+        setCampuses([]);
+        setLoading(false);
+      }
+      return;
+    }
 
     let loadedCount = 0;
     const TOTAL_COLLECTIONS = 3; // modulos, promociones, campus
@@ -48,7 +58,7 @@ export const DataProvider = ({ children }) => {
       unsubPromociones();
       unsubCampus();
     };
-  }, []);
+  }, [user]);
 
   return (
     <DataContext.Provider value={{ modulos, promociones, campuses, loading }}>
