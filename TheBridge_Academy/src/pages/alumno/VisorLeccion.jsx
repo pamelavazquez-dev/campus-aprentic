@@ -30,7 +30,7 @@ export default function VisorLeccion() {
           const studentPromos = alumnoActual?.promociones_id || [];
           const isBlocked = mod.promociones_activas && mod.promociones_activas.length > 0 
             ? !mod.promociones_activas.some(p => studentPromos.includes(p))
-            : mod.activo === false;
+            : true; // Por defecto, bloqueado hasta que el profesor lo habilita
           
           if (isBlocked) {
              toast.error('Este módulo no está disponible');

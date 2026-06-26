@@ -21,7 +21,8 @@ export default function AlumnoDashboard() {
           if (m.promociones_activas && m.promociones_activas.length > 0) {
             return m.promociones_activas.some(p => studentPromos.includes(p));
           }
-          return m.activo !== false;
+          // Por defecto, los módulos están bloqueados hasta que el profesor los habilita
+          return false;
         }));
         setLecciones(lecs);
         setAlumnoActual(profile);
