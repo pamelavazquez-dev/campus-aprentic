@@ -37,8 +37,9 @@ export default function AlumnoDashboard() {
 
 
   const modulosAsignados = useMemo(() => {
-    if (!alumnoActual || !alumnoActual.modulos_id) return [];
-    return modulos.filter(m => alumnoActual.modulos_id.includes(m.id));
+    if (!alumnoActual) return [];
+    // Los módulos ya vienen filtrados por promociones_activas desde fetchData
+    return modulos;
   }, [modulos, alumnoActual]);
 
   // Contar lecciones por módulo
