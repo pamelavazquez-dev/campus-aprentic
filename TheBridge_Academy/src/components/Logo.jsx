@@ -20,7 +20,7 @@ export default function Logo({ size = 'md', showText = true, className = '' }) {
               className="h-full max-w-none object-left object-cover logo-image"
             />
           </div>
-          <div className="flex flex-col justify-center leading-none text-text-strong dark:text-white">
+          <div className="flex flex-col justify-center leading-none text-black dark:text-white">
             <span className={`font-['Montserrat'] ${dim.smallText} font-black tracking-tight`}>THE</span>
             <span className={`font-['Montserrat'] ${dim.bigText} font-black tracking-tight -mt-[1px]`}>BRIDGE</span>
           </div>
