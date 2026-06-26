@@ -16,11 +16,12 @@ export const DataProvider = ({ children }) => {
   const [campuses, setCampuses] = useState([]);
   
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
+  const { user, role } = useAuth();
 
   useEffect(() => {
-    if (!db || !user) {
-      if (!user) {
+    // Only fetch global data if the user is fully logged in and has a role
+    if (!db || !user || !role) {
+      if (!user || !role) {
         setModulos([]);
         setPromociones([]);
         setCampuses([]);
@@ -30,7 +31,9 @@ export const DataProvider = ({ children }) => {
     }
 
     let loadedCount = 0;
-    const TOTAL_COLLECTIONS = 3; // modulos, promociones, campus
+    const isCampusNeeded = role === 'admin';
+    const TOTAL_COLLECTIONS = isCampusNeeded ? 3 : 2; // modulos, promociones, (campus si es admin)
+    
     const checkLoading = () => {
       loadedCount++;
       if (loadedCount >= TOTAL_COLLECTIONS) setLoading(false);
@@ -46,19 +49,22 @@ export const DataProvider = ({ children }) => {
       if (loadedCount < TOTAL_COLLECTIONS) checkLoading();
     }, (error) => console.error(error));
 
-
-
-    const unsubCampus = onSnapshot(collection(db, 'campus'), (snapshot) => {
-      setCampuses(snapshot.docs.map(doc => ({id: doc.id, ...doc.data()})));
-      if (loadedCount < TOTAL_COLLECTIONS) checkLoading();
-    }, (error) => console.error(error));
+    let unsubCampus = () => {};
+    if (isCampusNeeded) {
+      unsubCampus = onSnapshot(collection(db, 'campus'), (snapshot) => {
+        setCampuses(snapshot.docs.map(doc => ({id: doc.id, ...doc.data()})));
+        if (loadedCount < TOTAL_COLLECTIONS) checkLoading();
+      }, (error) => console.error(error));
+    } else {
+      setCampuses([]);
+    }
 
     return () => {
       unsubModulos();
       unsubPromociones();
       unsubCampus();
     };
-  }, [user]);
+  }, [user, role]);
 
   return (
     <DataContext.Provider value={{ modulos, promociones, campuses, loading }}>
