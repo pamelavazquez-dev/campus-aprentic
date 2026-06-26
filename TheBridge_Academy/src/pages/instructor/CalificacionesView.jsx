@@ -2,6 +2,7 @@ import toast from 'react-hot-toast';
 import { useState, useEffect, useContext, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { DataContext } from '../../context/DataContext';
+import PageHeader from '../../components/ui/PageHeader';
 import { getAllNotas, createNota, updateNota } from '../../services/notas.service';
 import { getAllProyectos } from '../../services/proyectos.service';
 import { useQuery } from '@tanstack/react-query';
@@ -179,10 +180,10 @@ export default function CalificacionesView() {
 
   return (
     <div className="animate-fade-in" style={{ maxWidth: '1000px', margin: '0 auto' }}>
-      <div className="instructor-page-hero bg-gradient-to-br from-[#0f172a] to-[#3e0c15] rounded-2xl relative overflow-hidden border border-white/10" style={{ padding: '32px 48px', marginBottom: '32px' }}>
-        <h2 style={{ fontSize: '32px', fontWeight: 900, margin: 0, color: 'white' }}>Evaluaciones y Notas</h2>
-        <p style={{ color: '#B9C0CA', margin: '8px 0 0 0', fontSize: '16px' }}>Califica el desempeño de tus alumnos por módulo.</p>
-      </div>
+      <PageHeader 
+        title="Evaluaciones y Notas"
+        description="Califica el desempeño de tus alumnos por módulo."
+      />
 
       <div style={{ marginBottom: '24px' }}>
         <label style={{ display: 'block', fontSize: '13px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '8px' }}>

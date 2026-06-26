@@ -2,6 +2,7 @@ import { useState, useEffect, useContext, useMemo } from 'react';
 import { DataContext } from '../../context/DataContext';
 import { useAuth } from '../../hooks/useAuth';
 import { getNotasByAlumnoId } from '../../services/notas.service';
+import PageHeader from '../../components/ui/PageHeader';
 
 export default function MisNotasView() {
   const { profile } = useAuth();
@@ -42,10 +43,10 @@ export default function MisNotasView() {
 
   return (
     <div className="animate-fade-in" style={{ maxWidth: '1000px', margin: '0 auto' }}>
-      <div className="bg-gradient-to-br from-[#0f172a] to-[#3e0c15] rounded-2xl relative overflow-hidden border border-white/10" style={{ padding: '32px 48px', marginBottom: '32px' }}>
-        <h2 style={{ fontSize: '32px', fontWeight: 900, margin: 0, color: 'white' }}>Mis Calificaciones</h2>
-        <p style={{ color: '#B9C0CA', margin: '8px 0 0 0', fontSize: '16px' }}>Aquí puedes ver el resultado de tus evaluaciones y el feedback de tus instructores.</p>
-      </div>
+      <PageHeader 
+        title="Mis Calificaciones"
+        description="Aquí puedes ver el resultado de tus evaluaciones y el feedback de tus instructores."
+      />
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {misNotas.length === 0 ? (

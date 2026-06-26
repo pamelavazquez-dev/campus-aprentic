@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getAllInscripciones, updateInscripcion } from '../../services/inscripciones.service';
+import PageHeader from '../../components/ui/PageHeader';
 
 export default function InscripcionesView() {
   const [inscripciones, setInscripciones] = useState([]);
@@ -36,10 +37,10 @@ export default function InscripcionesView() {
 
   return (
     <div className="admin-inscripciones-view animate-fade-in" style={{ maxWidth: '1000px', margin: '0 auto' }}>
-      <div className="admin-page-hero bg-gradient-to-br from-[#0f172a] to-[#3e0c15] rounded-2xl relative overflow-hidden border border-white/10" style={{ padding: '32px 48px', marginBottom: '32px' }}>
-        <h2 style={{ fontSize: '32px', fontWeight: 900, margin: 0, color: 'white' }}>Inscripciones Recibidas</h2>
-        <p style={{ color: '#B9C0CA', margin: '8px 0 0 0', fontSize: '16px' }}>Gestiona las solicitudes de alumnos a los campus.</p>
-      </div>
+      <PageHeader 
+        title="Inscripciones Recibidas"
+        description="Gestiona las solicitudes de alumnos a los campus."
+      />
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {inscripciones.length === 0 ? (

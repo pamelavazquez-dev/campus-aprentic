@@ -14,6 +14,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
+        setLoading(true);
         setUser(currentUser);
         try {
           const roleData = await getUserRole(currentUser.uid, currentUser.email);
@@ -23,13 +24,15 @@ export const AuthProvider = ({ children }) => {
           console.error("Error al obtener el rol del usuario:", error);
           setRole(null);
           setProfile(null);
+        } finally {
+          setLoading(false);
         }
       } else {
         setUser(null);
         setRole(null);
         setProfile(null);
+        setLoading(false);
       }
-      setLoading(false);
     });
     return () => unsubscribe();
   }, []);

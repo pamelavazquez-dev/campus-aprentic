@@ -7,6 +7,7 @@ import ThemeToggle from './ui/ThemeToggle';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -43,9 +44,14 @@ export default function Login() {
       <div className="bg-surface backdrop-blur-2xl border border-border-default rounded-3xl max-w-[440px] w-[90%] p-10 sm:p-12 shadow-xl hover:shadow-2xl transition-all duration-500 animate-fade-in relative z-10">
         
         <div className="text-center mb-10 flex flex-col items-center">
-          <div className="flex justify-center mb-6 transform hover:scale-105 transition-transform duration-500">
+          <a 
+            href="https://thebridge.tech/" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="flex justify-center mb-6 transform hover:scale-105 transition-transform duration-500 cursor-pointer"
+          >
             <Logo size="xl" />
-          </div>
+          </a>
           <h2 className="text-2xl font-black text-text-strong mb-2 tracking-tight">Bienvenido de nuevo</h2>
           <p className="text-text-secondary text-[15px] font-medium">Accede a tu plataforma educativa</p>
         </div>
@@ -61,7 +67,7 @@ export default function Login() {
           <div className="space-y-2 text-left group">
             <label className="block text-sm font-bold text-text-strong group-focus-within:text-brand-primary transition-colors">Correo electrónico</label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-text-secondary group-focus-within:text-brand-primary transition-colors">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-text-secondary dark:text-brand-primary group-focus-within:text-brand-primary transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><path d="m2 4 10 8 10-8"></path></svg>
               </div>
               <input 
@@ -78,17 +84,29 @@ export default function Login() {
           <div className="space-y-2 text-left group">
             <label className="block text-sm font-bold text-text-strong group-focus-within:text-brand-primary transition-colors">Contraseña</label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-text-secondary group-focus-within:text-brand-primary transition-colors">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-text-secondary dark:text-brand-primary group-focus-within:text-brand-primary transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
               </div>
               <input 
-                type="password" 
-                className="w-full pl-11 pr-4 py-3.5 bg-canvas border border-border-default rounded-xl text-text-strong text-[15px] font-semibold transition-all duration-300 focus:outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 focus:-translate-y-[2px] shadow-sm" 
+                type={showPassword ? "text" : "password"} 
+                className="w-full pl-11 pr-12 py-3.5 bg-canvas border border-border-default rounded-xl text-text-strong text-[15px] font-semibold transition-all duration-300 focus:outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 focus:-translate-y-[2px] shadow-sm" 
                 value={password} 
                 onChange={(e) => setPassword(e.target.value)} 
                 required 
                 placeholder="••••••••"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 pr-4 flex items-center text-text-secondary dark:text-brand-primary hover:text-brand-primary transition-colors focus:outline-none"
+                title={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+              >
+                {showPassword ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path><line x1="2" y1="2" x2="22" y2="22"></line></svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                )}
+              </button>
             </div>
           </div>
 

@@ -6,6 +6,7 @@ import { createDoc, updateDoc } from '../services/base.service';
 import { doc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import Avatar from '../components/ui/Avatar';
+import Select from '../components/ui/Select';
 import toast from 'react-hot-toast';
 
 export default function UsuariosView() {
@@ -151,23 +152,30 @@ export default function UsuariosView() {
           )}
         />
 
-        <div className="flex flex-col sm:flex-row gap-4 mt-8 bg-surface backdrop-blur-md border border-gray-200/60 rounded-2xl p-4 shadow-sm">
+        <div className="flex flex-col sm:flex-row gap-4 mt-8 bg-surface backdrop-blur-md border border-gray-200/60 rounded-2xl p-4 shadow-sm relative z-20">
           <div className="flex-1 flex flex-col gap-1">
             <label className="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Filtrar por Rol</label>
-            <select className="w-full px-4 py-2.5 bg-surface-solid border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300 cursor-pointer" value={filterRol} onChange={e => setFilterRol(e.target.value)}>
-              <option value="Alumno">Alumno</option>
-              <option value="Instructor">Instructor</option>
-              <option value="Administrador">Administrador</option>
-            </select>
+            <Select 
+              value={filterRol} 
+              onChange={setFilterRol} 
+              options={[
+                { value: 'Alumno', label: 'Alumno' },
+                { value: 'Instructor', label: 'Instructor' },
+                { value: 'Administrador', label: 'Administrador' }
+              ]}
+            />
           </div>
           <div className="flex-1 flex flex-col gap-1">
             <label className="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Filtrar por Campus</label>
-            <select className="w-full px-4 py-2.5 bg-surface-solid border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300 cursor-pointer" value={filterCampus} onChange={e => setFilterCampus(e.target.value)}>
-              <option value="">Todos los campus</option>
-              {campuses.map(c => (
-                <option key={c.id} value={c.id}>{c.nombre || c.id}</option>
-              ))}
-            </select>
+            <Select 
+              value={filterCampus} 
+              onChange={setFilterCampus} 
+              placeholder="Todos los campus"
+              options={[
+                { value: '', label: 'Todos los campus' },
+                ...campuses.map(c => ({ value: c.id, label: c.nombre || c.id }))
+              ]}
+            />
           </div>
         </div>
 
@@ -300,21 +308,29 @@ export default function UsuariosView() {
 
               {step === 2 && (
                 <div className="flex flex-col gap-5 animate-fadeSlideDown">
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-2 relative z-50">
                     <label className="text-sm font-bold text-text-strong">Rol en la Plataforma</label>
-                    <select className="w-full px-4 py-3 bg-surface-solid border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300 cursor-pointer" value={usuario.rol} onChange={e => setUsuario({...usuario, rol: e.target.value})}>
-                      <option>Instructor</option>
-                      <option>Alumno</option>
-                      <option>Administrador</option>
-                    </select>
+                    <Select 
+                      value={usuario.rol} 
+                      onChange={val => setUsuario({...usuario, rol: val})}
+                      options={[
+                        { value: 'Alumno', label: 'Alumno' },
+                        { value: 'Instructor', label: 'Instructor' },
+                        { value: 'Administrador', label: 'Administrador' }
+                      ]}
+                    />
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <label className="text-sm font-bold text-text-strong">Campus Asignado</label>
-                    <select className="w-full px-4 py-3 bg-surface-solid border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300 cursor-pointer" value={usuario.campus_id} onChange={e => setUsuario({...usuario, campus_id: e.target.value})}>
-                      {campuses.map(c => (
-                        <option key={c.id} value={c.id}>{c.nombre || c.id}</option>
-                      ))}
-                    </select>
+                  <div className="flex flex-col gap-2 relative z-40">
+                    <label className="text-sm font-bold text-text-strong">Campus (Opcional)</label>
+                    <Select 
+                      value={usuario.campus_id} 
+                      onChange={val => setUsuario({...usuario, campus_id: val})}
+                      placeholder="Seleccionar campus"
+                      options={[
+                        { value: '', label: 'Seleccionar campus' },
+                        ...campuses.map(c => ({ value: c.id, label: c.nombre || c.id }))
+                      ]}
+                    />
                   </div>
                   <div className="flex gap-4 mt-4 pt-4 border-t border-gray-100">
                     <button className="flex-1 bg-surface-solid border-2 border-gray-200 text-gray-600 py-3 rounded-xl text-sm font-bold transition-all hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 cursor-pointer shadow-sm" onClick={() => setStep(1)}>Atrás</button>
@@ -423,7 +439,7 @@ export default function UsuariosView() {
                 <label className="text-sm font-bold text-text-strong">Nombre Completo</label>
                 <input className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10" value={usuario.nombre} onChange={e => setUsuario({...usuario, nombre: e.target.value})} placeholder="Ej: Laura Ruiz" />
               </div>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 relative z-40">
                 <label className="text-sm font-bold text-text-strong">Email corporativo</label>
                 <input className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-xl text-sm text-text-strong transition-all duration-200 outline-none opacity-60 cursor-not-allowed" type="email" value={usuario.email} disabled title="El email no se puede editar" />
               </div>
@@ -431,13 +447,17 @@ export default function UsuariosView() {
                 <label className="text-sm font-bold text-text-strong">Rol</label>
                 <input className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-xl text-sm text-text-strong transition-all duration-200 outline-none opacity-60 cursor-not-allowed" value={usuario.rol} disabled title="El rol no se puede cambiar. Inactiva el usuario y crea uno nuevo." />
               </div>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 relative z-40">
                 <label className="text-sm font-bold text-text-strong">Campus Asignado</label>
-                <select className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 cursor-pointer" value={usuario.campus_id} onChange={e => setUsuario({...usuario, campus_id: e.target.value})}>
-                  {campuses.map(c => (
-                    <option key={c.id} value={c.id}>{c.nombre || c.id}</option>
-                  ))}
-                </select>
+                <Select 
+                  value={usuario.campus_id} 
+                  onChange={val => setUsuario({...usuario, campus_id: val})}
+                  placeholder="Seleccionar campus"
+                  options={[
+                    { value: '', label: 'Seleccionar campus' },
+                    ...campuses.map(c => ({ value: c.id, label: c.nombre || c.id }))
+                  ]}
+                />
               </div>
               <div className="flex gap-4 mt-4 pt-4 border-t border-border-default">
                 <button className="flex-1 bg-surface-solid border-2 border-border-default text-text-secondary py-3 rounded-xl text-sm font-bold transition-all hover:bg-surface hover:text-text-strong cursor-pointer shadow-sm" onClick={() => setShowEditModal(false)}>Cancelar</button>
