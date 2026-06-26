@@ -65,6 +65,7 @@ export default function AlumnoDashboard() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+
       
       {/* Page Header */}
       <div style={{ margin: '-48px -48px 32px -48px', background: 'var(--surface-solid)', borderBottom: '1px solid var(--border)' }}>

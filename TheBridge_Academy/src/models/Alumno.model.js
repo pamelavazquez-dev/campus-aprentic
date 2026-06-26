@@ -24,7 +24,7 @@ export const alumnoConverter = {
       data.nombre || '',
       data.email || '',
       data.avatar || '',
-      data.promociones_id || [],
+      data.promociones_id || (data.promocion_id ? [data.promocion_id] : []),
       data.modulos_id || []
     );
   }
