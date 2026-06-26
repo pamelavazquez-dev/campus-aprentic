@@ -27,7 +27,8 @@ export default function VisorLeccion() {
       try {
         const mod = moduloId ? await getModuloById(moduloId) : null;
         if (mod && !canEditModules) {
-          const studentPromos = alumnoActual?.promociones_id || [];
+          const promosRaw = alumnoActual?.promociones_id || alumnoActual?.promocion_id || [];
+          const studentPromos = Array.isArray(promosRaw) ? promosRaw : [promosRaw].filter(Boolean);
           const isBlocked = mod.promociones_activas && mod.promociones_activas.length > 0 
             ? !mod.promociones_activas.some(p => studentPromos.includes(p))
             : true; // Por defecto, bloqueado hasta que el profesor lo habilita

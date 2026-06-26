@@ -17,7 +17,9 @@ export default function AlumnoDashboard() {
       try {
         const [mods, lecs] = await Promise.all([getAllModulos(), getAllLecciones()]);
         setModulos(mods.filter(m => {
-          const studentPromos = profile?.promociones_id || [];
+          const promosRaw = profile?.promociones_id || profile?.promocion_id || [];
+          const studentPromos = Array.isArray(promosRaw) ? promosRaw : [promosRaw].filter(Boolean);
+          
           if (m.promociones_activas && m.promociones_activas.length > 0) {
             return m.promociones_activas.some(p => studentPromos.includes(p));
           }
