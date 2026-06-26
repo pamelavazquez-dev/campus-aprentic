@@ -58,7 +58,7 @@ export const DataProvider = ({ children }) => {
       unsubPromociones();
       unsubCampus();
     };
-  }, []);
+  }, [user]);
 
   return (
     <DataContext.Provider value={{ modulos, promociones, campuses, loading }}>
