@@ -1,25 +1,24 @@
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
-import pdfWorkerUrl from 'pdfjs-dist/legacy/build/pdf.worker.min.js?url';
+import * as pdfjsLib from 'pdfjs-dist';
 
-const pdfjs = pdfjsLib.default || pdfjsLib;
-
-// Configuramos el worker utilizando el archivo local proporcionado por pdfjs-dist
-if (pdfjs && pdfjs.GlobalWorkerOptions) {
-  pdfjs.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
-}
-
+// Configurar el worker usando new URL + import.meta.url para Vite (Compatible con v3.x)
+pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.js',
+  import.meta.url
+).toString();
 
 export const extractTextFromPDF = async (file) => {
   const arrayBuffer = await file.arrayBuffer();
-  const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
+  
+  // Inicializar el documento usando el alias importado directamente
+  const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+  const pdf = await loadingTask.promise;
+  
   let fullMarkdown = '';
   
   for (let i = 1; i <= pdf.numPages; i++) {
     const page = await pdf.getPage(i);
     const textContent = await page.getTextContent();
     
-    // Un procesado rudimentario para evitar que se junten las palabras sin espacios.
-    // pdfjs a veces separa texto en items distintos.
     let lastY = -1;
     let text = '';
     
@@ -34,6 +33,5 @@ export const extractTextFromPDF = async (file) => {
     fullMarkdown += text + '\n\n';
   }
   
-  // Limpieza básica de espacios múltiples
   return fullMarkdown.replace(/ +/g, ' ').trim();
 };
