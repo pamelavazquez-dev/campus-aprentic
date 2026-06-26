@@ -1,18 +1,13 @@
-import * as pdfjsLib from 'pdfjs-dist';
-import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.js?url';
-
-// Vite/Rollup a veces encapsula la importación en "default"
-const pdfjs = pdfjsLib.default || pdfjsLib;
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
+import pdfWorkerUrl from 'pdfjs-dist/legacy/build/pdf.worker.min.js?url';
 
 // Configuramos el worker utilizando el archivo local proporcionado por pdfjs-dist
-if (pdfjs.GlobalWorkerOptions) {
-  pdfjs.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
-}
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
 
 
 export const extractTextFromPDF = async (file) => {
   const arrayBuffer = await file.arrayBuffer();
-  const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
   let fullMarkdown = '';
   
   for (let i = 1; i <= pdf.numPages; i++) {
