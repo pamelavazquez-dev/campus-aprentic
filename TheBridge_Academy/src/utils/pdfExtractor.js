@@ -10,7 +10,11 @@ export const extractTextFromPDF = async (file) => {
   const arrayBuffer = await file.arrayBuffer();
   
   // Inicializar el documento
-  const loadingTask = getDocument({ data: arrayBuffer });
+  const loadingTask = getDocument({ 
+    data: arrayBuffer,
+    cMapUrl: 'https://unpkg.com/pdfjs-dist@3.11.174/cmaps/',
+    cMapPacked: true,
+  });
   const pdf = await loadingTask.promise;
   
   let fullMarkdown = '';
