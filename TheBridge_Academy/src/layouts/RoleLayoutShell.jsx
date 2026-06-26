@@ -5,9 +5,11 @@ import { auth } from '../config/firebase';
 import Logo from '../components/Logo';
 import Avatar from '../components/ui/Avatar';
 import ThemeToggle from '../components/ui/ThemeToggle';
+import ConfirmModal from '../components/ui/ConfirmModal';
 
 export default function RoleLayoutShell({ user, menuItems, roleLabel, brandLabel }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const navigate = useNavigate();
   const userName = user?.displayName || user?.email?.split('@')[0] || roleLabel;
 
@@ -54,7 +56,7 @@ export default function RoleLayoutShell({ user, menuItems, roleLabel, brandLabel
               </div>
             </div>
             <button
-              onClick={handleLogout}
+              onClick={() => setShowLogoutConfirm(true)}
               title="Cerrar Sesion"
               className="bg-transparent border-none text-[#B9C0CA] cursor-pointer flex items-center justify-center p-2 rounded-lg transition-all duration-200 hover:text-brand-primary hover:bg-brand-primary/10"
             >
@@ -113,7 +115,7 @@ export default function RoleLayoutShell({ user, menuItems, roleLabel, brandLabel
                     <span className="text-[11px] font-semibold text-[#B9C0CA]">{roleLabel}</span>
                   </div>
                 </div>
-                <button onClick={handleLogout} className="bg-brand-primary/10 text-brand-primary border border-brand-primary/20 px-3 py-2 rounded-lg text-xs font-black">
+                <button onClick={() => setShowLogoutConfirm(true)} className="bg-brand-primary/10 text-brand-primary border border-brand-primary/20 px-3 py-2 rounded-lg text-xs font-black">
                   Salir
                 </button>
               </div>
@@ -125,6 +127,15 @@ export default function RoleLayoutShell({ user, menuItems, roleLabel, brandLabel
       <main className="flex-1 px-4 py-6 md:p-12 w-full max-w-full box-border overflow-x-hidden">
         <Outlet />
       </main>
+
+      <ConfirmModal 
+        isOpen={showLogoutConfirm}
+        title="¿Cerrar Sesión?"
+        message={`Estás a punto de salir de tu cuenta de ${roleLabel.toLowerCase()}.`}
+        confirmText="Salir"
+        onConfirm={handleLogout}
+        onCancel={() => setShowLogoutConfirm(false)}
+      />
     </div>
   );
 }
