@@ -152,7 +152,7 @@ export default function UsuariosView() {
           )}
         />
 
-        <div className="flex flex-col sm:flex-row gap-4 mt-8 bg-surface backdrop-blur-md border border-gray-200/60 rounded-2xl p-4 shadow-sm">
+        <div className="flex flex-col sm:flex-row gap-4 mt-8 bg-surface backdrop-blur-md border border-gray-200/60 rounded-2xl p-4 shadow-sm relative z-20">
           <div className="flex-1 flex flex-col gap-1">
             <label className="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Filtrar por Rol</label>
             <Select 
@@ -308,7 +308,7 @@ export default function UsuariosView() {
 
               {step === 2 && (
                 <div className="flex flex-col gap-5 animate-fadeSlideDown">
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-2 relative z-50">
                     <label className="text-sm font-bold text-text-strong">Rol en la Plataforma</label>
                     <Select 
                       value={usuario.rol} 
@@ -320,7 +320,7 @@ export default function UsuariosView() {
                       ]}
                     />
                   </div>
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-2 relative z-40">
                     <label className="text-sm font-bold text-text-strong">Campus (Opcional)</label>
                     <Select 
                       value={usuario.campus_id} 
@@ -439,7 +439,7 @@ export default function UsuariosView() {
                 <label className="text-sm font-bold text-text-strong">Nombre Completo</label>
                 <input className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10" value={usuario.nombre} onChange={e => setUsuario({...usuario, nombre: e.target.value})} placeholder="Ej: Laura Ruiz" />
               </div>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 relative z-40">
                 <label className="text-sm font-bold text-text-strong">Email corporativo</label>
                 <input className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-xl text-sm text-text-strong transition-all duration-200 outline-none opacity-60 cursor-not-allowed" type="email" value={usuario.email} disabled title="El email no se puede editar" />
               </div>
@@ -447,7 +447,7 @@ export default function UsuariosView() {
                 <label className="text-sm font-bold text-text-strong">Rol</label>
                 <input className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-xl text-sm text-text-strong transition-all duration-200 outline-none opacity-60 cursor-not-allowed" value={usuario.rol} disabled title="El rol no se puede cambiar. Inactiva el usuario y crea uno nuevo." />
               </div>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 relative z-40">
                 <label className="text-sm font-bold text-text-strong">Campus Asignado</label>
                 <Select 
                   value={usuario.campus_id} 
