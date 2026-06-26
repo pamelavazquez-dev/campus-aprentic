@@ -16,11 +16,12 @@ export const DataProvider = ({ children }) => {
   const [campuses, setCampuses] = useState([]);
   
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
+  const { user, role } = useAuth();
 
   useEffect(() => {
-    if (!db || !user) {
-      if (!user) {
+    // Only fetch global data if the user is fully logged in and has a role
+    if (!db || !user || !role) {
+      if (!user || !role) {
         setModulos([]);
         setPromociones([]);
         setCampuses([]);
@@ -58,7 +59,7 @@ export const DataProvider = ({ children }) => {
       unsubPromociones();
       unsubCampus();
     };
-  }, [user]);
+  }, [user, role]);
 
   return (
     <DataContext.Provider value={{ modulos, promociones, campuses, loading }}>
