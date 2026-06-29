@@ -23,7 +23,21 @@ export function usePDFImport() {
       
       const sizeInKB = new Blob([markdown]).size / 1024;
       if (sizeInKB > 800) {
-        toast.error('El contenido del PDF es demasiado largo para una lectura cómoda. Te recomendamos dividir este tema en dos o más lecciones más cortas para facilitar el aprendizaje de tus alumnos.', { id: toastId, duration: 6000 });
+        toast.dismiss(toastId);
+        toast((t) => (
+          <div className="flex gap-4 items-start" role="alertdialog" aria-live="assertive">
+            <span className="text-sm font-medium">
+              El contenido del PDF es demasiado largo para una lectura cómoda. Te recomendamos dividir este tema en dos o más lecciones más cortas para facilitar el aprendizaje de tus alumnos.
+            </span>
+            <button 
+              onClick={() => toast.dismiss(t.id)} 
+              aria-label="Cerrar alerta"
+              className="text-gray-500 hover:text-gray-800 transition-colors p-1"
+            >
+              ✕
+            </button>
+          </div>
+        ), { duration: Infinity, icon: '⚠️' });
         setIsImporting(false);
         return false;
       }
@@ -34,7 +48,7 @@ export function usePDFImport() {
       return true;
     } catch (error) {
       console.error('Error extrayendo PDF:', error);
-      toast.error('Error al procesar el PDF. Revisa la consola.', { id: toastId });
+      toast.error('El archivo PDF parece estar dañado o tiene un formato no compatible. Por favor, asegúrate de que sea un PDF de texto válido e inténtalo de nuevo.', { id: toastId });
       return false;
     } finally {
       setIsImporting(false);

@@ -357,7 +357,7 @@ export default function VisorLeccion() {
                   {loadingMarkdown ? (
                     <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>Cargando contenido...</p>
                   ) : (
-                    <div className="prose prose-invert max-w-[800px] mx-auto prose-p:leading-loose prose-p:text-[17px] prose-headings:font-black prose-headings:tracking-tight prose-a:text-brand-primary prose-a:no-underline hover:prose-a:underline" style={{ color: 'var(--text-strong)', textAlign: 'left' }}>
+                    <div className="prose prose-invert max-w-[800px] mx-auto prose-p:leading-loose prose-p:text-[17px] prose-headings:font-black prose-headings:tracking-tight prose-a:text-brand-primary prose-a:no-underline hover:prose-a:underline overflow-hidden break-words prose-pre:overflow-x-auto prose-table:block prose-table:overflow-x-auto" style={{ color: 'var(--text-strong)', textAlign: 'left' }}>
                       <ReactMarkdown 
                         rehypePlugins={[rehypeSanitize]}
                         allowedElements={['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'a', 'ul', 'ol', 'li', 'b', 'i', 'strong', 'em', 'strike', 'code', 'pre', 'blockquote', 'hr', 'table', 'thead', 'tbody', 'tr', 'th', 'td']}
