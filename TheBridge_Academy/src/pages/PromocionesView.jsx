@@ -171,7 +171,7 @@ export default function PromocionesView() {
       )}
 
       {selectedCampusForModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in" onMouseDown={(e) => { if (e.target === e.currentTarget) setSelectedCampusForModal(null); }}>
           <div className="bg-surface border border-border-default rounded-2xl w-full max-w-5xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden transform transition-all duration-400">
             <div className="px-8 py-6 border-b border-border-default bg-surface-solid flex justify-between items-center">
               <div>
