@@ -235,11 +235,13 @@ export default function UsuariosView() {
                     </button>
                     <button
                       type="button"
-                      className={`py-2 px-4 rounded-xl text-sm font-bold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 border-none shadow-sm ${u.isActive ? 'bg-danger/10 text-danger hover:bg-danger hover:text-white' : 'bg-surface-solid border border-border-default text-gray-400 hover:bg-brand-primary/10 hover:text-brand-primary'}`}
+                      className={`py-2 px-4 rounded-xl text-sm font-bold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 border shadow-sm ${u.isActive ? 'bg-green-50 text-green-600 border-green-200 hover:bg-green-500 hover:text-white hover:border-green-500' : 'bg-red-50 text-red-600 border-red-200 hover:bg-red-500 hover:text-white hover:border-red-500'}`}
                       onClick={() => setUserToToggle(u)}
                       disabled={saving === u.id}
+                      title={u.isActive ? "Haz clic para inactivar al usuario" : "Haz clic para reactivar al usuario"}
                     >
-                      {saving === u.id ? '...' : u.isActive ? 'Inactivar' : 'Activar'}
+                      <span className={`w-2 h-2 rounded-full ${u.isActive ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                      {saving === u.id ? '...' : u.isActive ? 'Activo' : 'Inactivo'}
                     </button>
                   </div>
                 </div>
