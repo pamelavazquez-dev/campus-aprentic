@@ -34,7 +34,7 @@ export default function EditarCampusForm({ onClose, onUpdated, initialData }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="bg-surface border border-border-default rounded-3xl w-full max-w-md shadow-2xl transform transition-all duration-400 overflow-hidden">
         <div className="px-8 py-6 border-b border-border-default bg-gray-50/50 flex justify-between items-center">
           <h3 className="m-0 text-xl font-black text-text-strong">Editar Sede</h3>

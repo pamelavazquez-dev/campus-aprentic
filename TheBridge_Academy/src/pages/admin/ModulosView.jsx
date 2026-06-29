@@ -145,10 +145,10 @@ export default function ModulosView() {
                     <td className="px-6 py-4 border-b border-border-default text-sm text-[#334155]">
                       <span style={{
                         fontSize: '12px', fontWeight: 700, padding: '4px 10px', borderRadius: '6px',
-                        background: mod.activo !== false ? '#D1FAE5' : '#FEE2E2',
-                        color: mod.activo !== false ? '#065F46' : '#991B1B'
+                        background: mod.promociones_activas?.length > 0 ? '#DBEAFE' : (mod.activo !== false ? '#D1FAE5' : '#FEE2E2'),
+                        color: mod.promociones_activas?.length > 0 ? '#1E40AF' : (mod.activo !== false ? '#065F46' : '#991B1B')
                       }}>
-                        {mod.activo !== false ? 'Activo' : 'Inactivo'}
+                        {mod.promociones_activas?.length > 0 ? `Activo en ${mod.promociones_activas.length} promo(s)` : (mod.activo !== false ? 'Activo (Global)' : 'Inactivo')}
                       </span>
                     </td>
                     <td className="px-6 py-4 border-b border-border-default text-sm text-[#334155]">

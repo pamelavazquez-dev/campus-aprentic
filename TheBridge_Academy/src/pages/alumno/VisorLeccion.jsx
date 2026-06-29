@@ -2,11 +2,12 @@ import toast from 'react-hot-toast';
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getModuloById } from '../../services/modulos.service';
-import { getAllLecciones } from '../../services/lecciones.service';
-import { getAllProyectos, guardarEntregaProyecto } from '../../services/proyectos.service';
+import { getLeccionesByModuloId, getLeccionMarkdown } from '../../services/lecciones.service';
+import { getProyectosByModuloId, guardarEntregaProyecto } from '../../services/proyectos.service';
 import { getNotasByAlumnoId } from '../../services/notas.service';
 import { useRBAC } from '../../hooks/useRBAC';
 import ReactMarkdown from 'react-markdown';
+import rehypeSanitize from 'rehype-sanitize';
 import { useAuth } from '../../hooks/useAuth';
 
 export default function VisorLeccion() {
@@ -22,26 +23,54 @@ export default function VisorLeccion() {
   const [subiendoEntrega, setSubiendoEntrega] = useState(false);
   const { canEditModules } = useRBAC();
   const { user, profile: alumnoActual } = useAuth();
+  const [markdownContent, setMarkdownContent] = useState('');
+  const [loadingMarkdown, setLoadingMarkdown] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const totalScroll = document.documentElement.scrollTop;
+      const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scroll = windowHeight > 0 ? (totalScroll / windowHeight) * 100 : 0;
+      setScrollProgress(scroll);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const [mod, allLecs, allProyectos] = await Promise.all([
-          moduloId ? getModuloById(moduloId) : null,
-          getAllLecciones(),
-          getAllProyectos()
+        const mod = moduloId ? await getModuloById(moduloId) : null;
+        if (mod && !canEditModules) {
+          const promosRaw = alumnoActual?.promociones_id || alumnoActual?.promocion_id || [];
+          const studentPromos = Array.isArray(promosRaw) ? promosRaw : [promosRaw].filter(Boolean);
+          const isBlocked = mod.promociones_activas && mod.promociones_activas.length > 0 
+            ? !mod.promociones_activas.some(p => studentPromos.includes(p))
+            : true; // Por defecto, bloqueado hasta que el profesor lo habilita
+          
+          if (isBlocked) {
+             toast.error('Este módulo no está disponible');
+             navigate('/dashboard');
+             return;
+          }
+        }
+        
+        const [moduleLecs, moduleProyectos] = await Promise.all([
+          getLeccionesByModuloId(moduloId),
+          getProyectosByModuloId(moduloId)
         ]);
         const notasAlumno = alumnoActual?.id ? await getNotasByAlumnoId(alumnoActual.id) : [];
+        
         setModulo(mod);
-        setProyectos(allProyectos);
+        setProyectos(moduleProyectos);
         setNotas(notasAlumno);
-        // Filtrar lecciones de este módulo
-        const filtered = allLecs.filter(l => {
-          const modId = typeof l.modulo_id === 'string' ? l.modulo_id : (l.modulo_id?.id || '');
-          return modId === moduloId;
-        });
-        setLecciones(filtered);
-        if (filtered.length > 0) setSelectedLeccion(filtered[0]);
+        setLecciones(moduleLecs);
+        if (moduleLecs.length > 0) setSelectedLeccion(moduleLecs[0]);
       } catch (e) {
         console.error('Error cargando visor:', e);
       } finally {
@@ -49,7 +78,7 @@ export default function VisorLeccion() {
       }
     }
     fetchData();
-  }, [moduloId, alumnoActual?.id]);
+  }, [moduloId, alumnoActual?.id, canEditModules, navigate]);
 
   const selectedEntrega = useMemo(() => {
     if (!alumnoActual || !selectedLeccion) return null;
@@ -66,38 +95,26 @@ export default function VisorLeccion() {
       descripcion: selectedEntrega?.descripcion || '',
       archivoUrl: selectedEntrega?.archivoUrl || ''
     });
+    
+    // Cargar markdown diferido
+    async function fetchMarkdown() {
+      if (selectedLeccion) {
+        setLoadingMarkdown(true);
+        const text = await getLeccionMarkdown(selectedLeccion.id);
+        setMarkdownContent(text);
+        setLoadingMarkdown(false);
+      } else {
+        setMarkdownContent('');
+      }
+    }
+    fetchMarkdown();
   }, [selectedEntrega, selectedLeccion]);
 
   const refreshProyectos = async () => {
-    const allProyectos = await getAllProyectos();
-    setProyectos(allProyectos);
+    if (!moduloId) return;
+    const currentProyectos = await getProyectosByModuloId(moduloId);
+    setProyectos(currentProyectos);
   };
-
-  const notaAprobadaModulo = useMemo(() => (
-    notas.some(nota => nota.proyectoId === moduloId && Number(nota.valor) >= 5)
-  ), [notas, moduloId]);
-
-  const completadas = useMemo(() => {
-    if (!alumnoActual) return {};
-
-    return lecciones.reduce((acc, leccion) => {
-      const entrega = proyectos.find(proyecto => (
-        proyecto.alumnoId === alumnoActual.id &&
-        proyecto.moduloId === moduloId &&
-        proyecto.leccionId === leccion.id
-      ));
-
-      const notaAprobadaEntrega = entrega
-        ? notas.some(nota => nota.proyectoId === entrega.id && Number(nota.valor) >= 5)
-        : false;
-
-      if (notaAprobadaModulo || notaAprobadaEntrega) {
-        acc[leccion.id] = true;
-      }
-
-      return acc;
-    }, {});
-  }, [alumnoActual, lecciones, moduloId, notaAprobadaModulo, notas, proyectos]);
 
   const handleSubmitEntrega = async (event) => {
     event.preventDefault();
@@ -143,6 +160,32 @@ export default function VisorLeccion() {
   const backUrl = canEditModules ? '/admin/modulos' : '/alumno';
   const backText = canEditModules ? '← Volver a Gestión de Módulos' : '← Volver a Mis Módulos';
 
+  const notaAprobadaModulo = useMemo(() => (
+    notas.some(nota => nota.proyectoId === moduloId && Number(nota.valor) >= 5)
+  ), [notas, moduloId]);
+
+  const completadas = useMemo(() => {
+    if (!alumnoActual) return {};
+
+    return lecciones.reduce((acc, leccion) => {
+      const entrega = proyectos.find(proyecto => (
+        proyecto.alumnoId === alumnoActual.id &&
+        proyecto.moduloId === moduloId &&
+        proyecto.leccionId === leccion.id
+      ));
+
+      const notaAprobadaEntrega = entrega
+        ? notas.some(nota => nota.proyectoId === entrega.id && Number(nota.valor) >= 5)
+        : false;
+
+      if (notaAprobadaModulo || notaAprobadaEntrega) {
+        acc[leccion.id] = true;
+      }
+
+      return acc;
+    }, {});
+  }, [alumnoActual, lecciones, moduloId, notaAprobadaModulo, notas, proyectos]);
+
   const completadasCount = Object.keys(completadas).length;
   const progreso = lecciones.length > 0 ? Math.round((completadasCount / lecciones.length) * 100) : 0;
   const todasCompletadas = lecciones.length > 0 && completadasCount === lecciones.length;
@@ -170,7 +213,34 @@ export default function VisorLeccion() {
   }
 
   return (
-    <div className="lesson-view-shell animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1260px', margin: '0 auto' }}>      {/* Header del módulo */}
+    <>
+      {/* Barra de progreso de lectura (Sticky) */}
+      <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '4px', background: 'transparent', zIndex: 9999 }}>
+        <div style={{ width: `${scrollProgress}%`, height: '100%', background: 'var(--brand-primary)', transition: 'width 0.1s' }}></div>
+      </div>
+
+      {/* Botón Volver Arriba */}
+      {scrollProgress > 20 && (
+        <button
+          onClick={scrollToTop}
+          style={{
+            position: 'fixed', bottom: '32px', right: '32px', zIndex: 9998,
+            width: '48px', height: '48px', borderRadius: '50%',
+            background: 'var(--brand-primary)', color: 'white',
+            border: 'none', cursor: 'pointer', boxShadow: '0 8px 24px rgba(255,48,69,0.3)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            transition: 'all 0.3s ease', animation: 'fadeSlideDown 0.3s ease'
+          }}
+          onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-4px)'}
+          onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="18 15 12 9 6 15"></polyline>
+          </svg>
+        </button>
+      )}
+
+      <div className="lesson-view-shell animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1260px', margin: '0 auto' }}>      {/* Header del módulo */}
       <div className="lesson-view-header bg-gradient-to-br from-surface to-brand-primary/10 rounded-2xl relative overflow-hidden border border-border-default shadow-sm" style={{ padding: '28px 36px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -291,14 +361,23 @@ export default function VisorLeccion() {
               </div>
 
               {/* Contenido Markdown */}
-              {selectedLeccion.contenido_markdown && (
+              {(markdownContent || loadingMarkdown) && (
                 <div style={{ marginBottom: '24px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '32px' }}>
                   <div style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '24px', borderBottom: '1px solid var(--border)', paddingBottom: '12px' }}>
                     📖 Apuntes de la lección
                   </div>
-                  <div className="prose prose-invert max-w-none prose-p:leading-relaxed prose-headings:font-black prose-a:text-brand-primary" style={{ color: 'var(--text-strong)', textAlign: 'justify' }}>
-                    <ReactMarkdown>{selectedLeccion.contenido_markdown}</ReactMarkdown>
-                  </div>
+                  {loadingMarkdown ? (
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>Cargando contenido...</p>
+                  ) : (
+                    <div className="prose prose-invert max-w-[800px] mx-auto prose-p:leading-loose prose-p:text-[17px] prose-headings:font-black prose-headings:tracking-tight prose-a:text-brand-primary prose-a:no-underline hover:prose-a:underline" style={{ color: 'var(--text-strong)', textAlign: 'left' }}>
+                      <ReactMarkdown 
+                        rehypePlugins={[rehypeSanitize]}
+                        allowedElements={['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'a', 'ul', 'ol', 'li', 'b', 'i', 'strong', 'em', 'strike', 'code', 'pre', 'blockquote', 'hr', 'table', 'thead', 'tbody', 'tr', 'th', 'td']}
+                      >
+                        {markdownContent}
+                      </ReactMarkdown>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -336,7 +415,7 @@ export default function VisorLeccion() {
               )}
 
               {/* Sin contenido */}
-              {!selectedLeccion.contenido_url && (!selectedLeccion.videos_url || selectedLeccion.videos_url.length === 0) && !selectedLeccion.contenido_markdown && (
+              {!selectedLeccion.contenido_url && (!selectedLeccion.videos_url || selectedLeccion.videos_url.length === 0) && !markdownContent && !loadingMarkdown && (
                 <div style={{ marginBottom: '24px', background: 'var(--surface-solid)', border: '1px dashed var(--border)', borderRadius: '12px', padding: '48px', textAlign: 'center' }}>
                   <div style={{ fontSize: '48px', marginBottom: '12px' }}>📝</div>
                   <p style={{ color: 'var(--text-secondary)', margin: '0 0 4px 0', fontSize: '16px', fontWeight: 700 }}>Contenido pendiente</p>
@@ -476,5 +555,6 @@ export default function VisorLeccion() {
         </div>
       </div>
     </div>
+    </>
   );
 }

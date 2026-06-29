@@ -11,7 +11,7 @@ export default function ConfirmModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] flex items-center justify-center p-4 animate-fade-in">
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] flex items-center justify-center p-4 animate-fade-in" onMouseDown={(e) => { if (e.target === e.currentTarget) onCancel(); }}>
       <div className="bg-surface border border-border-default rounded-3xl w-full max-w-sm shadow-2xl transform transition-all duration-400 overflow-hidden text-center">
         <div className="p-8 pb-6 flex flex-col items-center">
           <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-6 ${isDanger ? 'bg-red-100 text-red-500' : 'bg-brand-primary/10 text-brand-primary'}`}>

@@ -21,7 +21,16 @@ export default function AlumnoDashboard() {
       try {
         const [mods, lecs, proyectosData] = await Promise.all([getAllModulos(), getAllLecciones(), getAllProyectos()]);
         const notasAlumno = profile?.id ? await getNotasByAlumnoId(profile.id) : [];
-        setModulos(mods.filter(m => m.activo !== false));
+        setModulos(mods.filter(m => {
+          const promosRaw = profile?.promociones_id || profile?.promocion_id || [];
+          const studentPromos = Array.isArray(promosRaw) ? promosRaw : [promosRaw].filter(Boolean);
+          
+          if (m.promociones_activas && m.promociones_activas.length > 0) {
+            return m.promociones_activas.some(p => studentPromos.includes(p));
+          }
+          // Por defecto, los módulos están bloqueados hasta que el profesor los habilita
+          return false;
+        }));
         setLecciones(lecs);
         setProyectos(proyectosData);
         setNotas(notasAlumno);
@@ -37,8 +46,9 @@ export default function AlumnoDashboard() {
 
 
   const modulosAsignados = useMemo(() => {
-    if (!alumnoActual || !alumnoActual.modulos_id) return [];
-    return modulos.filter(m => alumnoActual.modulos_id.includes(m.id));
+    if (!alumnoActual) return [];
+    // Los módulos ya vienen filtrados por promociones_activas desde fetchData
+    return modulos;
   }, [modulos, alumnoActual]);
 
   // Contar lecciones por módulo
@@ -95,6 +105,7 @@ export default function AlumnoDashboard() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+
       
       {/* Page Header */}
       <div className="student-dashboard-hero">

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useContext } from 'react';
+import { useState, useEffect, useMemo, useContext, useRef } from 'react';
 import { getAllModulos, updateModulo } from '../../services/modulos.service';
 import { getAllLecciones, createLeccion, deleteLeccion } from '../../services/lecciones.service';
 import { useNavigate } from 'react-router-dom';
@@ -6,19 +6,21 @@ import { useRBAC } from '../../hooks/useRBAC';
 import { useAuth } from '../../hooks/useAuth';
 import { DataContext } from '../../context/DataContext';
 import { ROLES } from '../../utils/rbac';
-import { extractTextFromPDF } from '../../utils/pdfExtractor';
+import { usePDFImport } from '../../hooks/usePDFImport';
 import toast from 'react-hot-toast';
 import { filterModulesByTracks, getProfesorTracks, getUniqueModulesByName, inferModuleTrack } from '../../utils/academicFilters';
 
 export default function WizardCurso() {
   const [modulos, setModulos] = useState([]);
   const [lecciones, setLecciones] = useState([]);
+  const [selectedPromocion, setSelectedPromocion] = useState('');
   const [selectedModulo, setSelectedModulo] = useState('');
   const [expandedLeccion, setExpandedLeccion] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showCrear, setShowCrear] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [nuevaLeccion, setNuevaLeccion] = useState({ titulo: '', descripcion: '', contenido_url: '', videos_url: '', contenido_markdown: '' });
+  const [nuevaLeccion, setNuevaLeccion] = useState({ titulo: '', descripcion: '', contenido_url: '', videos_url: '' });
+  const { isImporting, importPDF, clearPDF, markdownRef, markdownKey } = usePDFImport();
   const [mensaje, setMensaje] = useState({ text: '', type: '' });
   const navigate = useNavigate();
   const { isAuthorized } = useRBAC();
@@ -29,6 +31,18 @@ export default function WizardCurso() {
     () => getProfesorTracks(profile, promociones),
     [profile, promociones]
   );
+  const profesorPromociones = useMemo(() => {
+    if (isAdmin) return promociones;
+    const ids = Array.isArray(profile?.promocion_id) ? profile.promocion_id : [profile?.promocion_id].filter(Boolean);
+    return promociones.filter(p => ids.includes(p.id));
+  }, [isAdmin, profile, promociones]);
+
+  // Set default promotion
+  useEffect(() => {
+    if (!selectedPromocion && profesorPromociones.length > 0) {
+      setSelectedPromocion(profesorPromociones[0].id);
+    }
+  }, [profesorPromociones, selectedPromocion]);
 
   const fetchData = async () => {
     try {
@@ -39,7 +53,7 @@ export default function WizardCurso() {
 
       setModulos(visibleMods);
       setLecciones(lecs);
-      if ((!selectedModulo || !visibleMods.some((modulo) => modulo.id === selectedModulo)) && visibleMods.length > 0) {
+      if (!selectedModulo && visibleMods.length > 0) {
         setSelectedModulo(visibleMods[0].id);
       }
     } catch (e) {
@@ -65,6 +79,14 @@ export default function WizardCurso() {
   // Crear lección
   const handleCrearLeccion = async () => {
     if (!nuevaLeccion.titulo.trim()) return;
+    
+    // Verificar que el markdown insertado manualmente no supere 800 KB
+    const sizeInKB = new Blob([markdownRef.current || '']).size / 1024;
+    if (sizeInKB > 800) {
+      setMensaje({ text: 'El contenido excede el límite de 800 KB.', type: 'error' });
+      return;
+    }
+
     setSaving(true);
     try {
       const lecId = `lec-${selectedModulo}-${Date.now()}`;
@@ -76,11 +98,12 @@ export default function WizardCurso() {
         titulo: nuevaLeccion.titulo.trim(),
         descripcion: nuevaLeccion.descripcion.trim() || 'Sin descripción',
         contenido_url: nuevaLeccion.contenido_url.trim(),
-        contenido_markdown: nuevaLeccion.contenido_markdown,
+        contenido_markdown: markdownRef.current,
         videos_url: videosArray
       });
       setMensaje({ text: `Lección "${nuevaLeccion.titulo}" creada con éxito.`, type: 'success' });
-      setNuevaLeccion({ titulo: '', descripcion: '', contenido_url: '', videos_url: '', contenido_markdown: '' });
+      setNuevaLeccion({ titulo: '', descripcion: '', contenido_url: '', videos_url: '' });
+      clearPDF();
       setShowCrear(false);
       // Refrescar datos
       await fetchData();
@@ -107,35 +130,8 @@ export default function WizardCurso() {
   };
 
   const handlePDFUpload = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    if (file.type !== 'application/pdf') {
-      toast.error('Por favor, selecciona un archivo PDF válido.');
-      return;
-    }
-
-    setSaving(true);
-    toast.loading('Extrayendo texto del PDF...', { id: 'pdf-wizard' });
-    
-    try {
-      const markdown = await extractTextFromPDF(file);
-      const sizeInKB = new Blob([markdown]).size / 1024;
-      if (sizeInKB > 800) {
-        toast.error(`El texto extraído pesa más de 800 KB (${Math.round(sizeInKB)} KB). Demasiado texto.`, { id: 'pdf-wizard' });
-        setSaving(false);
-        return;
-      }
-
-      setNuevaLeccion(curr => ({ ...curr, contenido_markdown: markdown }));
-      toast.success('PDF importado como Markdown correctamente.', { id: 'pdf-wizard' });
-    } catch (error) {
-      console.error('Error extrayendo PDF:', error);
-      toast.error('Error al procesar el PDF. Revisa la consola.', { id: 'pdf-wizard' });
-    } finally {
-      setSaving(false);
-      event.target.value = '';
-    }
+    await importPDF(event.target.files[0], 'pdf-wizard');
+    event.target.value = '';
   };
 
   // Auto-clear mensajes
@@ -192,11 +188,29 @@ export default function WizardCurso() {
         </div>
       )}
 
-      {/* Selector de Módulo */}
+      {/* Selectores */}
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: '16px', flexWrap: 'wrap' }}>
+        <div style={{ flex: 1, minWidth: '240px' }}>
+          <label style={{ display: 'block', fontSize: '13px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>
+            1. Seleccionar promoción
+          </label>
+          <select
+            className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
+            value={selectedPromocion}
+            onChange={e => { setSelectedPromocion(e.target.value); }}
+            style={{ fontSize: '15px', fontWeight: 600, padding: '12px 16px', cursor: 'pointer', width: '100%' }}
+          >
+            {profesorPromociones.map(p => (
+              <option key={p.id} value={p.id}>
+                {p.nombre || p.id}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div style={{ flex: 1, minWidth: '280px' }}>
           <label style={{ display: 'block', fontSize: '13px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>
-            Seleccionar módulo
+            2. Seleccionar módulo
           </label>
           <select
             className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
@@ -213,20 +227,20 @@ export default function WizardCurso() {
         </div>
 
         {/* Toggle Activo/Inactivo */}
-        {!isAdmin && moduloActual && (
+        {!isAdmin && moduloActual && selectedPromocion && (
           <div
             onClick={async () => {
-              const newState = !(moduloActual.activo !== false);
+              const isCurrentlyActive = moduloActual.promociones_activas?.includes(selectedPromocion);
+              const newPromocionesActivas = isCurrentlyActive 
+                ? (moduloActual.promociones_activas || []).filter(id => id !== selectedPromocion)
+                : [...(moduloActual.promociones_activas || []), selectedPromocion];
+              
               try {
                 await updateModulo(moduloActual.id, {
-                  nombre: moduloActual.nombre,
-                  tipo: moduloActual.tipo || inferModuleTrack(moduloActual),
-                  horas: moduloActual.horas,
-                  lecciones_Id: moduloActual.lecciones_Id || [],
-                  profesor_id: moduloActual.profesor_id || '',
-                  activo: newState
+                  ...moduloActual,
+                  promociones_activas: newPromocionesActivas
                 });
-                setMensaje({ text: `Módulo ${newState ? 'activado' : 'desactivado'} correctamente.`, type: 'success' });
+                setMensaje({ text: `Módulo ${isCurrentlyActive ? 'bloqueado' : 'desbloqueado'} para esta promoción.`, type: 'success' });
                 await fetchData();
               } catch (e) {
                 console.error(e);
@@ -236,24 +250,24 @@ export default function WizardCurso() {
             style={{
               display: 'flex', alignItems: 'center', gap: '10px',
               padding: '10px 20px', borderRadius: '10px', cursor: 'pointer',
-              border: `1px solid ${moduloActual.activo !== false ? '#A7F3D0' : '#FECACA'}`,
-              background: moduloActual.activo !== false ? '#D1FAE5' : '#FEE2E2',
+              border: `1px solid ${moduloActual.promociones_activas?.includes(selectedPromocion) ? '#A7F3D0' : '#FECACA'}`,
+              background: moduloActual.promociones_activas?.includes(selectedPromocion) ? '#D1FAE5' : '#FEE2E2',
               transition: 'all 0.2s', whiteSpace: 'nowrap'
             }}
           >
             <div style={{
               width: '36px', height: '20px', borderRadius: '10px', position: 'relative',
-              background: moduloActual.activo !== false ? '#10B981' : '#EF4444', transition: 'background 0.3s'
+              background: moduloActual.promociones_activas?.includes(selectedPromocion) ? '#10B981' : '#EF4444', transition: 'background 0.3s'
             }}>
               <div style={{
                 width: '16px', height: '16px', borderRadius: '50%', background: 'white',
                 position: 'absolute', top: '2px', transition: 'left 0.3s',
-                left: moduloActual.activo !== false ? '18px' : '2px',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+                left: moduloActual.promociones_activas?.includes(selectedPromocion) ? '18px' : '2px',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
               }}></div>
             </div>
-            <span style={{ fontSize: '13px', fontWeight: 700, color: moduloActual.activo !== false ? '#065F46' : '#991B1B' }}>
-              {moduloActual.activo !== false ? 'Activo' : 'Inactivo'}
+            <span style={{ fontSize: '13px', fontWeight: 700, color: moduloActual.promociones_activas?.includes(selectedPromocion) ? '#065F46' : '#991B1B' }}>
+              {moduloActual.promociones_activas?.includes(selectedPromocion) ? 'Activo' : 'Inactivo'}
             </span>
           </div>
         )}
@@ -350,14 +364,15 @@ export default function WizardCurso() {
                     type="button" 
                     style={{ background: 'rgba(255,48,69,0.1)', color: 'var(--brand-primary)', border: '1px solid rgba(255,48,69,0.2)', padding: '6px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: 700, pointerEvents: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}
                   >
-                    📄 Importar de PDF
+                    {isImporting ? '⏳ Importando...' : '📄 Importar de PDF'}
                   </button>
                 </div>
               </div>
               <textarea
+                key={markdownKey}
                 className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
-                value={nuevaLeccion.contenido_markdown}
-                onChange={e => setNuevaLeccion({ ...nuevaLeccion, contenido_markdown: e.target.value })}
+                defaultValue={markdownRef.current}
+                onChange={e => { markdownRef.current = e.target.value; }}
                 placeholder="# Título Principal\n\nEl texto de tu lección aquí..."
                 rows={6}
                 style={{ width: '100%', padding: '12px 16px', fontSize: '14px', resize: 'vertical', fontFamily: 'monospace' }}
@@ -372,7 +387,7 @@ export default function WizardCurso() {
             <button
               className="bg-brand-gradient text-white py-3 px-6 rounded-lg text-sm font-black transition-all duration-300 hover:-translate-y-0.5 shadow-glow inline-flex items-center justify-center gap-2 border-none cursor-pointer"
               onClick={handleCrearLeccion}
-              disabled={saving || !nuevaLeccion.titulo.trim()}
+              disabled={saving || isImporting || !nuevaLeccion.titulo.trim()}
               style={{ padding: '10px 24px', width: 'auto' }}
             >
               {saving ? 'Guardando...' : 'Crear Lección'}

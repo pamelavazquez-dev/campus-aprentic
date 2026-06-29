@@ -33,23 +33,30 @@ export default function AdminModulosView() {
   const [selectedModulo, setSelectedModulo] = useState(null);
 
   useEffect(() => {
-    const timeoutId = window.setTimeout(async () => {
+    let isMounted = true;
+    
+    const fetchModulos = async () => {
       setLoading(true);
-
       try {
         const data = await getAllModulos();
-        setModulos(data
-          .filter((modulo) => !isLegacyDuplicatedModule(modulo))
-          .map(normalizeModulo)
-          .sort((a, b) => a.nombre.localeCompare(b.nombre)));
+        if (isMounted) {
+          setModulos(data
+            .filter((modulo) => !isLegacyDuplicatedModule(modulo))
+            .map(normalizeModulo)
+            .sort((a, b) => a.nombre.localeCompare(b.nombre)));
+        }
       } catch (error) {
         console.error('Error obteniendo modulos', error);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
-    }, 0);
-
-    return () => window.clearTimeout(timeoutId);
+    };
+    
+    fetchModulos();
+    
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const handleModuloSaved = (modulo) => {

@@ -4,7 +4,7 @@ const requiredText = (fieldName) => (
   z.string().trim().min(1, `${fieldName} es obligatorio`)
 );
 
-const optionalUrl = z.string().trim();
+const optionalUrl = z.string().trim().refine(val => !val || /^https?:\/\//i.test(val) || /^\//i.test(val), { message: 'URL invalida o protocolo no seguro' });
 
 export const loginSchema = z.object({
   email: z.email('Introduce un email valido').trim(),
@@ -24,7 +24,7 @@ export const promocionSchema = z.object({
 export const alumnoSchema = z.object({
   nombre: requiredText('El nombre'),
   email: z.email('Introduce un email valido').trim(),
-  avatar: z.string().default(''),
+  avatar: optionalUrl.default(''),
   promociones_id: z.array(z.string()).default([]),
   modulos_id: z.array(z.string()).default([]),
 });
@@ -32,7 +32,7 @@ export const alumnoSchema = z.object({
 export const profesorSchema = z.object({
   nombre: requiredText('El nombre'),
   email: z.email('Introduce un email valido').trim(),
-  avatar: z.string().default(''),
+  avatar: optionalUrl.default(''),
   campus_id: requiredText('El campus'),
   promocion_id: z.array(z.string()).default([]),
   isActive: z.boolean().default(true),
@@ -49,6 +49,7 @@ export const moduloSchema = z.object({
   lecciones_Id: z.array(z.string()).default([]),
   activo: z.boolean().default(true),
   profesor_id: z.union([z.string(), z.array(z.string())]).default(''),
+  promociones_activas: z.array(z.string()).default([]),
 });
 
 export const leccionSchema = z.object({
@@ -56,7 +57,7 @@ export const leccionSchema = z.object({
   titulo: requiredText('El titulo'),
   descripcion: requiredText('La descripcion'),
   contenido_url: optionalUrl.default(''),
-  contenido_markdown: z.string().optional().default(''),
+  contenido_markdown: z.string().max(820_000, 'El contenido excede 800 KB').optional().default(''),
   videos_url: z.array(z.string()).default([]),
 });
 
@@ -72,8 +73,6 @@ export const proyectoEntregaSchema = z.object({
   archivoUrl: optionalUrl.refine(Boolean, 'El archivo es obligatorio'),
   archivoNombre: requiredText('El nombre del archivo'),
   estado: z.enum(['entregado', 'revisado']).default('entregado'),
-  alumnoIds: z.array(z.string()).default([]),
-  notas: z.array(z.string()).default([]),
   entregadoEn: requiredText('La fecha de entrega'),
   actualizadoEn: requiredText('La fecha de actualizacion'),
 });
@@ -81,7 +80,7 @@ export const proyectoEntregaSchema = z.object({
 export const adminSchema = z.object({
   nombre: requiredText('El nombre'),
   email: z.email('Introduce un email valido').trim(),
-  avatar: z.string().default(''),
+  avatar: optionalUrl.default(''),
   campus_asignados: z.array(z.string()).default([]),
   isActive: z.boolean().default(true),
 });

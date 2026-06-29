@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { collection, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, documentId, onSnapshot } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { useAuth } from '../hooks/useAuth';
 
@@ -16,7 +16,7 @@ export const DataProvider = ({ children }) => {
   const [campuses, setCampuses] = useState([]);
   
   const [loading, setLoading] = useState(true);
-  const { user, role } = useAuth();
+  const { user, role, profile } = useAuth();
 
   useEffect(() => {
     // Only fetch global data if the user is fully logged in and has a role
@@ -39,12 +39,24 @@ export const DataProvider = ({ children }) => {
       if (loadedCount >= TOTAL_COLLECTIONS) setLoading(false);
     };
 
-    const unsubModulos = onSnapshot(collection(db, 'modulos'), (snapshot) => {
+    let modulosQuery = collection(db, 'modulos');
+    let promocionesQuery = collection(db, 'promociones');
+
+    // FIX: Filtrar si es alumno para no descargar la base de datos entera de módulos y promociones
+    if (role === 'alumno' && profile) {
+      const studentPromos = Array.isArray(profile.promociones_id) ? profile.promociones_id : (profile.promocion_id ? [profile.promocion_id] : []);
+      if (studentPromos.length > 0) {
+        modulosQuery = query(collection(db, 'modulos'), where('promociones_activas', 'array-contains-any', studentPromos));
+        promocionesQuery = query(collection(db, 'promociones'), where(documentId(), 'in', studentPromos));
+      }
+    }
+
+    const unsubModulos = onSnapshot(modulosQuery, (snapshot) => {
       setModulos(snapshot.docs.map(doc => ({id: doc.id, ...doc.data()})));
       if (loadedCount < TOTAL_COLLECTIONS) checkLoading();
     }, (error) => console.error(error));
 
-    const unsubPromociones = onSnapshot(collection(db, 'promociones'), (snapshot) => {
+    const unsubPromociones = onSnapshot(promocionesQuery, (snapshot) => {
       setPromociones(snapshot.docs.map(doc => ({id: doc.id, ...doc.data()})));
       if (loadedCount < TOTAL_COLLECTIONS) checkLoading();
     }, (error) => console.error(error));
@@ -66,8 +78,15 @@ export const DataProvider = ({ children }) => {
     };
   }, [user, role]);
 
+  const contextValue = React.useMemo(() => ({
+    modulos,
+    promociones,
+    campuses,
+    loading
+  }), [modulos, promociones, campuses, loading]);
+
   return (
-    <DataContext.Provider value={{ modulos, promociones, campuses, loading }}>
+    <DataContext.Provider value={contextValue}>
       {children}
     </DataContext.Provider>
   );

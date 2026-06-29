@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, enableMultiTabIndexedDbPersistence } from 'firebase/firestore';
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore';
 import { getAnalytics } from 'firebase/analytics';
 
 export const firebaseConfig = {
@@ -17,17 +17,12 @@ const app = firebaseConfig.apiKey ? initializeApp(firebaseConfig) : null;
 export const analytics = app && typeof window !== 'undefined' ? getAnalytics(app) : null;
 
 export const auth = app ? getAuth(app) : null;
-export const db = app ? getFirestore(app) : null;
 
-// Activar persistencia offline (caché local) para evitar reads innecesarios
-if (db) {
-  enableMultiTabIndexedDbPersistence(db).catch((err) => {
-    if (err.code === 'failed-precondition') {
-      console.warn('Persistencia fallida: múltiples pestañas abiertas no soportan la persistencia clásica, o estás en incógnito.');
-    } else if (err.code === 'unimplemented') {
-      console.warn('El navegador actual no soporta persistencia de Firestore.');
-    }
-  });
-}
+// FIX: Activar persistencia offline con la API moderna de Firebase v9+
+export const db = app ? initializeFirestore(app, {
+  localCache: persistentLocalCache({
+    tabManager: persistentMultipleTabManager()
+  })
+}) : null;
 
 export default app;

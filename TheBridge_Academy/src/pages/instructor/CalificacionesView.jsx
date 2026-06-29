@@ -3,8 +3,8 @@ import { useState, useEffect, useContext, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { DataContext } from '../../context/DataContext';
 import PageHeader from '../../components/ui/PageHeader';
-import { getAllNotas, createNota, updateNota } from '../../services/notas.service';
-import { getAllProyectos } from '../../services/proyectos.service';
+import { getAllNotas, getNotasByModuloId, createNota, updateNota } from '../../services/notas.service';
+import { getAllProyectos, getProyectosByModuloId } from '../../services/proyectos.service';
 import { useQuery } from '@tanstack/react-query';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../config/firebase';
@@ -59,10 +59,18 @@ export default function CalificacionesView() {
   });
 
   const fetchNotas = async () => {
+    if (!selectedModulo) {
+      setNotas([]);
+      setProyectos([]);
+      setLoadingNotas(false);
+      return;
+    }
+    
+    setLoadingNotas(true);
     try {
       const [notasData, proyectosData] = await Promise.all([
-        getAllNotas(),
-        getAllProyectos()
+        getNotasByModuloId(selectedModulo),
+        getProyectosByModuloId(selectedModulo)
       ]);
       setNotas(notasData);
       setProyectos(proyectosData);
@@ -75,7 +83,7 @@ export default function CalificacionesView() {
 
   useEffect(() => {
     fetchNotas();
-  }, []);
+  }, [selectedModulo]);
 
   useEffect(() => {
     if (!showModal) return undefined;
@@ -295,7 +303,7 @@ export default function CalificacionesView() {
       )}
 
       {showModal && createPortal(
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 animate-fade-in overflow-hidden">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 animate-fade-in overflow-hidden" onMouseDown={(e) => { if (e.target === e.currentTarget) setShowModal(false); }}>
           <div className="bg-surface border border-border-default rounded-3xl w-full max-w-lg shadow-2xl transform transition-all duration-400 overflow-hidden">
             <div className="p-6 border-b border-border-default flex justify-between items-center bg-gray150/50 rounded-t-3xl">
               <h3 style={{ fontSize: '24px', fontWeight: 900, color: 'var(--text-strong)' }}>Calificar Alumno</h3>

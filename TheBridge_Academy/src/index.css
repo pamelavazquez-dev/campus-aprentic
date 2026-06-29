@@ -80,6 +80,7 @@
 }
 
 .dark {
+  color-scheme: dark;
   /* Dark Mode Colors */
   --ink: #F8FAFC;
   --canvas: #09090B; /* Zinc 950 */

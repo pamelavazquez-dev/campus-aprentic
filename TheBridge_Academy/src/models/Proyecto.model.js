@@ -4,8 +4,6 @@ export class Proyecto {
     titulo,
     descripcion,
     promocionId,
-    alumnoIds,
-    notas,
     estado,
     alumnoId = '',
     alumnoEmail = '',
@@ -21,8 +19,6 @@ export class Proyecto {
     this.titulo = titulo;
     this.descripcion = descripcion;
     this.promocionId = promocionId;
-    this.alumnoIds = alumnoIds;
-    this.notas = notas;
     this.estado = estado;
     this.alumnoId = alumnoId;
     this.alumnoEmail = alumnoEmail;
@@ -41,8 +37,6 @@ export const proyectoConverter = {
     titulo: proyecto.titulo,
     descripcion: proyecto.descripcion,
     promocionId: proyecto.promocionId,
-    alumnoIds: proyecto.alumnoIds,
-    notas: proyecto.notas,
     estado: proyecto.estado,
     alumnoId: proyecto.alumnoId,
     alumnoEmail: proyecto.alumnoEmail,
@@ -61,8 +55,6 @@ export const proyectoConverter = {
       data.titulo || '',
       data.descripcion || '',
       data.promocionId || '',
-      data.alumnoIds || [],
-      data.notas || data.notaIds || [],
       data.estado || 'abierto',
       data.alumnoId || '',
       data.alumnoEmail || '',

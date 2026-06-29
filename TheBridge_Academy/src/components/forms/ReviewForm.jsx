@@ -2,12 +2,14 @@ import { useState } from 'react';
 import { createReview } from '../../services/reviews.service';
 import Card from '../Card';
 import Input from '../Input';
+import { useAuth } from '../../hooks/useAuth';
 
-export default function ReviewForm({ promocionId, alumnoId, onSubmitted }) {
+export default function ReviewForm({ promocionId, onSubmitted }) {
   const [rating, setRating] = useState(5);
   const [comentario, setComentario] = useState('');
   const [loading, setLoading] = useState(false);
   const [mensaje, setMensaje] = useState('');
+  const { user } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,10 +20,9 @@ export default function ReviewForm({ promocionId, alumnoId, onSubmitted }) {
 
     setLoading(true);
     try {
-      const reviewId = `rev_${Date.now()}`;
-      await createReview(reviewId, {
+      await createReview(null, {
         promocion_id: promocionId,
-        alumno_id: alumnoId,
+        alumno_id: user.uid,
         rating: Number(rating),
         comentario,
         fecha: new Date().toISOString()
