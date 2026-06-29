@@ -193,7 +193,7 @@ export default function VisorLeccion() {
   if (loading) {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '400px' }}>
-        <div style={{ textAlign: 'center' }}>
+        <div role="status" aria-live="polite" aria-label="Cargando lecciones" style={{ textAlign: 'center' }}>
           <div style={{ width: '48px', height: '48px', border: '4px solid var(--gray200)', borderTopColor: 'var(--brand-primary)', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px auto' }}></div>
           <p style={{ color: 'var(--text-secondary)', fontSize: '15px' }}>Cargando lecciones...</p>
         </div>
@@ -215,13 +215,14 @@ export default function VisorLeccion() {
   return (
     <>
       {/* Barra de progreso de lectura (Sticky) */}
-      <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '4px', background: 'transparent', zIndex: 9999 }}>
+      <div role="progressbar" aria-valuenow={Math.round(scrollProgress)} aria-valuemin="0" aria-valuemax="100" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '4px', background: 'transparent', zIndex: 9999 }}>
         <div style={{ width: `${scrollProgress}%`, height: '100%', background: 'var(--brand-primary)', transition: 'width 0.1s' }}></div>
       </div>
 
       {/* Botón Volver Arriba */}
       {scrollProgress > 20 && (
         <button
+          aria-label="Volver arriba"
           onClick={scrollToTop}
           style={{
             position: 'fixed', bottom: '32px', right: '32px', zIndex: 9998,
@@ -369,7 +370,7 @@ export default function VisorLeccion() {
                   {loadingMarkdown ? (
                     <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>Cargando contenido...</p>
                   ) : (
-                    <div className="prose prose-invert max-w-[800px] mx-auto prose-p:leading-loose prose-p:text-[17px] prose-headings:font-black prose-headings:tracking-tight prose-a:text-brand-primary prose-a:no-underline hover:prose-a:underline" style={{ color: 'var(--text-strong)', textAlign: 'left' }}>
+                    <div className="prose prose-invert max-w-[800px] mx-auto prose-p:leading-loose prose-p:text-[17px] prose-headings:font-black prose-headings:tracking-tight prose-a:text-brand-primary prose-a:no-underline hover:prose-a:underline overflow-hidden break-words prose-pre:overflow-x-auto prose-table:block prose-table:overflow-x-auto" style={{ color: 'var(--text-strong)', textAlign: 'left' }}>
                       <ReactMarkdown 
                         rehypePlugins={[rehypeSanitize]}
                         allowedElements={['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'a', 'ul', 'ol', 'li', 'b', 'i', 'strong', 'em', 'strike', 'code', 'pre', 'blockquote', 'hr', 'table', 'thead', 'tbody', 'tr', 'th', 'td']}

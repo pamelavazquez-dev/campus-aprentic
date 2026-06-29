@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 
 // Genera un color consistente basado en el string (nombre o email)
 const stringToColor = (str) => {
@@ -18,7 +18,7 @@ const getInitials = (name) => {
   return name.substring(0, 2).toUpperCase();
 };
 
-export default function Avatar({ src, name = '', size = 'md', rounded = 'rounded-full', className = '' }) {
+const Avatar = memo(function Avatar({ src, name = '', size = 'md', rounded = 'rounded-full', className = '' }) {
   const [imgError, setImgError] = useState(false);
 
   // Configuración de tamaños
@@ -65,4 +65,6 @@ export default function Avatar({ src, name = '', size = 'md', rounded = 'rounded
       <div className="absolute inset-0 bg-white/10 opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
     </div>
   );
-}
+});
+
+export default Avatar;

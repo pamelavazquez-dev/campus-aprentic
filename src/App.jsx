@@ -1,3 +1,4 @@
+import { Suspense, lazy } from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuth } from './hooks/useAuth';
@@ -15,26 +16,26 @@ import ProtectedRoute from './layouts/ProtectedRoute';
 import ErrorBoundary from './components/ErrorBoundary';
 
 // Layouts
-import AdminLayout from './layouts/AdminLayout';
-import InstructorLayout from './layouts/InstructorLayout';
-import AlumnoLayout from './layouts/AlumnoLayout';
+const AdminLayout = lazy(() => import('./layouts/AdminLayout'));
+const InstructorLayout = lazy(() => import('./layouts/InstructorLayout'));
+const AlumnoLayout = lazy(() => import('./layouts/AlumnoLayout'));
 
 // Páginas actuales de admin
-import PromocionesView from './pages/PromocionesView';
-import AlumnosView from './pages/AlumnosView';
+const PromocionesView = lazy(() => import('./pages/PromocionesView'));
+const AlumnosView = lazy(() => import('./pages/AlumnosView'));
 
-import DashboardAdmin from './pages/admin/DashboardAdmin';
-import InstructorDashboard from './pages/instructor/InstructorDashboard';
-import WizardCurso from './pages/instructor/WizardCurso';
-import AlumnoDashboard from './pages/alumno/AlumnoDashboard';
-import VisorLeccion from './pages/alumno/VisorLeccion';
-import InscripcionesView from './pages/admin/InscripcionesView';
-import CalificacionesView from './pages/instructor/CalificacionesView';
-import MisNotasView from './pages/alumno/MisNotasView';
-import AdminModulosView from './pages/AdminModulosView';
-import ProfesoresView from './pages/ProfesoresView';
-import LeccionesView from './pages/LeccionesView';
-import ModulosView from './pages/ModulosView';
+const DashboardAdmin = lazy(() => import('./pages/admin/DashboardAdmin'));
+const InstructorDashboard = lazy(() => import('./pages/instructor/InstructorDashboard'));
+const WizardCurso = lazy(() => import('./pages/instructor/WizardCurso'));
+const AlumnoDashboard = lazy(() => import('./pages/alumno/AlumnoDashboard'));
+const VisorLeccion = lazy(() => import('./pages/alumno/VisorLeccion'));
+const InscripcionesView = lazy(() => import('./pages/admin/InscripcionesView'));
+const CalificacionesView = lazy(() => import('./pages/instructor/CalificacionesView'));
+const MisNotasView = lazy(() => import('./pages/alumno/MisNotasView'));
+const AdminModulosView = lazy(() => import('./pages/AdminModulosView'));
+const ProfesoresView = lazy(() => import('./pages/ProfesoresView'));
+const LeccionesView = lazy(() => import('./pages/LeccionesView'));
+const ModulosView = lazy(() => import('./pages/ModulosView'));
 import { DataProvider } from './context/DataContext';
 
 function App() {
@@ -81,6 +82,11 @@ function App() {
       <HashRouter>
         <ErrorBoundary>
         <DataProvider>
+        <Suspense fallback={
+          <div style={{ textAlign: 'center', marginTop: '20vh' }}>
+            <h2 style={{ animation: 'pulse 1.5s infinite' }}>Cargando interfaz...</h2>
+          </div>
+        }>
         <Routes>
         <Route path="/login" element={
           !user ? <Login /> : 
@@ -136,6 +142,7 @@ function App() {
         {/* Redirección por defecto */}
         <Route path="*" element={<Navigate to={homePath} replace />} />
       </Routes>
+        </Suspense>
         </DataProvider>
         </ErrorBoundary>
       </HashRouter>
