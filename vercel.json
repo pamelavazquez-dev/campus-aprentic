@@ -1,5 +1,0 @@
-{
-  "installCommand": "cd TheBridge_Academy && npm install",
-  "buildCommand": "cd TheBridge_Academy && npm run build",
-  "outputDirectory": "TheBridge_Academy/dist"
-}
