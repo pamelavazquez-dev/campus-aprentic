@@ -3,6 +3,13 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../config/firebase';
 import { getUserRole } from '../services/roles.service';
 
+let authInitPromise = null;
+let resolveAuthInit = null;
+
+authInitPromise = new Promise((resolve) => {
+  resolveAuthInit = resolve;
+});
+
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -33,12 +40,17 @@ export const AuthProvider = ({ children }) => {
         setProfile(null);
         setLoading(false);
       }
+      
+      if (resolveAuthInit) {
+        resolveAuthInit();
+        resolveAuthInit = null;
+      }
     });
     return () => unsubscribe();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, role, profile, loading }}>
+    <AuthContext.Provider value={{ user, role, profile, loading, authInitPromise }}>
       {children}
     </AuthContext.Provider>
   );
