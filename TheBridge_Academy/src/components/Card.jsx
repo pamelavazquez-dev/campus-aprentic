@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { memo } from 'react'
 
-export default function Card({ children }) {
+const Card = memo(function Card({ children }) {
   return (
     <article>
       {children}
     </article>
   )
-}
+});
+
+export default Card;

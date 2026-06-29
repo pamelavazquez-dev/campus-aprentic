@@ -1,4 +1,6 @@
-export default function Badge({ children, variant = 'neutral' }) {
+import { memo } from 'react';
+
+const Badge = memo(function Badge({ children, variant = 'neutral' }) {
   const styles = {
     neutral: 'bg-slate-100 text-slate-600 border border-slate-200',
     success: 'bg-green-100 text-green-700 border border-green-200',
@@ -12,4 +14,6 @@ export default function Badge({ children, variant = 'neutral' }) {
       {children}
     </span>
   );
-}
+});
+
+export default Badge;

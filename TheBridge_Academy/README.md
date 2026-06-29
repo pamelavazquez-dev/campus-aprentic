@@ -101,7 +101,7 @@ src/
 > Interceptor de interfaz empático: Si el documento extraído sobrepasa el límite seguro de 800 KB, aborta la subida y sugiere dividir el temario antes de llegar a Firestore.
 
 ### Autenticación Segura (Login)
-![Portal de Autenticación Centralizado](./docs/assets/login-placeholder.png)
+![Portal de Autenticación Centralizado](./docs/assets/login.png)
 > Puerta de enlace universal. Valida las credenciales JWT de Firebase y enruta estáticamente al Layout correspondiente de forma imperceptible gracias al prefetching.
 
 ---

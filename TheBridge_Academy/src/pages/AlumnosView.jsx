@@ -8,13 +8,14 @@ import { db } from '../config/firebase';
 import Avatar from '../components/ui/Avatar';
 import Select from '../components/ui/Select';
 import toast from 'react-hot-toast';
+import ConfirmModal from '../components/ui/ConfirmModal';
 
 export default function UsuariosView() {
   const { campuses, modulos } = useContext(DataContext);
   const [filterRol, setFilterRol] = useState('Alumno');
   const [filterCampus, setFilterCampus] = useState('');
   
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useUsuarios(filterRol, filterCampus);
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch } = useUsuarios(filterRol, filterCampus);
   const usuarios = data?.pages.flatMap(page => page.docs) || [];
   const [showWizard, setShowWizard] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -23,6 +24,7 @@ export default function UsuariosView() {
   const [saving, setSaving] = useState(false);
   const [showMatricula, setShowMatricula] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [userToToggle, setUserToToggle] = useState(null);
 
   // Set default campus when campuses load
   useEffect(() => {
@@ -83,19 +85,20 @@ export default function UsuariosView() {
     }
   };
 
-  const handleToggleUserStatus = async (userToToggle) => {
+  const handleToggleUserStatus = async () => {
+    if (!userToToggle) return;
     setSaving(userToToggle.id);
     try {
-      // Use the _collection field to always write to the correct Firestore collection
       const collectionName = userToToggle._collection || 'alumnos';
-
       await updateDoc(collectionName, userToToggle.id, { isActive: !userToToggle.isActive });
       toast.success(`Usuario ${!userToToggle.isActive ? 'activado' : 'inactivado'} correctamente`);
+      refetch(); // Ensure React Query fetches new state
     } catch (error) {
       console.error(error);
       toast.error('Error al cambiar el estado del usuario');
     } finally {
       setSaving(false);
+      setUserToToggle(null);
     }
   };
 
@@ -233,7 +236,7 @@ export default function UsuariosView() {
                     <button
                       type="button"
                       className={`py-2 px-4 rounded-xl text-sm font-bold cursor-pointer transition-all duration-300 inline-flex items-center justify-center gap-2 border-none shadow-sm ${u.isActive ? 'bg-danger/10 text-danger hover:bg-danger hover:text-white' : 'bg-surface-solid border border-border-default text-gray-400 hover:bg-brand-primary/10 hover:text-brand-primary'}`}
-                      onClick={() => handleToggleUserStatus(u)}
+                      onClick={() => setUserToToggle(u)}
                       disabled={saving === u.id}
                     >
                       {saving === u.id ? '...' : u.isActive ? 'Inactivar' : 'Activar'}
@@ -469,6 +472,20 @@ export default function UsuariosView() {
           </div>
         </div>
       )}
+
+      <ConfirmModal 
+        isOpen={!!userToToggle}
+        title={userToToggle?.isActive ? "Inactivar Usuario" : "Activar Usuario"}
+        message={userToToggle?.isActive 
+          ? `¿Estás seguro de que deseas inactivar a ${userToToggle?.nombre || userToToggle?.email}? Perderá el acceso a la plataforma inmediatamente.`
+          : `¿Estás seguro de que deseas reactivar a ${userToToggle?.nombre || userToToggle?.email}? Volverá a tener acceso a sus recursos.`
+        }
+        confirmText={userToToggle?.isActive ? "Sí, Inactivar" : "Sí, Activar"}
+        cancelText="Cancelar"
+        onConfirm={handleToggleUserStatus}
+        onCancel={() => setUserToToggle(null)}
+        isDanger={userToToggle?.isActive}
+      />
     </div>
   );
 }
