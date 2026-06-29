@@ -1,5 +1,5 @@
 import toast from 'react-hot-toast';
-import { useState, useEffect, useContext, useMemo } from 'react';
+import { memo, useCallback, useState, useEffect, useContext, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { DataContext } from '../../context/DataContext';
 import PageHeader from '../../components/ui/PageHeader';
@@ -10,6 +10,62 @@ import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { useAuth } from '../../hooks/useAuth';
 import { filterModulesByTracks, getProfesorTracks, getUniqueModulesByName } from '../../utils/academicFilters';
+import Select from '../../components/ui/Select';
+
+const AlumnoCalificacionCard = memo(function AlumnoCalificacionCard({
+  alumno,
+  entrega,
+  nota,
+  onEvaluar,
+}) {
+  return (
+    <div className="bg-surface backdrop-blur-lg border border-border-default rounded-xl p-8 shadow-sm transition-all duration-400 hover:-translate-y-[6px] hover:shadow-md" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '24px' }}>
+        <div>
+          <div style={{ fontSize: '16px', fontWeight: 800, color: 'var(--text-strong)' }}>{alumno.nombre || alumno.email}</div>
+          <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>{alumno.email}</div>
+        </div>
+        <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
+          {nota ? (
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: '20px', fontWeight: 900, color: nota.valor >= 5 ? '#10B981' : '#EF4444' }}>
+                {nota.valor}/10
+              </div>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Evaluado</div>
+            </div>
+          ) : (
+            <div style={{ fontSize: '13px', fontWeight: 600, color: '#F59E0B' }}>Sin calificar</div>
+          )}
+          <button className="bg-brand-gradient text-white py-3 px-6 rounded-lg text-sm font-black transition-all duration-300 hover:-translate-y-0.5 shadow-glow inline-flex items-center justify-center gap-2 border-none cursor-pointer" style={{ padding: '8px 16px', fontSize: '13px' }} onClick={() => onEvaluar(alumno)}>
+            {nota ? 'Modificar Nota' : 'Evaluar'}
+          </button>
+        </div>
+      </div>
+
+      <div style={{ background: 'var(--gray100)', border: '1px solid var(--border)', borderRadius: '10px', padding: '12px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+        {entrega ? (
+          <>
+            <div>
+              <div style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-strong)' }}>
+                Entrega: {entrega.titulo || 'Proyecto entregado'}
+              </div>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                {entrega.entregadoEn ? new Date(entrega.entregadoEn).toLocaleDateString() : 'Fecha no disponible'}
+              </div>
+            </div>
+            <a href={entrega.archivoUrl} target="_blank" rel="noreferrer" className="text-brand-primary font-black text-sm no-underline hover:underline">
+              Ver proyecto
+            </a>
+          </>
+        ) : (
+          <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)' }}>
+            Sin entrega registrada para este modulo.
+          </span>
+        )}
+      </div>
+    </div>
+  );
+});
 
 export default function CalificacionesView() {
   const { modulos, promociones, loading } = useContext(DataContext);
@@ -58,7 +114,7 @@ export default function CalificacionesView() {
     enabled: !!selectedModulo,
   });
 
-  const fetchNotas = async () => {
+  const fetchNotas = useCallback(async () => {
     if (!selectedModulo) {
       setNotas([]);
       setProyectos([]);
@@ -79,11 +135,11 @@ export default function CalificacionesView() {
     } finally {
       setLoadingNotas(false);
     }
-  };
+  }, [selectedModulo]);
 
   useEffect(() => {
     fetchNotas();
-  }, [selectedModulo]);
+  }, [fetchNotas]);
 
   useEffect(() => {
     if (!showModal) return undefined;
@@ -100,50 +156,67 @@ export default function CalificacionesView() {
   }, [showModal]);
 
 
-  const getEntregaAlumno = (alumnoId) => (
-    proyectos.find(proyecto => (
-      proyecto.alumnoId === alumnoId &&
-      proyecto.moduloId === selectedModulo
-    ))
-  );
+  const entregasPorAlumno = useMemo(() => {
+    const entregasMap = new Map();
 
-  const getNotaAlumno = (alumnoId) => (
-    notas.find(n => n.alumnoId === alumnoId && n.proyectoId === selectedModulo)
-  );
+    proyectos
+      .filter((proyecto) => proyecto.moduloId === selectedModulo)
+      .forEach((proyecto) => entregasMap.set(proyecto.alumnoId, proyecto));
 
-  const alumnosFiltrados = alumnosDelModulo.filter((alumno) => {
-    const entregaAlumno = getEntregaAlumno(alumno.id);
-    const existingNota = getNotaAlumno(alumno.id);
+    return entregasMap;
+  }, [proyectos, selectedModulo]);
+
+  const notasPorAlumno = useMemo(() => {
+    const notasMap = new Map();
+
+    notas
+      .filter((nota) => nota.proyectoId === selectedModulo)
+      .forEach((nota) => notasMap.set(nota.alumnoId, nota));
+
+    return notasMap;
+  }, [notas, selectedModulo]);
+
+  const notaMediaModulo = useMemo(() => {
+    const valores = Array.from(notasPorAlumno.values()).map((nota) => Number(nota.valor));
+
+    if (valores.length === 0) return null;
+
+    const total = valores.reduce((acc, valor) => acc + valor, 0);
+    return (total / valores.length).toFixed(1);
+  }, [notasPorAlumno]);
+
+  const alumnosFiltrados = useMemo(() => alumnosDelModulo.filter((alumno) => {
+    const entregaAlumno = entregasPorAlumno.get(alumno.id);
+    const existingNota = notasPorAlumno.get(alumno.id);
 
     if (filtroRevision === 'pendientes') return entregaAlumno && !existingNota;
     if (filtroRevision === 'sin-entrega') return !entregaAlumno;
     if (filtroRevision === 'evaluados') return Boolean(existingNota);
 
     return true;
-  });
+  }), [alumnosDelModulo, entregasPorAlumno, filtroRevision, notasPorAlumno]);
 
-  const filterOptions = [
+  const filterOptions = useMemo(() => [
     { id: 'todos', label: 'Todos', count: alumnosDelModulo.length },
     {
       id: 'pendientes',
       label: 'Pendientes de revisar',
-      count: alumnosDelModulo.filter(alumno => getEntregaAlumno(alumno.id) && !getNotaAlumno(alumno.id)).length
+      count: alumnosDelModulo.filter(alumno => entregasPorAlumno.get(alumno.id) && !notasPorAlumno.get(alumno.id)).length
     },
     {
       id: 'sin-entrega',
       label: 'Sin entrega',
-      count: alumnosDelModulo.filter(alumno => !getEntregaAlumno(alumno.id)).length
+      count: alumnosDelModulo.filter(alumno => !entregasPorAlumno.get(alumno.id)).length
     },
     {
       id: 'evaluados',
       label: 'Evaluados',
-      count: alumnosDelModulo.filter(alumno => getNotaAlumno(alumno.id)).length
+      count: alumnosDelModulo.filter(alumno => notasPorAlumno.get(alumno.id)).length
     },
-  ];
+  ], [alumnosDelModulo, entregasPorAlumno, notasPorAlumno]);
 
-  const handleOpenGrade = (alumno) => {
-    // Buscar si ya tiene nota para este módulo (usando moduloId en lugar de proyectoId)
-    const existingNota = getNotaAlumno(alumno.id);
+  const handleOpenGrade = useCallback((alumno) => {
+    const existingNota = notasPorAlumno.get(alumno.id);
     
     setNotaForm({
       id: existingNota?.id || null,
@@ -152,7 +225,7 @@ export default function CalificacionesView() {
       comentario: existingNota?.comentario || ''
     });
     setShowModal(true);
-  };
+  }, [notasPorAlumno]);
 
   const handleSaveNota = async () => {
     setSaving(true);
@@ -197,17 +270,16 @@ export default function CalificacionesView() {
         <label style={{ display: 'block', fontSize: '13px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '8px' }}>
           Seleccionar Módulo
         </label>
-        <select
-          className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
+        <Select
           value={selectedModulo}
-          onChange={e => { setSelectedModulo(e.target.value); setFiltroRevision('todos'); }}
-          style={{ fontSize: '15px', fontWeight: 600, padding: '12px 16px', width: '100%', maxWidth: '400px' }}
-        >
-          <option value="">-- Elige un módulo --</option>
-          {modulosProfesor.map(m => (
-            <option key={m.id} value={m.id}>{m.nombre}</option>
-          ))}
-        </select>
+          onChange={(value) => { setSelectedModulo(value); setFiltroRevision('todos'); }}
+          placeholder="Elige un modulo"
+          className="w-full max-w-[400px]"
+          options={[
+            { value: '', label: 'Elige un modulo' },
+            ...modulosProfesor.map(m => ({ value: m.id, label: m.nombre }))
+          ]}
+        />
       </div>
 
       {selectedModulo && (
@@ -216,6 +288,11 @@ export default function CalificacionesView() {
             <h3 style={{ margin: 0, fontSize: '20px', color: 'var(--text-strong)' }}>
               Alumnos Matriculados ({alumnosFiltrados.length}/{alumnosDelModulo.length})
             </h3>
+            {notaMediaModulo && (
+              <span className="bg-surface-solid border border-border-default rounded-lg px-3 py-2 text-xs font-black text-text-secondary">
+                Media del modulo: {notaMediaModulo}/10
+              </span>
+            )}
 
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               {filterOptions.map(option => {
@@ -241,63 +318,15 @@ export default function CalificacionesView() {
           ) : alumnosFiltrados.length === 0 ? (
             <p style={{ color: 'var(--text-secondary)' }}>No hay alumnos que coincidan con este filtro.</p>
           ) : (
-            alumnosFiltrados.map(alumno => {
-              const existingNota = getNotaAlumno(alumno.id);
-              const entregaAlumno = getEntregaAlumno(alumno.id);
-              
-              return (
-                <div key={alumno.id} className="bg-surface backdrop-blur-lg border border-border-default rounded-xl p-8 shadow-sm transition-all duration-400 hover:-translate-y-[6px] hover:shadow-md" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '24px' }}>
-                    <div>
-                      <div style={{ fontSize: '16px', fontWeight: 800, color: 'var(--text-strong)' }}>{alumno.nombre || alumno.email}</div>
-                      <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>{alumno.email}</div>
-                    </div>
-                    <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-                      {existingNota ? (
-                        <div style={{ textAlign: 'right' }}>
-                          <div style={{ fontSize: '20px', fontWeight: 900, color: existingNota.valor >= 5 ? '#10B981' : '#EF4444' }}>
-                            {existingNota.valor}/10
-                          </div>
-                          <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Evaluado</div>
-                        </div>
-                      ) : (
-                        <div style={{ fontSize: '13px', fontWeight: 600, color: '#F59E0B' }}>Sin calificar</div>
-                      )}
-                      <button className="bg-brand-gradient text-white py-3 px-6 rounded-lg text-sm font-black transition-all duration-300 hover:-translate-y-0.5 shadow-glow inline-flex items-center justify-center gap-2 border-none cursor-pointer" style={{ padding: '8px 16px', fontSize: '13px' }} onClick={() => handleOpenGrade(alumno)}>
-                        {existingNota ? 'Modificar Nota' : 'Evaluar'}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div style={{ background: 'var(--gray100)', border: '1px solid var(--border)', borderRadius: '10px', padding: '12px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-                    {entregaAlumno ? (
-                      <>
-                        <div>
-                          <div style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-strong)' }}>
-                            Entrega: {entregaAlumno.titulo || 'Proyecto entregado'}
-                          </div>
-                          <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-                            {entregaAlumno.entregadoEn ? new Date(entregaAlumno.entregadoEn).toLocaleDateString() : 'Fecha no disponible'}
-                          </div>
-                        </div>
-                        <a
-                          href={entregaAlumno.archivoUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-brand-primary font-black text-sm no-underline hover:underline"
-                        >
-                          Ver proyecto
-                        </a>
-                      </>
-                    ) : (
-                      <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)' }}>
-                        Sin entrega registrada para este modulo.
-                      </span>
-                    )}
-                  </div>
-                </div>
-              );
-            })
+            alumnosFiltrados.map(alumno => (
+              <AlumnoCalificacionCard
+                key={alumno.id}
+                alumno={alumno}
+                entrega={entregasPorAlumno.get(alumno.id)}
+                nota={notasPorAlumno.get(alumno.id)}
+                onEvaluar={handleOpenGrade}
+              />
+            ))
           )}
         </div>
       )}

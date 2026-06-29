@@ -5,7 +5,8 @@ export default function Select({
   onChange, 
   options = [], 
   placeholder = 'Seleccionar...',
-  className = ''
+  className = '',
+  disabled = false
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
@@ -27,8 +28,11 @@ export default function Select({
     <div className={`relative ${className}`} ref={containerRef}>
       <button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className={`w-full px-4 py-2.5 bg-surface-solid border border-border-default rounded-xl text-sm text-text-strong transition-all duration-200 outline-none hover:border-brand-primary/50 flex justify-between items-center cursor-pointer ${isOpen ? 'ring-4 ring-brand-primary/10 border-brand-primary' : ''}`}
+        onClick={() => {
+          if (!disabled) setIsOpen(!isOpen);
+        }}
+        disabled={disabled}
+        className={`w-full px-4 py-2.5 bg-surface-solid border border-border-default rounded-xl text-sm text-text-strong transition-all duration-200 outline-none hover:border-brand-primary/50 flex justify-between items-center cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed ${isOpen ? 'ring-4 ring-brand-primary/10 border-brand-primary' : ''}`}
       >
         <span className={!selectedOption && placeholder ? 'text-text-secondary' : 'text-text-strong'}>
           {selectedOption ? selectedOption.label : placeholder}
@@ -43,7 +47,7 @@ export default function Select({
         </svg>
       </button>
 
-      {isOpen && (
+      {isOpen && !disabled && (
         <div className="absolute z-50 w-full mt-2 bg-surface backdrop-blur-xl border border-border-default rounded-xl shadow-xl overflow-hidden animate-fade-in origin-top">
           <ul className="max-h-60 overflow-y-auto py-1 custom-scrollbar">
             {options.map((opt) => (

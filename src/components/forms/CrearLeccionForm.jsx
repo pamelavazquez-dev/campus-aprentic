@@ -5,6 +5,7 @@ import { getAllModulos, updateModulo } from '../../services/modulos.service';
 import { leccionSchema } from '../../schemas/app.schemas';
 import { getFieldErrors } from '../../schemas/validation';
 import { usePDFImport } from '../../hooks/usePDFImport';
+import Select from '../ui/Select';
 
 const INITIAL_FORM = {
   modulo_id: '',
@@ -115,20 +116,14 @@ export default function CrearLeccionForm({ onClose, onCreated }) {
           
           <div className="flex flex-col gap-2">
             <label className="text-sm font-bold text-text-strong">Módulo Asignado</label>
-            <div className="relative">
-              <select
-                className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300 cursor-pointer appearance-none"
-                value={formData.modulo_id}
-                onChange={(event) => updateField('modulo_id', event.target.value)}
-              >
-                {modulos.map((modulo) => (
-                  <option key={modulo.id} value={modulo.id}>{modulo.nombre}</option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-text-secondary">
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" /></svg>
-              </div>
-            </div>
+            <Select
+              value={formData.modulo_id}
+              onChange={(value) => updateField('modulo_id', value)}
+              options={modulos.map((modulo) => ({
+                value: modulo.id,
+                label: modulo.nombre,
+              }))}
+            />
             {errors.modulo_id && <span className="text-xs font-bold text-red-500 mt-1">{errors.modulo_id}</span>}
           </div>
 

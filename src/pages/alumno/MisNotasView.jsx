@@ -1,8 +1,50 @@
-import { useState, useEffect, useContext, useMemo } from 'react';
+import { memo, useState, useEffect, useContext, useMemo } from 'react';
 import { DataContext } from '../../context/DataContext';
 import { useAuth } from '../../hooks/useAuth';
 import { getNotasByAlumnoId } from '../../services/notas.service';
 import PageHeader from '../../components/ui/PageHeader';
+
+const NotaCard = memo(function NotaCard({ nota, modulo }) {
+  const isAprobado = nota.valor >= 5;
+
+  return (
+    <div className="bg-surface backdrop-blur-lg border border-border-default rounded-xl p-8 shadow-sm transition-all duration-400 hover:-translate-y-[6px] hover:shadow-md" style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '24px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)', paddingBottom: '16px' }}>
+        <div>
+          <h3 style={{ fontSize: '20px', fontWeight: 900, color: 'var(--text-strong)', margin: '0 0 4px 0' }}>
+            {modulo?.nombre || 'Modulo Desconocido'}
+          </h3>
+          <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+            Evaluado el {nota.actualizadoEn ? new Date(nota.actualizadoEn).toLocaleDateString() : 'N/A'}
+          </span>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <div style={{ fontSize: '32px', fontWeight: 900, color: isAprobado ? '#10B981' : '#EF4444', lineHeight: 1 }}>
+            {nota.valor}<span style={{ fontSize: '18px', color: 'var(--text-secondary)' }}>/10</span>
+          </div>
+          <span style={{
+            display: 'inline-block', marginTop: '8px', padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 'bold',
+            background: isAprobado ? '#D1FAE5' : '#FEE2E2',
+            color: isAprobado ? '#065F46' : '#991B1B'
+          }}>
+            {isAprobado ? 'Aprobado' : 'Suspenso'}
+          </span>
+        </div>
+      </div>
+      
+      {nota.comentario && (
+        <div style={{ background: 'var(--gray50)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+          <div style={{ fontSize: '12px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '8px' }}>
+            Feedback del Instructor
+          </div>
+          <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-strong)', lineHeight: 1.6 }}>
+            "{nota.comentario}"
+          </p>
+        </div>
+      )}
+    </div>
+  );
+});
 
 export default function MisNotasView() {
   const { profile } = useAuth();
@@ -39,6 +81,19 @@ export default function MisNotasView() {
     return notas.filter(n => n.alumnoId === profile.id);
   }, [notas, profile]);
 
+  const modulosPorId = useMemo(() => {
+    const modulosMap = new Map();
+    modulos.forEach((modulo) => modulosMap.set(modulo.id, modulo));
+    return modulosMap;
+  }, [modulos]);
+
+  const notaMediaAlumno = useMemo(() => {
+    if (misNotas.length === 0) return null;
+
+    const total = misNotas.reduce((acc, nota) => acc + Number(nota.valor), 0);
+    return (total / misNotas.length).toFixed(1);
+  }, [misNotas]);
+
   if (dataLoading || loadingNotas) return <div>Cargando tus notas...</div>;
 
   return (
@@ -48,6 +103,12 @@ export default function MisNotasView() {
         description="Aquí puedes ver el resultado de tus evaluaciones y el feedback de tus instructores."
       />
 
+      {notaMediaAlumno && (
+        <div className="bg-surface backdrop-blur-lg border border-border-default rounded-xl p-4 shadow-sm" style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
+          <span style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Media actual</span>
+          <strong style={{ fontSize: '24px', color: Number(notaMediaAlumno) >= 5 ? '#10B981' : '#EF4444' }}>{notaMediaAlumno}/10</strong>
+        </div>
+      )}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {misNotas.length === 0 ? (
           <div style={{ padding: '48px', textAlign: 'center', background: 'var(--surface)', borderRadius: '16px', border: '1px dashed var(--border)' }}>
@@ -56,48 +117,13 @@ export default function MisNotasView() {
             <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: '14px' }}>Tus notas aparecerán aquí cuando los instructores evalúen tu desempeño.</p>
           </div>
         ) : (
-          misNotas.map(nota => {
-            const moduloAsociado = modulos.find(m => m.id === nota.proyectoId);
-            const isAprobado = nota.valor >= 5;
-
-            return (
-              <div key={nota.id} className="bg-surface backdrop-blur-lg border border-border-default rounded-xl p-8 shadow-sm transition-all duration-400 hover:-translate-y-[6px] hover:shadow-md" style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '24px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)', paddingBottom: '16px' }}>
-                  <div>
-                    <h3 style={{ fontSize: '20px', fontWeight: 900, color: 'var(--text-strong)', margin: '0 0 4px 0' }}>
-                      {moduloAsociado?.nombre || 'Módulo Desconocido'}
-                    </h3>
-                    <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-                      Evaluado el {nota.actualizadoEn ? new Date(nota.actualizadoEn).toLocaleDateString() : 'N/A'}
-                    </span>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '32px', fontWeight: 900, color: isAprobado ? '#10B981' : '#EF4444', lineHeight: 1 }}>
-                      {nota.valor}<span style={{ fontSize: '18px', color: 'var(--text-secondary)' }}>/10</span>
-                    </div>
-                    <span style={{ 
-                      display: 'inline-block', marginTop: '8px', padding: '4px 12px', borderRadius: '12px', fontSize: '12px', fontWeight: 'bold',
-                      background: isAprobado ? '#D1FAE5' : '#FEE2E2',
-                      color: isAprobado ? '#065F46' : '#991B1B'
-                    }}>
-                      {isAprobado ? 'Aprobado' : 'Suspenso'}
-                    </span>
-                  </div>
-                </div>
-                
-                {nota.comentario && (
-                  <div style={{ background: 'var(--gray50)', padding: '16px', borderRadius: '8px', border: '1px solid var(--border)' }}>
-                    <div style={{ fontSize: '12px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '8px' }}>
-                      Feedback del Instructor
-                    </div>
-                    <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-strong)', lineHeight: 1.6 }}>
-                      "{nota.comentario}"
-                    </p>
-                  </div>
-                )}
-              </div>
-            );
-          })
+          misNotas.map(nota => (
+            <NotaCard
+              key={nota.id}
+              nota={nota}
+              modulo={modulosPorId.get(nota.proyectoId)}
+            />
+          ))
         )}
       </div>
     </div>

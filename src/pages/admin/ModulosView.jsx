@@ -3,6 +3,7 @@ import { DataContext } from '../../context/DataContext';
 import { deleteModulo, updateModulo } from '../../services/modulos.service';
 import { useNavigate } from 'react-router-dom';
 import PageHeader from '../../components/ui/PageHeader';
+import Select from '../../components/ui/Select';
 
 export default function ModulosView() {
   const { modulos, equipo, loading } = useContext(DataContext);
@@ -103,17 +104,15 @@ export default function ModulosView() {
                     <td className="px-6 py-4 border-b border-border-default text-sm text-[#334155]">
                       {asignando === mod.id ? (
                         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                          <select
-                            className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
-                            defaultValue={mod.profesor_id || ''}
-                            onChange={e => handleAsignar(mod.id, e.target.value)}
-                            style={{ padding: '6px 10px', fontSize: '13px', minWidth: '180px' }}
-                          >
-                            <option value="">Sin asignar</option>
-                            {profesores.map(p => (
-                              <option key={p.id} value={p.id}>{p.nombre || p.email}</option>
-                            ))}
-                          </select>
+                          <Select
+                            value={mod.profesor_id || ''}
+                            onChange={(value) => handleAsignar(mod.id, value)}
+                            className="min-w-[180px]"
+                            options={[
+                              { value: '', label: 'Sin asignar' },
+                              ...profesores.map(p => ({ value: p.id, label: p.nombre || p.email }))
+                            ]}
+                          />
                           <button
                             onClick={() => setAsignando(null)}
                             style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', fontSize: '16px' }}

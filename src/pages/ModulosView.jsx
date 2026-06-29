@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Badge from '../components/ui/Badge';
 import DataTable from '../components/ui/DataTable';
 import PageHeader from '../components/ui/PageHeader';
+import Select from '../components/ui/Select';
 import { getAllAlumnos, updateAlumno } from '../services/alumnos.service';
 import { getAllModulos } from '../services/modulos.service';
 import { getAllPromociones } from '../services/promociones.service';
@@ -231,16 +232,15 @@ export default function ModulosView() {
       <div className="control-panel">
         <div className="input-group">
           <label>Promocion</label>
-          <select
-            className="glass-input"
+          <Select
             value={selectedPromocionId}
-            onChange={(event) => handlePromocionChange(event.target.value)}
+            onChange={handlePromocionChange}
             disabled={loading}
-          >
-            {promociones.map((promocion) => (
-              <option key={promocion.id} value={promocion.id}>{promocion.nombre}</option>
-            ))}
-          </select>
+            options={promociones.map((promocion) => ({
+              value: promocion.id,
+              label: promocion.nombre,
+            }))}
+          />
         </div>
         {selectedPromocion && (
           <p>

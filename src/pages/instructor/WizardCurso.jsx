@@ -9,6 +9,7 @@ import { ROLES } from '../../utils/rbac';
 import { usePDFImport } from '../../hooks/usePDFImport';
 import toast from 'react-hot-toast';
 import { filterModulesByTracks, getProfesorTracks, getUniqueModulesByName, inferModuleTrack } from '../../utils/academicFilters';
+import Select from '../../components/ui/Select';
 
 export default function WizardCurso() {
   const [modulos, setModulos] = useState([]);
@@ -192,38 +193,30 @@ export default function WizardCurso() {
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: '16px', flexWrap: 'wrap' }}>
         <div style={{ flex: 1, minWidth: '240px' }}>
           <label style={{ display: 'block', fontSize: '13px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>
-            1. Seleccionar promoción
+            1. Seleccionar promocion
           </label>
-          <select
-            className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
+          <Select
             value={selectedPromocion}
-            onChange={e => { setSelectedPromocion(e.target.value); }}
-            style={{ fontSize: '15px', fontWeight: 600, padding: '12px 16px', cursor: 'pointer', width: '100%' }}
-          >
-            {profesorPromociones.map(p => (
-              <option key={p.id} value={p.id}>
-                {p.nombre || p.id}
-              </option>
-            ))}
-          </select>
+            onChange={setSelectedPromocion}
+            options={profesorPromociones.map(p => ({
+              value: p.id,
+              label: p.nombre || p.id,
+            }))}
+          />
         </div>
 
         <div style={{ flex: 1, minWidth: '280px' }}>
           <label style={{ display: 'block', fontSize: '13px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>
-            2. Seleccionar módulo
+            2. Seleccionar modulo
           </label>
-          <select
-            className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
+          <Select
             value={selectedModulo}
-            onChange={e => { setSelectedModulo(e.target.value); setExpandedLeccion(null); setShowCrear(false); }}
-            style={{ fontSize: '15px', fontWeight: 600, padding: '12px 16px', cursor: 'pointer', width: '100%' }}
-          >
-            {modulos.map(m => (
-              <option key={m.id} value={m.id}>
-                {m.nombre} — {m.horas || 0}h
-              </option>
-            ))}
-          </select>
+            onChange={(value) => { setSelectedModulo(value); setExpandedLeccion(null); setShowCrear(false); }}
+            options={modulos.map(m => ({
+              value: m.id,
+              label: `${m.nombre} - ${m.horas || 0}h`,
+            }))}
+          />
         </div>
 
         {/* Toggle Activo/Inactivo */}

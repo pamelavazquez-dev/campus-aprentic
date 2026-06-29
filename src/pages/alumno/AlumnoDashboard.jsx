@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useCallback, useState, useEffect, useMemo } from 'react';
 import { getAllModulos } from '../../services/modulos.service';
 import { getAllLecciones } from '../../services/lecciones.service';
 import { getAllProyectos } from '../../services/proyectos.service';
@@ -51,46 +51,52 @@ export default function AlumnoDashboard() {
     return modulos;
   }, [modulos, alumnoActual]);
 
-  // Contar lecciones por módulo
-  const getLeccionCount = (moduloId) => {
-    return lecciones.filter(l => {
-      const modId = typeof l.modulo_id === 'string' ? l.modulo_id : (l.modulo_id?.id || '');
-      return modId === moduloId;
-    }).length;
-  };
+  const leccionesPorModulo = useMemo(() => {
+    const leccionesMap = new Map();
 
-  const getModuloProgress = (moduloId) => {
-    if (!alumnoActual) {
-      return { completadas: 0, total: 0, porcentaje: 0 };
-    }
-
-    const leccionesModulo = lecciones.filter(l => {
-      const modId = typeof l.modulo_id === 'string' ? l.modulo_id : (l.modulo_id?.id || '');
-      return modId === moduloId;
+    lecciones.forEach((leccion) => {
+      const modId = typeof leccion.modulo_id === 'string' ? leccion.modulo_id : (leccion.modulo_id?.id || '');
+      const actuales = leccionesMap.get(modId) || [];
+      leccionesMap.set(modId, [...actuales, leccion]);
     });
 
-    const notaAprobadaModulo = notas.some(nota => nota.proyectoId === moduloId && Number(nota.valor) >= 5);
+    return leccionesMap;
+  }, [lecciones]);
 
-    const completadas = leccionesModulo.filter(leccion => {
-      if (notaAprobadaModulo) return true;
+  const progresoPorModulo = useMemo(() => {
+    if (!alumnoActual) return {};
 
-      const entrega = proyectos.find(proyecto => (
-        proyecto.alumnoId === alumnoActual.id &&
-        proyecto.moduloId === moduloId &&
-        proyecto.leccionId === leccion.id
-      ));
+    return modulosAsignados.reduce((acc, modulo) => {
+      const leccionesModulo = leccionesPorModulo.get(modulo.id) || [];
+      const notaAprobadaModulo = notas.some(nota => nota.proyectoId === modulo.id && Number(nota.valor) >= 5);
 
-      return entrega
-        ? notas.some(nota => nota.proyectoId === entrega.id && Number(nota.valor) >= 5)
-        : false;
-    }).length;
+      const completadas = leccionesModulo.filter((leccion) => {
+        if (notaAprobadaModulo) return true;
 
-    return {
-      completadas,
-      total: leccionesModulo.length,
-      porcentaje: leccionesModulo.length > 0 ? Math.round((completadas / leccionesModulo.length) * 100) : 0
-    };
-  };
+        const entrega = proyectos.find(proyecto => (
+          proyecto.alumnoId === alumnoActual.id &&
+          proyecto.moduloId === modulo.id &&
+          proyecto.leccionId === leccion.id
+        ));
+
+        return entrega
+          ? notas.some(nota => nota.proyectoId === entrega.id && Number(nota.valor) >= 5)
+          : false;
+      }).length;
+
+      acc[modulo.id] = {
+        completadas,
+        total: leccionesModulo.length,
+        porcentaje: leccionesModulo.length > 0 ? Math.round((completadas / leccionesModulo.length) * 100) : 0
+      };
+
+      return acc;
+    }, {});
+  }, [alumnoActual, leccionesPorModulo, modulosAsignados, notas, proyectos]);
+
+  const isModuloFinalizado = useCallback((moduloId) => (
+    progresoPorModulo[moduloId]?.porcentaje === 100
+  ), [progresoPorModulo]);
 
   if (loading) {
     return (
@@ -148,8 +154,9 @@ export default function AlumnoDashboard() {
               </div>
             ) : (
               modulosAsignados.map(mod => {
-                const numLecciones = getLeccionCount(mod.id);
-                const progresoModulo = getModuloProgress(mod.id);
+                const progresoModulo = progresoPorModulo[mod.id] || { completadas: 0, total: 0, porcentaje: 0 };
+                const moduloFinalizado = isModuloFinalizado(mod.id);
+                const numLecciones = progresoModulo.total;
                 return (
                   <div
                     key={mod.id}
@@ -185,18 +192,18 @@ export default function AlumnoDashboard() {
                         <span style={{ fontSize: '12px', fontWeight: 900, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                           Progreso
                         </span>
-                        <span style={{ fontSize: '12px', fontWeight: 900, color: progresoModulo.porcentaje === 100 ? '#10B981' : 'var(--brand-primary)' }}>
+                        <span style={{ fontSize: '12px', fontWeight: 900, color: moduloFinalizado ? '#10B981' : 'var(--brand-primary)' }}>
                           {progresoModulo.completadas}/{progresoModulo.total} completadas - {progresoModulo.porcentaje}%
                         </span>
                       </div>
                       <div style={{ height: '8px', background: 'var(--gray200)', borderRadius: '999px', overflow: 'hidden' }}>
-                        <div style={{ width: `${progresoModulo.porcentaje}%`, height: '100%', background: progresoModulo.porcentaje === 100 ? 'linear-gradient(90deg, #10B981, #34D399)' : 'linear-gradient(90deg, var(--brand-primary), #FF6B7A)', transition: 'width 0.5s ease', borderRadius: '999px' }}></div>
+                        <div style={{ width: `${progresoModulo.porcentaje}%`, height: '100%', background: moduloFinalizado ? 'linear-gradient(90deg, #10B981, #34D399)' : 'linear-gradient(90deg, var(--brand-primary), #FF6B7A)', transition: 'width 0.5s ease', borderRadius: '999px' }}></div>
                       </div>
                     </div>
 
                     <div style={{ marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid var(--border-default)', display: 'flex', justifyContent: 'space-between', color: 'var(--brand-primary)', fontWeight: 'bold', fontSize: '14px' }}>
-                      <span>Continuar Aprendiendo</span>
-                      <span>&rarr;</span>
+                      <span>{moduloFinalizado ? 'Modulo Finalizado' : 'Continuar Aprendiendo'}</span>
+                      <span>{moduloFinalizado ? 'OK' : '>'}</span>
                     </div>
                   </div>
                 );

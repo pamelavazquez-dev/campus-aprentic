@@ -3,6 +3,7 @@ import { createReview } from '../../services/reviews.service';
 import Card from '../Card';
 import Input from '../Input';
 import { useAuth } from '../../hooks/useAuth';
+import Select from '../ui/Select';
 
 export default function ReviewForm({ promocionId, onSubmitted }) {
   const [rating, setRating] = useState(5);
@@ -50,17 +51,17 @@ export default function ReviewForm({ promocionId, onSubmitted }) {
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: '16px' }}>
           <label style={{ display: 'block', fontWeight: 600, marginBottom: '8px' }}>Calificación (1-5)</label>
-          <select 
-            className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]" 
-            value={rating} 
-            onChange={(e) => setRating(e.target.value)}
-          >
-            <option value="5">⭐⭐⭐⭐⭐ - Excelente</option>
-            <option value="4">⭐⭐⭐⭐ - Muy Bueno</option>
-            <option value="3">⭐⭐⭐ - Bueno</option>
-            <option value="2">⭐⭐ - Regular</option>
-            <option value="1">⭐ - Malo</option>
-          </select>
+          <Select
+            value={rating}
+            onChange={setRating}
+            options={[
+              { value: 5, label: '5 - Excelente' },
+              { value: 4, label: '4 - Muy bueno' },
+              { value: 3, label: '3 - Bueno' },
+              { value: 2, label: '2 - Regular' },
+              { value: 1, label: '1 - Malo' },
+            ]}
+          />
         </div>
         
         <div style={{ marginBottom: '16px' }}>

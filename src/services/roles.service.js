@@ -7,17 +7,22 @@ import { db } from '../config/firebase';
 const getUserByEmail = async (collectionName, email) => {
   if (!db || !email) return null;
 
-  const usersQuery = query(
-    collection(db, collectionName),
-    where('email', '==', email),
-    limit(1)
-  );
-  const snapshot = await getDocs(usersQuery);
+  try {
+    const usersQuery = query(
+      collection(db, collectionName),
+      where('email', '==', email),
+      limit(1)
+    );
+    const snapshot = await getDocs(usersQuery);
 
-  if (snapshot.empty) return null;
+    if (snapshot.empty) return null;
 
-  const docSnap = snapshot.docs[0];
-  return { id: docSnap.id, ...docSnap.data() };
+    const docSnap = snapshot.docs[0];
+    return { id: docSnap.id, ...docSnap.data() };
+  } catch (error) {
+    if (error.code === 'permission-denied') return null;
+    throw error;
+  }
 };
 
 export async function getUserRole(uid, email = '') {

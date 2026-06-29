@@ -4,6 +4,7 @@ import { createAlumno, updateAlumno } from '../../services/alumnos.service';
 import { getAllPromociones } from '../../services/promociones.service';
 import { alumnoSchema } from '../../schemas/app.schemas';
 import { getFieldErrors } from '../../schemas/validation';
+import Select from '../ui/Select';
 
 const INITIAL_FORM = {
   nombre: '',
@@ -130,20 +131,14 @@ export default function CrearAlumnoForm({ alumno = null, onClose, onSaved }) {
 
           <div className="flex flex-col gap-2">
             <label className="text-sm font-bold text-text-strong">Promoción Asignada</label>
-            <div className="relative">
-              <select
-                className="w-full px-4 py-3 bg-surface-solid border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300 cursor-pointer appearance-none"
-                value={formData.promocion_id}
-                onChange={(event) => updateField('promocion_id', event.target.value)}
-              >
-                {promociones.map((promocion) => (
-                  <option key={promocion.id} value={promocion.id}>{promocion.nombre}</option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" /></svg>
-              </div>
-            </div>
+            <Select
+              value={formData.promocion_id}
+              onChange={(value) => updateField('promocion_id', value)}
+              options={promociones.map((promocion) => ({
+                value: promocion.id,
+                label: promocion.nombre,
+              }))}
+            />
             {errors.promociones_id && <span className="text-xs font-bold text-red-500 mt-1">{errors.promociones_id}</span>}
           </div>
 

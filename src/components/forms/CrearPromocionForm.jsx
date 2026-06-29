@@ -2,6 +2,7 @@ import toast from 'react-hot-toast';
 import { useState, useEffect, useContext } from 'react';
 import { DataContext } from '../../context/DataContext';
 import { createPromocion, updatePromocion } from '../../services/promociones.service';
+import Select from '../ui/Select';
 
 export default function CrearPromocionForm({ onClose, onCreated, initialData = null }) {
   const { campuses } = useContext(DataContext);
@@ -82,23 +83,18 @@ export default function CrearPromocionForm({ onClose, onCreated, initialData = n
           
           <div className="flex flex-col gap-2">
             <label className="text-sm font-bold text-text-strong">Sede (Campus)</label>
-            <div className="relative">
-              <select 
-                className="w-full px-4 py-3 bg-surface-solid border border-gray-200 rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300 cursor-pointer appearance-none"
-                value={formData.campus}
-                onChange={e => setFormData({...formData, campus: e.target.value})}
-              >
-                <option value="" disabled>Selecciona una sede</option>
-                {campuses && campuses.map(camp => (
-                  <option key={camp.id} value={camp.id}>
-                    {camp.nombre || camp.id}
-                  </option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" /></svg>
-              </div>
-            </div>
+            <Select
+              value={formData.campus}
+              onChange={(value) => setFormData({ ...formData, campus: value })}
+              placeholder="Selecciona una sede"
+              options={[
+                { value: '', label: 'Selecciona una sede' },
+                ...(campuses || []).map(camp => ({
+                  value: camp.id,
+                  label: camp.nombre || camp.id,
+                }))
+              ]}
+            />
           </div>
 
           <div className="flex flex-col gap-2">
