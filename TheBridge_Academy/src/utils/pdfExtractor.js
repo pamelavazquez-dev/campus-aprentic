@@ -12,30 +12,33 @@ export const extractTextFromPDF = async (file) => {
   // Inicializar el documento
   const loadingTask = getDocument({ 
     data: arrayBuffer,
-    cMapUrl: 'https://unpkg.com/pdfjs-dist@3.11.174/cmaps/',
+    cMapUrl: '/cmaps/',
     cMapPacked: true,
   });
   const pdf = await loadingTask.promise;
   
-  let fullMarkdown = '';
+  let parts = [];
   
   for (let i = 1; i <= pdf.numPages; i++) {
+    // Ceder el control al hilo principal (Event Loop) para no congelar la UI
+    await new Promise(resolve => setTimeout(resolve, 0));
+    
     const page = await pdf.getPage(i);
     const textContent = await page.getTextContent();
     
     let lastY = -1;
-    let text = '';
+    const lines = [];
     
     for (const item of textContent.items) {
-      if (lastY !== item.transform[5] && text.length > 0) {
-        text += '\n';
+      if (lastY !== item.transform[5] && lines.length > 0) {
+        lines.push('\n');
       }
-      text += item.str + ' ';
+      lines.push(item.str, ' ');
       lastY = item.transform[5];
     }
     
-    fullMarkdown += text + '\n\n';
+    parts.push(lines.join(''));
   }
   
-  return fullMarkdown.replace(/ +/g, ' ').trim();
+  return parts.join('\n\n').replace(/ +/g, ' ').trim();
 };

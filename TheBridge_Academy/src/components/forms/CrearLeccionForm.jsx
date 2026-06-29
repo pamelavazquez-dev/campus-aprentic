@@ -1,17 +1,17 @@
 import toast from 'react-hot-toast';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { createLeccion } from '../../services/lecciones.service';
 import { getAllModulos, updateModulo } from '../../services/modulos.service';
 import { leccionSchema } from '../../schemas/app.schemas';
 import { getFieldErrors } from '../../schemas/validation';
-import { extractTextFromPDF } from '../../utils/pdfExtractor';
+import { usePDFImport } from '../../hooks/usePDFImport';
 
 const INITIAL_FORM = {
   modulo_id: '',
   titulo: '',
   descripcion: '',
   contenido_url: '',
-  contenido_markdown: '',
+  // contenido_markdown se manejará por ref para evitar re-renders
 };
 
 export default function CrearLeccionForm({ onClose, onCreated }) {
@@ -19,6 +19,7 @@ export default function CrearLeccionForm({ onClose, onCreated }) {
   const [modulos, setModulos] = useState([]);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const { isImporting, importPDF, markdownRef, markdownKey } = usePDFImport();
 
   useEffect(() => {
     const timeoutId = window.setTimeout(async () => {
@@ -40,43 +41,19 @@ export default function CrearLeccionForm({ onClose, onCreated }) {
   };
 
   const handlePDFUpload = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    if (file.type !== 'application/pdf') {
-      toast.error('Por favor, selecciona un archivo PDF válido.');
-      return;
-    }
-
-    setLoading(true);
-    toast.loading('Extrayendo texto del PDF...', { id: 'pdf-extract' });
-    
-    try {
-      const markdown = await extractTextFromPDF(file);
-      
-      // Validar 800 KB (aprox 800,000 bytes). Un carácter en utf-8 suele ser 1 byte, pero por seguridad comprobamos la longitud.
-      const sizeInKB = new Blob([markdown]).size / 1024;
-      if (sizeInKB > 800) {
-        toast.error(`El texto extraído pesa más de 800 KB (${Math.round(sizeInKB)} KB). Demasiado texto.`, { id: 'pdf-extract' });
-        setLoading(false);
-        return;
-      }
-
-      setFormData(curr => ({ ...curr, contenido_markdown: markdown }));
-      toast.success('PDF importado como Markdown correctamente.', { id: 'pdf-extract' });
-    } catch (error) {
-      console.error('Error extrayendo PDF:', error);
-      toast.error('Error al procesar el PDF. Revisa la consola.', { id: 'pdf-extract' });
-    } finally {
-      setLoading(false);
-      // Reset input
-      event.target.value = '';
-    }
+    await importPDF(event.target.files[0], 'pdf-extract');
+    event.target.value = '';
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setErrors({});
+    
+    const sizeInKB = new Blob([markdownRef.current || '']).size / 1024;
+    if (sizeInKB > 800) {
+      toast.error('El contenido excede el límite de 800 KB.');
+      return;
+    }
 
     try {
       const leccionData = leccionSchema.parse({
@@ -84,7 +61,7 @@ export default function CrearLeccionForm({ onClose, onCreated }) {
         titulo: formData.titulo,
         descripcion: formData.descripcion,
         contenido_url: formData.contenido_url,
-        contenido_markdown: formData.contenido_markdown,
+        contenido_markdown: markdownRef.current,
         videos_url: [],
       });
 
@@ -206,14 +183,15 @@ export default function CrearLeccionForm({ onClose, onCreated }) {
                   className="px-3 py-1.5 bg-brand-primary/10 text-brand-primary border border-brand-primary/20 hover:bg-brand-primary hover:text-white rounded-lg text-xs font-bold transition-colors pointer-events-none flex items-center gap-1.5"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M10 18H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9l5 5v11a2 2 0 0 1-2 2h-1"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline></svg>
-                  Importar de PDF
+                  {isImporting ? 'Importando...' : 'Importar de PDF'}
                 </button>
               </div>
             </div>
             <textarea
+              key={markdownKey}
               className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-gray-300 min-h-[150px] font-mono custom-scrollbar"
-              value={formData.contenido_markdown}
-              onChange={(event) => updateField('contenido_markdown', event.target.value)}
+              defaultValue={markdownRef.current}
+              onChange={(event) => { markdownRef.current = event.target.value; }}
               placeholder="# Título Principal\n\nEl texto de tu lección aquí..."
             />
             {errors.contenido_markdown && <span className="text-xs font-bold text-red-500 mt-1">{errors.contenido_markdown}</span>}
@@ -231,7 +209,7 @@ export default function CrearLeccionForm({ onClose, onCreated }) {
             <button 
               type="submit" 
               className="flex-1 bg-brand-gradient text-white py-3 rounded-xl text-sm font-bold transition-all hover:shadow-lg hover:-translate-y-0.5 border-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed" 
-              disabled={loading}
+              disabled={loading || isImporting}
             >
               {loading ? 'Creando...' : 'Crear Lección'}
             </button>

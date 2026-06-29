@@ -2,6 +2,8 @@ import { getDoc, getAll, createDoc, updateDoc, deleteDoc } from './base.service'
 import { proyectoConverter, Proyecto } from '../models/Proyecto.model';
 import { proyectoEntregaSchema } from '../schemas/app.schemas';
 import { validateData } from '../schemas/validation';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../config/firebase';
 
 const COLLECTION = 'proyectos';
 
@@ -30,6 +32,12 @@ const buildProyecto = (id, data) => (
 
 export const getProyectoById = (id) => getDoc(COLLECTION, id, proyectoConverter);
 export const getAllProyectos = () => getAll(COLLECTION, proyectoConverter);
+export const getProyectosByModuloId = async (moduloId) => {
+  if (!moduloId) return [];
+  const q = query(collection(db, COLLECTION).withConverter(proyectoConverter), where('moduloId', '==', moduloId));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(doc => doc.data());
+};
 
 export const createProyecto = (id, data) => {
   const model = buildProyecto(id, data);
@@ -50,10 +58,8 @@ export const guardarEntregaProyecto = async (data) => {
     ...data,
     archivoUrl: data.archivoUrl,
     archivoNombre: data.archivoNombre || data.archivoUrl,
-    alumnoIds: [data.alumnoId],
     alumnoEmail: data.alumnoEmail,
     alumnoAuthUid: data.alumnoAuthUid,
-    notas: [],
     estado: 'entregado',
     entregadoEn: data.entregadoEn || now,
     actualizadoEn: now,

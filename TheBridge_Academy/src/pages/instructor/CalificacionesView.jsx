@@ -3,8 +3,8 @@ import { useState, useEffect, useContext, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { DataContext } from '../../context/DataContext';
 import PageHeader from '../../components/ui/PageHeader';
-import { getAllNotas, createNota, updateNota } from '../../services/notas.service';
-import { getAllProyectos } from '../../services/proyectos.service';
+import { getAllNotas, getNotasByModuloId, createNota, updateNota } from '../../services/notas.service';
+import { getAllProyectos, getProyectosByModuloId } from '../../services/proyectos.service';
 import { useQuery } from '@tanstack/react-query';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../../config/firebase';
@@ -59,10 +59,18 @@ export default function CalificacionesView() {
   });
 
   const fetchNotas = async () => {
+    if (!selectedModulo) {
+      setNotas([]);
+      setProyectos([]);
+      setLoadingNotas(false);
+      return;
+    }
+    
+    setLoadingNotas(true);
     try {
       const [notasData, proyectosData] = await Promise.all([
-        getAllNotas(),
-        getAllProyectos()
+        getNotasByModuloId(selectedModulo),
+        getProyectosByModuloId(selectedModulo)
       ]);
       setNotas(notasData);
       setProyectos(proyectosData);
@@ -75,7 +83,7 @@ export default function CalificacionesView() {
 
   useEffect(() => {
     fetchNotas();
-  }, []);
+  }, [selectedModulo]);
 
   useEffect(() => {
     if (!showModal) return undefined;

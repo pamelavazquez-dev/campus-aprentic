@@ -7,6 +7,12 @@ const COLLECTION = 'notas';
 
 export const getNotaById = (id) => getDoc(COLLECTION, id, notaConverter);
 export const getAllNotas = () => getAll(COLLECTION, notaConverter);
+export const getNotasByModuloId = async (moduloId) => {
+  if (!moduloId) return [];
+  const q = query(collection(db, COLLECTION).withConverter(notaConverter), where('proyectoId', '==', moduloId));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(doc => doc.data());
+};
 export const getNotasByAlumnoId = async (alumnoId) => {
   if (!alumnoId) return [];
 
