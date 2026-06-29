@@ -6,5 +6,8 @@ export const useAuth = () => {
   if (context === undefined) {
     throw new Error('useAuth debe ser usado dentro de un AuthProvider');
   }
+  if (context.loading && context.authInitPromise) {
+    throw context.authInitPromise;
+  }
   return context;
 };

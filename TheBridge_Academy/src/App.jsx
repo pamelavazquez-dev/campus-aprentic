@@ -42,111 +42,105 @@ function App() {
   const { user, role, loading } = useAuth();
   const homePath = user && role ? `/${role}` : '/login';
 
-  if (loading) {
-    return (
-      <div style={{ textAlign: 'center', marginTop: '20vh' }}>
-        <h2 style={{ animation: 'pulse 1.5s infinite' }}>Cargando The Bridge Academy...</h2>
-      </div>
-    );
-  }
+  // El loading ahora es manejado de forma nativa por React Suspense en main.jsx y useAuth.js
 
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <Toaster 
-        position="top-right" 
-        toastOptions={{
-          style: {
-            background: 'var(--surface-solid)',
-            color: 'var(--text-strong)',
-            border: '1px solid var(--border-default)',
-            borderRadius: '12px',
-            boxShadow: '0 10px 24px rgba(0,0,0,0.1)',
-            fontWeight: 600,
-            fontSize: '14px',
-          },
-          success: {
-            iconTheme: {
-              primary: '#10B981',
-              secondary: 'white',
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            style: {
+              background: 'var(--surface-solid)',
+              color: 'var(--text-strong)',
+              border: '1px solid var(--border-default)',
+              borderRadius: '12px',
+              boxShadow: '0 10px 24px rgba(0,0,0,0.1)',
+              fontWeight: 600,
+              fontSize: '14px',
             },
-          },
-          error: {
-            iconTheme: {
-              primary: '#EF4444',
-              secondary: 'white',
+            success: {
+              iconTheme: {
+                primary: '#10B981',
+                secondary: 'white',
+              },
             },
-          },
-        }}
-      />
-      <BrowserRouter>
-        <ErrorBoundary>
-        <DataProvider>
-        <Suspense fallback={
-          <div style={{ textAlign: 'center', marginTop: '20vh' }}>
-            <h2 style={{ animation: 'pulse 1.5s infinite' }}>Cargando interfaz...</h2>
-          </div>
-        }>
-        <Routes>
-        <Route path="/login" element={
-          !user ? <Login /> : 
-          role ? <Navigate to={`/${role}`} replace /> : 
-          <div style={{ textAlign: 'center', marginTop: '20vh' }}>
-            <h2>⚠️ Acceso Denegado</h2>
-            <p>Tu cuenta no tiene ningún rol asignado en el sistema.</p>
-            <p>Por favor, contacta con un administrador.</p>
-            <button onClick={() => signOut(auth)} style={{ marginTop: '20px', padding: '10px 20px', cursor: 'pointer' }}>Cerrar Sesión</button>
-          </div>
-        } />
-        
-        {/* Rutas de Administrador */}
-        <Route path="/admin/*" element={
-          <ProtectedRoute requiredRole="admin">
-            <AdminLayout user={user} />
-          </ProtectedRoute>
-        }>
-          <Route index element={<DashboardAdmin />} />
-          <Route path="usuarios" element={<AlumnosView />} />
-          <Route path="profesores" element={<ProfesoresView />} />
-          <Route path="campus" element={<PromocionesView />} />
-          <Route path="modulos" element={<AdminModulosView />} />
-          <Route path="inscripciones" element={<InscripcionesView />} />
-          <Route path="modulos/nuevo" element={<WizardCurso />} />
-          <Route path="modulos/ver/:id" element={<VisorLeccion />} />
-        </Route>
+            error: {
+              iconTheme: {
+                primary: '#EF4444',
+                secondary: 'white',
+              },
+            },
+          }}
+        />
+        <BrowserRouter>
+          <ErrorBoundary>
+            <DataProvider>
+              <Suspense fallback={
+                <div style={{ textAlign: 'center', marginTop: '20vh' }}>
+                  <h2 style={{ animation: 'pulse 1.5s infinite' }}>Cargando interfaz...</h2>
+                </div>
+              }>
+                <Routes>
+                  <Route path="/login" element={
+                    !user ? <Login /> :
+                      role ? <Navigate to={`/${role}`} replace /> :
+                        <div style={{ textAlign: 'center', marginTop: '20vh' }}>
+                          <h2>⚠️ Acceso Denegado</h2>
+                          <p>Tu cuenta no tiene ningún rol asignado en el sistema.</p>
+                          <p>Por favor, contacta con un administrador.</p>
+                          <button onClick={() => signOut(auth)} style={{ marginTop: '20px', padding: '10px 20px', cursor: 'pointer' }}>Cerrar Sesión</button>
+                        </div>
+                  } />
 
-        {/* Rutas de Instructor */}
-        <Route path="/instructor/*" element={
-          <ProtectedRoute requiredRole="instructor">
-            <InstructorLayout user={user} />
-          </ProtectedRoute>
-        }>
-          <Route index element={<InstructorDashboard />} />
-          <Route path="wizard" element={<WizardCurso />} />
-          <Route path="lecciones" element={<LeccionesView />} />
-          <Route path="modulos" element={<ModulosView />} />
-          <Route path="notas" element={<CalificacionesView />} />
-        </Route>
+                  {/* Rutas de Administrador */}
+                  <Route path="/admin/*" element={
+                    <ProtectedRoute requiredRole="admin">
+                      <AdminLayout user={user} />
+                    </ProtectedRoute>
+                  }>
+                    <Route index element={<DashboardAdmin />} />
+                    <Route path="usuarios" element={<AlumnosView />} />
+                    <Route path="profesores" element={<ProfesoresView />} />
+                    <Route path="campus" element={<PromocionesView />} />
+                    <Route path="modulos" element={<AdminModulosView />} />
+                    <Route path="inscripciones" element={<InscripcionesView />} />
+                    <Route path="modulos/nuevo" element={<WizardCurso />} />
+                    <Route path="modulos/ver/:id" element={<VisorLeccion />} />
+                  </Route>
 
-        {/* Rutas de Alumno */}
-        <Route path="/alumno/*" element={
-          <ProtectedRoute requiredRole="alumno">
-            <AlumnoLayout user={user} />
-          </ProtectedRoute>
-        }>
-          <Route index element={<AlumnoDashboard />} />
-          <Route path="visor/:id?" element={<VisorLeccion />} />
-          <Route path="notas" element={<MisNotasView />} />
-        </Route>
+                  {/* Rutas de Instructor */}
+                  <Route path="/instructor/*" element={
+                    <ProtectedRoute requiredRole="instructor">
+                      <InstructorLayout user={user} />
+                    </ProtectedRoute>
+                  }>
+                    <Route index element={<InstructorDashboard />} />
+                    <Route path="wizard" element={<WizardCurso />} />
+                    <Route path="lecciones" element={<LeccionesView />} />
+                    <Route path="modulos" element={<ModulosView />} />
+                    <Route path="notas" element={<CalificacionesView />} />
+                  </Route>
 
-        {/* Redirección por defecto */}
-        <Route path="*" element={<Navigate to={homePath} replace />} />
-      </Routes>
-        </Suspense>
-        </DataProvider>
-        </ErrorBoundary>
-      </BrowserRouter>
-    </ThemeProvider>
+                  {/* Rutas de Alumno */}
+                  <Route path="/alumno/*" element={
+                    <ProtectedRoute requiredRole="alumno">
+                      <AlumnoLayout user={user} />
+                    </ProtectedRoute>
+                  }>
+                    <Route index element={<AlumnoDashboard />} />
+                    <Route path="visor/:id?" element={<VisorLeccion />} />
+                    <Route path="notas" element={<MisNotasView />} />
+                  </Route>
+
+                  {/* Redirección por defecto */}
+                  <Route path="*" element={<Navigate to={homePath} replace />} />
+                </Routes>
+              </Suspense>
+            </DataProvider>
+          </ErrorBoundary>
+        </BrowserRouter>
+      </ThemeProvider>
     </QueryClientProvider>
   )
 }
