@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getModuloById } from '../../services/modulos.service';
 import { getAllLecciones } from '../../services/lecciones.service';
 import { getAllProyectos, guardarEntregaProyecto } from '../../services/proyectos.service';
+import { getNotasByAlumnoId } from '../../services/notas.service';
 import { useRBAC } from '../../hooks/useRBAC';
 import ReactMarkdown from 'react-markdown';
 import { useAuth } from '../../hooks/useAuth';
@@ -15,8 +16,8 @@ export default function VisorLeccion() {
   const [lecciones, setLecciones] = useState([]);
   const [selectedLeccion, setSelectedLeccion] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [completadas, setCompletadas] = useState({});
   const [proyectos, setProyectos] = useState([]);
+  const [notas, setNotas] = useState([]);
   const [entregaForm, setEntregaForm] = useState({ titulo: '', descripcion: '', archivoUrl: '' });
   const [subiendoEntrega, setSubiendoEntrega] = useState(false);
   const { canEditModules } = useRBAC();
@@ -30,8 +31,10 @@ export default function VisorLeccion() {
           getAllLecciones(),
           getAllProyectos()
         ]);
+        const notasAlumno = alumnoActual?.id ? await getNotasByAlumnoId(alumnoActual.id) : [];
         setModulo(mod);
         setProyectos(allProyectos);
+        setNotas(notasAlumno);
         // Filtrar lecciones de este módulo
         const filtered = allLecs.filter(l => {
           const modId = typeof l.modulo_id === 'string' ? l.modulo_id : (l.modulo_id?.id || '');
@@ -46,11 +49,7 @@ export default function VisorLeccion() {
       }
     }
     fetchData();
-  }, [moduloId]);
-
-  const handleCompletar = (lecId) => {
-    setCompletadas(prev => ({ ...prev, [lecId]: true }));
-  };
+  }, [moduloId, alumnoActual?.id]);
 
   const selectedEntrega = useMemo(() => {
     if (!alumnoActual || !selectedLeccion) return null;
@@ -73,6 +72,32 @@ export default function VisorLeccion() {
     const allProyectos = await getAllProyectos();
     setProyectos(allProyectos);
   };
+
+  const notaAprobadaModulo = useMemo(() => (
+    notas.some(nota => nota.proyectoId === moduloId && Number(nota.valor) >= 5)
+  ), [notas, moduloId]);
+
+  const completadas = useMemo(() => {
+    if (!alumnoActual) return {};
+
+    return lecciones.reduce((acc, leccion) => {
+      const entrega = proyectos.find(proyecto => (
+        proyecto.alumnoId === alumnoActual.id &&
+        proyecto.moduloId === moduloId &&
+        proyecto.leccionId === leccion.id
+      ));
+
+      const notaAprobadaEntrega = entrega
+        ? notas.some(nota => nota.proyectoId === entrega.id && Number(nota.valor) >= 5)
+        : false;
+
+      if (notaAprobadaModulo || notaAprobadaEntrega) {
+        acc[leccion.id] = true;
+      }
+
+      return acc;
+    }, {});
+  }, [alumnoActual, lecciones, moduloId, notaAprobadaModulo, notas, proyectos]);
 
   const handleSubmitEntrega = async (event) => {
     event.preventDefault();
@@ -120,6 +145,7 @@ export default function VisorLeccion() {
 
   const completadasCount = Object.keys(completadas).length;
   const progreso = lecciones.length > 0 ? Math.round((completadasCount / lecciones.length) * 100) : 0;
+  const todasCompletadas = lecciones.length > 0 && completadasCount === lecciones.length;
 
   if (loading) {
     return (
@@ -161,6 +187,11 @@ export default function VisorLeccion() {
             </h3>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            {todasCompletadas && (
+              <span style={{ background: '#D1FAE5', color: '#065F46', border: '1px solid #A7F3D0', borderRadius: '999px', padding: '8px 12px', fontSize: '12px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
+                Tareas completadas
+              </span>
+            )}
             <span className="text-text-secondary" style={{ fontSize: '13px', fontWeight: 700 }}>
               {completadasCount}/{lecciones.length} completadas
             </span>
@@ -184,25 +215,6 @@ export default function VisorLeccion() {
           boxShadow: 'var(--shadow-sm)', backdropFilter: 'blur(14px)',
           position: 'sticky', top: '96px', maxHeight: 'calc(100vh - 120px)'
         }}>
-          <div style={{ background: 'var(--gray100)', border: '1px solid var(--border)', borderRadius: '14px', padding: '18px', marginBottom: '18px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 900, color: 'var(--brand-primary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-              Ruta del modulo
-            </span>
-            <h4 style={{ margin: '8px 0 14px 0', fontSize: '18px', lineHeight: 1.2, fontWeight: 900, color: 'var(--text-strong)' }}>
-              {modulo.nombre}
-            </h4>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <span style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-secondary)' }}>Progreso</span>
-              <span style={{ fontSize: '13px', fontWeight: 900, color: progreso === 100 ? '#10B981' : 'var(--brand-primary)' }}>{progreso}%</span>
-            </div>
-            <div style={{ height: '8px', background: 'var(--gray200)', borderRadius: '999px', overflow: 'hidden' }}>
-              <div style={{ width: `${progreso}%`, height: '100%', background: 'linear-gradient(90deg, var(--brand-primary), #FF6B7A)', transition: 'width 0.5s ease', borderRadius: '999px' }}></div>
-            </div>
-            <p style={{ margin: '10px 0 0 0', color: 'var(--text-secondary)', fontSize: '13px', fontWeight: 700 }}>
-              {completadasCount} de {lecciones.length} lecciones completadas
-            </p>
-          </div>
-
           <div style={{ padding: '0 16px 12px 16px' }}>
             <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
               Contenido del módulo
@@ -448,16 +460,9 @@ export default function VisorLeccion() {
                       Lección completada
                     </div>
                   ) : (
-                    <button
-                      className="bg-brand-gradient text-white py-3 px-6 rounded-lg text-sm font-black transition-all duration-300 hover:-translate-y-0.5 shadow-glow inline-flex items-center justify-center gap-2 border-none cursor-pointer"
-                      onClick={() => handleCompletar(selectedLeccion.id)}
-                      style={{ width: 'auto', padding: '12px 24px', display: 'flex', alignItems: 'center', gap: '8px' }}
-                    >
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                      </svg>
-                      Marcar como completada
-                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', fontWeight: 700, fontSize: '14px' }}>
+                      Pendiente de aprobar
+                    </div>
                   )}
                 </div>
               )}

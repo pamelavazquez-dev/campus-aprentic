@@ -65,8 +65,8 @@ export default function DashboardAdmin() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
       
       {/* SaaS Page Header & Sub-Nav */}
-      <div className="admin-dashboard-header" style={{ margin: '-48px -48px 32px -48px', background: 'var(--surface)', borderBottom: '1px solid var(--border)' }}>
-        <div className="admin-dashboard-header-inner" style={{ padding: '32px 48px 0 48px', width: '100%', margin: '0 auto' }}>
+      <div className="admin-dashboard-header">
+        <div className="admin-dashboard-header-inner" style={{ width: '100%', margin: '0 auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
             <div>
               <h2 style={{ fontSize: '32px', fontWeight: 900, margin: '0 0 4px 0', color: 'var(--text-strong)', letterSpacing: '-0.5px' }}>Dashboard</h2>
