@@ -39,13 +39,17 @@ export const profesorConverter = {
   },
   fromFirestore: (snapshot, options) => {
     const data = snapshot.data(options);
+
+    const extractId = (val) => typeof val === 'object' && val?.id ? String(val.id) : String(val);
+    const extractArrayIds = (arr) => (Array.isArray(arr) ? arr : [arr]).filter(Boolean).map(extractId);
+
     return new Profesor(
       snapshot.id,
       data.nombre || '',
       data.email || '',
       data.avatar || '',
-      data.campus_id || '',
-      data.promocion_id || [],
+      data.campus_id ? extractId(data.campus_id) : '',
+      extractArrayIds(data.promocion_id),
       data.isActive !== undefined ? data.isActive : true,
       data.password,
       data.initialPasswordChangeRequired || false

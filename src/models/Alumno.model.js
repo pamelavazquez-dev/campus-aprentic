@@ -37,13 +37,19 @@ export const alumnoConverter = {
   },
   fromFirestore: (snapshot, options) => {
     const data = snapshot.data(options);
+
+    const extractId = (val) => typeof val === 'object' && val?.id ? String(val.id) : String(val);
+    const extractArrayIds = (arr) => (Array.isArray(arr) ? arr : []).map(extractId);
+
+    const rawPromos = data.promociones_id || (data.promocion_id ? [data.promocion_id] : []);
+
     return new Alumno(
       snapshot.id,
       data.nombre || '',
       data.email || '',
       data.avatar || '',
-      data.promociones_id || (data.promocion_id ? [data.promocion_id] : []),
-      data.modulos_id || [],
+      extractArrayIds(rawPromos),
+      extractArrayIds(data.modulos_id),
       data.password || '',
       data.initialPasswordChangeRequired || false
     );

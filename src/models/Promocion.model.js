@@ -51,14 +51,17 @@ export const promocionConverter = {
   fromFirestore: (snapshot, options) => {
     const data = snapshot.data(options);
 
+    const extractId = (val) => typeof val === 'object' && val?.id ? String(val.id) : String(val);
+    const extractArrayIds = (arr) => (Array.isArray(arr) ? arr : [arr]).filter(Boolean).map(extractId);
+
     return new Promocion(
       snapshot.id,
       data.nombre || '',
       parseDate(data.fechaInicio),
       parseDate(data.fechaFin),
       parseReference(data.campus_id || data.campus),
-      data.alumnos_id || [],
-      data.profesor_id || [],
+      extractArrayIds(data.alumnos_id),
+      extractArrayIds(data.profesor_id),
       data.estado || 'activa'
     );
   },

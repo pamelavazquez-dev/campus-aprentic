@@ -21,12 +21,16 @@ export const adminConverter = {
   }),
   fromFirestore: (snapshot, options) => {
     const data = snapshot.data(options);
+
+    const extractId = (val) => typeof val === 'object' && val?.id ? String(val.id) : String(val);
+    const extractArrayIds = (arr) => (Array.isArray(arr) ? arr : [arr]).filter(Boolean).map(extractId);
+
     return new Admin(
       snapshot.id,
       data.nombre || data.ombre || '', // Soportar el typo antiguo
       data.email || '',
       data.avatar || '',
-      data.campus_asignados || [],
+      extractArrayIds(data.campus_asignados),
       data.isActive !== undefined ? data.isActive : (data.isActice !== undefined ? data.isActice : true),
       data.initialPasswordChangeRequired || false
     );

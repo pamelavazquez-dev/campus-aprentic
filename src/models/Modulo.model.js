@@ -23,15 +23,20 @@ export const moduloConverter = {
   }),
   fromFirestore: (snapshot, options) => {
     const data = snapshot.data(options);
+    
+    // Función auxiliar para extraer strings de posibles DocumentReferences
+    const extractId = (val) => typeof val === 'object' && val?.id ? String(val.id) : String(val);
+    const extractArrayIds = (arr) => (Array.isArray(arr) ? arr : []).map(extractId);
+    
     return new Modulo(
       snapshot.id,
       data.nombre || data.titulo || '', // Fallback al titulo antiguo
       data.horas || 0,
-      data.lecciones_Id || data.lecciones_id || [],
+      extractArrayIds(data.lecciones_Id || data.lecciones_id),
       data.tipo || '',
       data.activo !== false,
-      data.profesor_id || '',
-      data.promociones_activas || []
+      data.profesor_id ? extractId(data.profesor_id) : '',
+      extractArrayIds(data.promociones_activas)
     );
   }
 };

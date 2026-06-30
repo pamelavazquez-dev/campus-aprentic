@@ -227,50 +227,55 @@ export default function WizardCurso() {
         </div>
 
         {/* Toggle Activo/Inactivo */}
-        {!isAdmin && moduloActual && selectedPromocion && (
-          <div
-            onClick={async () => {
-              const isCurrentlyActive = moduloActual.promociones_activas?.includes(selectedPromocion);
-              const newPromocionesActivas = isCurrentlyActive 
-                ? (moduloActual.promociones_activas || []).filter(id => id !== selectedPromocion)
-                : [...(moduloActual.promociones_activas || []), selectedPromocion];
-              
-              try {
-                await updateModulo(moduloActual.id, {
-                  ...moduloActual,
-                  promociones_activas: newPromocionesActivas
-                });
-                setMensaje({ text: `Módulo ${isCurrentlyActive ? 'bloqueado' : 'desbloqueado'} para esta promoción.`, type: 'success' });
-                await fetchData();
-              } catch (e) {
-                console.error(e);
-                setMensaje({ text: 'Error al cambiar estado del módulo.', type: 'error' });
-              }
-            }}
-            style={{
-              display: 'flex', alignItems: 'center', gap: '10px',
-              padding: '10px 20px', borderRadius: '10px', cursor: 'pointer',
-              border: `1px solid ${moduloActual.promociones_activas?.includes(selectedPromocion) ? '#A7F3D0' : '#FECACA'}`,
-              background: moduloActual.promociones_activas?.includes(selectedPromocion) ? '#D1FAE5' : '#FEE2E2',
-              transition: 'all 0.2s', whiteSpace: 'nowrap'
-            }}
-          >
-            <div style={{
-              width: '36px', height: '20px', borderRadius: '10px', position: 'relative',
-              background: moduloActual.promociones_activas?.includes(selectedPromocion) ? '#10B981' : '#EF4444', transition: 'background 0.3s'
-            }}>
+        {!isAdmin && moduloActual && selectedPromocion && (() => {
+          const currentIdsStr = (moduloActual.promociones_activas || []).map(id => typeof id === 'object' && id.id ? String(id.id) : String(id));
+          const isCurrentlyActive = currentIdsStr.includes(selectedPromocion);
+          
+          return (
+            <div
+              onClick={async () => {
+                const newPromocionesActivas = isCurrentlyActive 
+                  ? currentIdsStr.filter(id => id !== selectedPromocion)
+                  : [...currentIdsStr, selectedPromocion];
+                
+                try {
+                  await updateModulo(moduloActual.id, {
+                    ...moduloActual,
+                    tipo: moduloActual.tipo || inferModuleTrack(moduloActual),
+                    promociones_activas: newPromocionesActivas
+                  });
+                  setMensaje({ text: `Módulo ${isCurrentlyActive ? 'bloqueado' : 'desbloqueado'} para esta promoción.`, type: 'success' });
+                  await fetchData();
+                } catch (e) {
+                  console.error('Error actualizando módulo:', e);
+                  setMensaje({ text: 'Error al cambiar estado del módulo.', type: 'error' });
+                }
+              }}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '10px',
+                padding: '10px 20px', borderRadius: '10px', cursor: 'pointer',
+                border: `1px solid ${isCurrentlyActive ? '#A7F3D0' : '#FECACA'}`,
+                background: isCurrentlyActive ? '#D1FAE5' : '#FEE2E2',
+                transition: 'all 0.2s', whiteSpace: 'nowrap'
+              }}
+            >
               <div style={{
-                width: '16px', height: '16px', borderRadius: '50%', background: 'white',
-                position: 'absolute', top: '2px', transition: 'left 0.3s',
-                left: moduloActual.promociones_activas?.includes(selectedPromocion) ? '18px' : '2px',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-              }}></div>
+                width: '36px', height: '20px', borderRadius: '10px', position: 'relative',
+                background: isCurrentlyActive ? '#10B981' : '#EF4444', transition: 'background 0.3s'
+              }}>
+                <div style={{
+                  width: '16px', height: '16px', borderRadius: '50%', background: 'white',
+                  position: 'absolute', top: '2px', transition: 'left 0.3s',
+                  left: isCurrentlyActive ? '18px' : '2px',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                }}></div>
+              </div>
+              <span style={{ fontSize: '13px', fontWeight: 700, color: isCurrentlyActive ? '#065F46' : '#991B1B' }}>
+                {isCurrentlyActive ? 'Activo' : 'Inactivo'}
+              </span>
             </div>
-            <span style={{ fontSize: '13px', fontWeight: 700, color: moduloActual.promociones_activas?.includes(selectedPromocion) ? '#065F46' : '#991B1B' }}>
-              {moduloActual.promociones_activas?.includes(selectedPromocion) ? 'Activo' : 'Inactivo'}
-            </span>
-          </div>
-        )}
+          );
+        })()}
 
         {/* Botón Crear Lección */}
         {!isAdmin && (
