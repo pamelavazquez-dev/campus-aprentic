@@ -34,9 +34,14 @@ export const getProyectoById = (id) => getDoc(COLLECTION, id, proyectoConverter)
 export const getAllProyectos = () => getAll(COLLECTION, proyectoConverter);
 export const getProyectosByModuloId = async (moduloId) => {
   if (!moduloId) return [];
-  const q = query(collection(db, COLLECTION).withConverter(proyectoConverter), where('moduloId', '==', moduloId));
+  const { doc } = await import('firebase/firestore');
+  const moduloRef = doc(db, 'modulos', moduloId);
+  const q = query(
+    collection(db, COLLECTION).withConverter(proyectoConverter), 
+    where('moduloId', 'in', [moduloId, moduloRef])
+  );
   const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => doc.data());
+  return snapshot.docs.map(document => document.data());
 };
 
 export const createProyecto = (id, data) => {

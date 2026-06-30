@@ -12,7 +12,11 @@ export const getAllLecciones = () => getAll(COLLECTION, leccionConverter);
 
 export const getLeccionesByModuloId = async (moduloId) => {
   if (!moduloId) return [];
-  const q = query(collection(db, COLLECTION).withConverter(leccionConverter), where('modulo_id', '==', moduloId));
+  const moduloRef = doc(db, 'modulos', moduloId);
+  const q = query(
+    collection(db, COLLECTION).withConverter(leccionConverter), 
+    where('modulo_id', 'in', [moduloId, moduloRef])
+  );
   const snapshot = await getDocs(q);
   return snapshot.docs.map(doc => doc.data()); // Solo retorna metadatos sin el texto pesado
 };
