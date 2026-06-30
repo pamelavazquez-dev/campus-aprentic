@@ -1,5 +1,5 @@
 import { Suspense, lazy } from 'react';
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { signOut } from 'firebase/auth';
@@ -68,7 +68,7 @@ function App() {
           }}
         />
 
-        <HashRouter>
+        <BrowserRouter>
           <ErrorBoundary>
             <DataProvider>
               <Suspense fallback={<GlobalLoader text="Cargando interfaz..." />}>
@@ -148,7 +148,7 @@ function App() {
               </Suspense>
             </DataProvider>
           </ErrorBoundary>
-        </HashRouter>
+        </BrowserRouter>
       </ThemeProvider>
     </QueryClientProvider>
   );

@@ -2,7 +2,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { collection, query, limit, getDocs, startAfter, orderBy, where } from 'firebase/firestore';
 import { db } from '../config/firebase';
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 100;
 
 export const useUsuarios = (rolFilter, campusFilter = '') => {
   return useInfiniteQuery({
@@ -48,8 +48,31 @@ export const useUsuarios = (rolFilter, campusFilter = '') => {
       // Filtrado local por campus para evitar complejidad de índices compuestos en Firebase durante el MVP.
       const filteredDocs = campusFilter 
         ? docs.filter(u => {
-            const cId = u.campus_id?.id || u.campus_id || u.campus_asignados?.[0] || u.campus || '';
-            return typeof cId === 'string' ? cId.includes(campusFilter) : cId === campusFilter;
+            let cId = '';
+            
+            // Extraer el ID real del campus sin importar si es una Referencia de Firestore, un objeto {id: ...} o un string directo.
+            if (u.campus_id) {
+              if (typeof u.campus_id === 'string') {
+                cId = u.campus_id;
+              } else if (typeof u.campus_id === 'object' && u.campus_id.id) {
+                cId = String(u.campus_id.id);
+              }
+            } else if (u.campus_asignados && u.campus_asignados.length > 0) {
+              const firstCampus = u.campus_asignados[0];
+              if (typeof firstCampus === 'string') {
+                cId = firstCampus;
+              } else if (typeof firstCampus === 'object' && firstCampus.id) {
+                cId = String(firstCampus.id);
+              }
+            } else if (u.campus) {
+              if (typeof u.campus === 'string') {
+                cId = u.campus;
+              } else if (typeof u.campus === 'object' && u.campus.id) {
+                cId = String(u.campus.id);
+              }
+            }
+
+            return cId === campusFilter || cId.includes(campusFilter);
           }) 
         : docs;
 

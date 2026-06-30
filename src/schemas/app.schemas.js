@@ -27,6 +27,7 @@ export const alumnoSchema = z.object({
   avatar: optionalUrl.default(''),
   promociones_id: z.array(z.string()).default([]),
   modulos_id: z.array(z.string()).default([]),
+  password: z.string().optional(),
 });
 
 export const profesorSchema = z.object({
@@ -36,6 +37,7 @@ export const profesorSchema = z.object({
   campus_id: requiredText('El campus'),
   promocion_id: z.array(z.string()).default([]),
   isActive: z.boolean().default(true),
+  password: z.string().optional(),
 });
 
 export const profesorEstadoSchema = z.object({

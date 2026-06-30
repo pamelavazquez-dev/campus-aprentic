@@ -2,9 +2,8 @@ import { useState, useEffect, useContext } from 'react';
 import { getAllInscripciones, updateInscripcion, deleteInscripcion } from '../../services/inscripciones.service';
 import { createDoc } from '../../services/base.service';
 import { doc } from 'firebase/firestore';
-import { db, firebaseConfig } from '../../config/firebase';
-import { initializeApp } from 'firebase/app';
-import { getAuth, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
+import { db } from '../../config/firebase';
+import { createAuthUser, generateDefaultPassword } from '../../utils/auth.utils';
 import { DataContext } from '../../context/DataContext';
 import PageHeader from '../../components/ui/PageHeader';
 import Avatar from '../../components/ui/Avatar';
@@ -52,18 +51,11 @@ export default function SolicitudesView() {
       await updateInscripcion(insc.id, { ...insc, aceptada: isAccepted });
       
       if (isAccepted) {
-        // Create user
-        const n = insc.nombre ? insc.nombre.trim().substring(0, 2).toLowerCase() : '';
-        const a = insc.apellidos ? insc.apellidos.trim().substring(0, 2).toLowerCase() : '';
-        const generatedPassword = `${n}${a}1234!`;
+        const generatedPassword = generateDefaultPassword(insc.nombre || '', insc.apellidos || '');
 
         let authUid = null;
         try {
-          const secondaryApp = initializeApp(firebaseConfig, `SecondaryApp-${Date.now()}`);
-          const secondaryAuth = getAuth(secondaryApp);
-          const userCredential = await createUserWithEmailAndPassword(secondaryAuth, insc.email, generatedPassword);
-          authUid = userCredential.user.uid;
-          await signOut(secondaryAuth);
+          authUid = await createAuthUser(insc.email, generatedPassword);
         } catch (authError) {
           console.error("Error creating auth user:", authError);
         }

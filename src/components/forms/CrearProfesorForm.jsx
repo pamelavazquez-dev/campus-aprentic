@@ -6,6 +6,7 @@ import { getAllPromociones } from '../../services/promociones.service';
 import { profesorSchema } from '../../schemas/app.schemas';
 import { getFieldErrors } from '../../schemas/validation';
 import Select from '../ui/Select';
+import { createAuthUser, generateDefaultPassword } from '../../utils/auth.utils';
 
 const INITIAL_FORM = {
   nombre: '',
@@ -54,17 +55,25 @@ export default function CrearProfesorForm({ onClose, onCreated }) {
     setErrors({});
 
     try {
-      const profesorData = profesorSchema.parse({
+      let finalProfesorData = {
         nombre: formData.nombre,
         email: formData.email,
         avatar: '',
         campus_id: formData.campus_id,
         promocion_id: formData.promocion_id ? [formData.promocion_id] : [],
         isActive: true,
-      });
+      };
 
       setLoading(true);
-      const nuevoProfesor = await createProfesor(null, profesorData);
+      
+      const generatedPassword = generateDefaultPassword(formData.nombre);
+      
+      const authUid = await createAuthUser(formData.email, generatedPassword);
+      finalProfesorData.password = generatedPassword;
+
+      const validatedData = profesorSchema.parse(finalProfesorData);
+
+      const nuevoProfesor = await createProfesor(authUid, validatedData);
 
       onCreated(nuevoProfesor);
       onClose();

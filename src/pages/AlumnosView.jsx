@@ -9,6 +9,7 @@ import Avatar from '../components/ui/Avatar';
 import Select from '../components/ui/Select';
 import toast from 'react-hot-toast';
 import ConfirmModal from '../components/ui/ConfirmModal';
+import { createAuthUser, generateDefaultPassword } from '../utils/auth.utils';
 
 export default function UsuariosView() {
   const { campuses, modulos } = useContext(DataContext);
@@ -38,7 +39,14 @@ export default function UsuariosView() {
   const handleSaveUser = async () => {
     setSaving(true);
     try {
-      const newId = `USR-${Date.now()}`;
+      // 1. Generate default password
+      const generatedPassword = generateDefaultPassword(usuario.nombre || usuario.email.split('@')[0]);
+      
+      // 2. Create user in Firebase Auth silently
+      const authUid = await createAuthUser(usuario.email, generatedPassword);
+      
+      // 3. Use the Auth UID as the Firestore document ID (or fallback)
+      const newId = authUid || `USR-${Date.now()}`;
       
       let collectionName = 'alumnos';
       if (usuario.rol === 'Instructor') collectionName = 'profesores';
@@ -51,8 +59,12 @@ export default function UsuariosView() {
         avatar: '',
         promociones_id: [],
         modulos_id: [],
-        isActive: true
+        isActive: true,
+        password: generatedPassword // Store the generated password in Firestore for debugging/records
       });
+      
+      console.log(`Usuario creado en Auth con UID: ${authUid}. Contraseña: ${generatedPassword}`);
+      toast.success(`Usuario creado. Contraseña: ${generatedPassword}`, { duration: 10000 });
       
       setStep(1);
       setUsuario({ nombre: '', email: '', rol: 'Instructor', campus_id: campuses[0]?.id || '' });
