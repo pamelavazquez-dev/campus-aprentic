@@ -2,6 +2,7 @@ import toast from 'react-hot-toast';
 import { useState, useEffect, useContext } from 'react';
 import { DataContext } from '../../context/DataContext';
 import { createPromocion, updatePromocion } from '../../services/promociones.service';
+import { getAllProfesores } from '../../services/profesores.service';
 import Select from '../ui/Select';
 
 export default function CrearPromocionForm({ onClose, onCreated, initialData = null }) {
@@ -11,9 +12,23 @@ export default function CrearPromocionForm({ onClose, onCreated, initialData = n
     campus: 'Madrid',
     fechaInicio: '',
     fechaFin: '',
-    estado: 'activa'
+    estado: 'activa',
+    profesor_id: ''
   });
+  const [profesores, setProfesores] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const loadProfesores = async () => {
+      try {
+        const data = await getAllProfesores();
+        setProfesores(data);
+      } catch (error) {
+        console.error("Error cargando profesores", error);
+      }
+    };
+    loadProfesores();
+  }, []);
 
   useEffect(() => {
     if (initialData) {
@@ -22,7 +37,8 @@ export default function CrearPromocionForm({ onClose, onCreated, initialData = n
         campus: initialData.campus_id || 'Madrid',
         fechaInicio: initialData.fechaInicio || '',
         fechaFin: initialData.fechaFin || '',
-        estado: initialData.estado || 'activa'
+        estado: initialData.estado || 'activa',
+        profesor_id: (initialData.profesor_id && initialData.profesor_id.length > 0) ? (typeof initialData.profesor_id[0] === 'object' ? initialData.profesor_id[0].id : initialData.profesor_id[0]) : ''
       });
     }
   }, [initialData]);
@@ -37,12 +53,17 @@ export default function CrearPromocionForm({ onClose, onCreated, initialData = n
       // pero Firebase recomienda dejar que genere el ID automáticamente si le pasamos null o no lo especificamos.
       // Nuestro servicio createDoc espera (collection, id, data). Si id no se usa o es null, setDoc fallaría, 
       // así que usaremos Date.now().toString() como ID simple para el MVP.
+      const dataToSave = { 
+        ...formData, 
+        profesor_id: formData.profesor_id ? [formData.profesor_id] : [] 
+      };
+
       if (isEditing) {
-        await updatePromocion(initialData.id, formData);
-        onCreated({ id: initialData.id, ...formData });
+        await updatePromocion(initialData.id, dataToSave);
+        onCreated({ id: initialData.id, ...dataToSave });
       } else {
         const newId = `PROMO-${Date.now()}`;
-        const nuevaPromo = await createPromocion(newId, formData);
+        const nuevaPromo = await createPromocion(newId, dataToSave);
         onCreated(nuevaPromo);
       }
       onClose();
@@ -55,7 +76,7 @@ export default function CrearPromocionForm({ onClose, onCreated, initialData = n
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4 animate-fade-in" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="bg-surface border border-border-default rounded-3xl w-full max-w-md shadow-2xl transform transition-all duration-400 overflow-hidden">
         <div className="px-8 py-6 border-b border-border-default bg-gray-50/50 flex justify-between items-center">
           <h3 className="m-0 text-xl font-black text-text-strong">{isEditing ? 'Editar Promoción' : 'Nueva Promoción'}</h3>
@@ -92,6 +113,22 @@ export default function CrearPromocionForm({ onClose, onCreated, initialData = n
                 ...(campuses || []).map(camp => ({
                   value: camp.id,
                   label: camp.nombre || camp.id,
+                }))
+              ]}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-bold text-text-strong">Profesor Asignado</label>
+            <Select
+              value={formData.profesor_id}
+              onChange={(value) => setFormData({ ...formData, profesor_id: value })}
+              placeholder="Selecciona un profesor"
+              options={[
+                { value: '', label: 'Sin asignar' },
+                ...profesores.map(p => ({
+                  value: p.id,
+                  label: p.nombre || p.id,
                 }))
               ]}
             />

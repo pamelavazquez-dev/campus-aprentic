@@ -34,8 +34,9 @@ export default function WizardCurso() {
   );
   const profesorPromociones = useMemo(() => {
     if (isAdmin) return promociones;
-    const ids = Array.isArray(profile?.promocion_id) ? profile.promocion_id : [profile?.promocion_id].filter(Boolean);
-    return promociones.filter(p => ids.includes(p.id));
+    const rawIds = Array.isArray(profile?.promocion_id) ? profile.promocion_id : [profile?.promocion_id].filter(Boolean);
+    const idsStr = rawIds.map(id => typeof id === 'object' && id.id ? String(id.id) : String(id));
+    return promociones.filter(p => idsStr.includes(p.id));
   }, [isAdmin, profile, promociones]);
 
   // Set default promotion

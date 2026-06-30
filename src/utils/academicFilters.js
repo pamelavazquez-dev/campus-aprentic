@@ -52,7 +52,10 @@ export const getProfesorTracks = (profesor, promociones) => {
     : [profesor?.promocion_id].filter(Boolean);
 
   const tracks = profesorPromociones
-    .map((promocionId) => promociones.find((promocion) => promocion.id === promocionId))
+    .map((promocionId) => {
+      const idStr = typeof promocionId === 'object' && promocionId.id ? String(promocionId.id) : String(promocionId);
+      return promociones.find((promocion) => promocion.id === idStr);
+    })
     .map(getPromotionTrack)
     .filter(Boolean);
 
