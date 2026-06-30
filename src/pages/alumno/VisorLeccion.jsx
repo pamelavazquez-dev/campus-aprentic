@@ -405,12 +405,43 @@ export default function VisorLeccion() {
                     🎬 Vídeos de la lección
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {selectedLeccion.videos_url.map((v, i) => (
-                      <div key={i} style={{ background: 'var(--gray50)', borderRadius: '8px', padding: '12px 16px', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <div style={{ width: '32px', height: '32px', background: '#FEE2E2', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>▶</div>
-                        <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-strong)', wordBreak: 'break-all' }}>{v}</span>
-                      </div>
-                    ))}
+                    {selectedLeccion.videos_url.map((v, i) => {
+                      let youtubeId = '';
+                      if (v.includes('youtube.com/watch?v=')) {
+                        youtubeId = v.split('v=')[1].split('&')[0];
+                      } else if (v.includes('youtu.be/')) {
+                        youtubeId = v.split('youtu.be/')[1].split('?')[0];
+                      }
+
+                      return (
+                        <div key={i} style={{ background: 'var(--surface-solid)', borderRadius: '12px', padding: '16px', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <div style={{ width: '32px', height: '32px', background: '#FEE2E2', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', flexShrink: 0 }}>▶</div>
+                            <a href={v} target="_blank" rel="noreferrer" style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-strong)', wordBreak: 'break-all', textDecoration: 'none' }} className="hover:text-brand-primary transition-colors">
+                              {v}
+                            </a>
+                          </div>
+                          
+                          {youtubeId ? (
+                            <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden', borderRadius: '8px', background: '#000' }}>
+                              <iframe 
+                                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                                src={`https://www.youtube.com/embed/${youtubeId}`}
+                                title="YouTube video player"
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                              ></iframe>
+                            </div>
+                          ) : (v.toLowerCase().endsWith('.mp4') || v.toLowerCase().endsWith('.webm') || v.toLowerCase().endsWith('.ogg')) ? (
+                            <video controls style={{ width: '100%', borderRadius: '8px', background: '#000' }}>
+                              <source src={v} />
+                              Tu navegador no soporta el reproductor de vídeo.
+                            </video>
+                          ) : null}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}

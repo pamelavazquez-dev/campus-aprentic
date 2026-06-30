@@ -26,6 +26,7 @@ const InstructorDashboard = lazy(() => import('./pages/instructor/InstructorDash
 const WizardCurso = lazy(() => import('./pages/instructor/WizardCurso'));
 const AlumnoDashboard = lazy(() => import('./pages/alumno/AlumnoDashboard'));
 const VisorLeccion = lazy(() => import('./pages/alumno/VisorLeccion'));
+const SolicitudesView = lazy(() => import('./pages/admin/SolicitudesView'));
 const InscripcionesView = lazy(() => import('./pages/admin/InscripcionesView'));
 const CalificacionesView = lazy(() => import('./pages/instructor/CalificacionesView'));
 const MisNotasView = lazy(() => import('./pages/alumno/MisNotasView'));
@@ -112,6 +113,7 @@ function App() {
                     <Route path="profesores" element={<ProfesoresView />} />
                     <Route path="campus" element={<PromocionesView />} />
                     <Route path="modulos" element={<AdminModulosView />} />
+                    <Route path="solicitudes" element={<SolicitudesView />} />
                     <Route path="inscripciones" element={<InscripcionesView />} />
                     <Route path="modulos/nuevo" element={<WizardCurso />} />
                     <Route path="modulos/ver/:id" element={<VisorLeccion />} />

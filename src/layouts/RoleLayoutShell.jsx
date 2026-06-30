@@ -6,12 +6,14 @@ import Logo from '../components/Logo';
 import Avatar from '../components/ui/Avatar';
 import ThemeToggle from '../components/ui/ThemeToggle';
 import ConfirmModal from '../components/ui/ConfirmModal';
+import { useAuth } from '../hooks/useAuth';
 
 export default function RoleLayoutShell({ user, menuItems, roleLabel, brandLabel }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const navigate = useNavigate();
-  const userName = user?.displayName || user?.email?.split('@')[0] || roleLabel;
+  const { profile } = useAuth();
+  const userName = profile?.nombre || user?.displayName || user?.email?.split('@')[0] || roleLabel;
 
   const handleLogout = async () => {
     await signOut(auth);

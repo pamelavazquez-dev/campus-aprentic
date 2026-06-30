@@ -1,5 +1,10 @@
 import { useState, useEffect, useContext } from 'react';
 import { getAllInscripciones, updateInscripcion, deleteInscripcion } from '../../services/inscripciones.service';
+import { createDoc } from '../../services/base.service';
+import { doc } from 'firebase/firestore';
+import { db, firebaseConfig } from '../../config/firebase';
+import { initializeApp } from 'firebase/app';
+import { getAuth, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
 import { DataContext } from '../../context/DataContext';
 import PageHeader from '../../components/ui/PageHeader';
 import Avatar from '../../components/ui/Avatar';
@@ -7,7 +12,7 @@ import Select from '../../components/ui/Select';
 import ConfirmModal from '../../components/ui/ConfirmModal';
 import toast from 'react-hot-toast';
 
-export default function InscripcionesView() {
+export default function SolicitudesView() {
   const { campuses, promociones } = useContext(DataContext);
   const [inscripciones, setInscripciones] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,7 +29,6 @@ export default function InscripcionesView() {
   const fetchInscripciones = async () => {
     try {
       const data = await getAllInscripciones();
-      // Sort by newest first if they have a date, otherwise just keep order
       const sorted = data.sort((a, b) => {
         if (!a.creadoEn) return 1;
         if (!b.creadoEn) return -1;
@@ -46,7 +50,39 @@ export default function InscripcionesView() {
   const handleStatusChange = async (insc, isAccepted) => {
     try {
       await updateInscripcion(insc.id, { ...insc, aceptada: isAccepted });
-      toast.success('Estado actualizado correctamente');
+      
+      if (isAccepted) {
+        // Create user
+        const n = insc.nombre ? insc.nombre.trim().substring(0, 2).toLowerCase() : '';
+        const a = insc.apellidos ? insc.apellidos.trim().substring(0, 2).toLowerCase() : '';
+        const generatedPassword = `${n}${a}1234!`;
+
+        let authUid = null;
+        try {
+          const secondaryApp = initializeApp(firebaseConfig, `SecondaryApp-${Date.now()}`);
+          const secondaryAuth = getAuth(secondaryApp);
+          const userCredential = await createUserWithEmailAndPassword(secondaryAuth, insc.email, generatedPassword);
+          authUid = userCredential.user.uid;
+          await signOut(secondaryAuth);
+        } catch (authError) {
+          console.error("Error creating auth user:", authError);
+        }
+
+        const newId = authUid || `USR-${Date.now()}`;
+
+        await createDoc('alumnos', newId, {
+          nombre: `${insc.nombre || ''} ${insc.apellidos || ''}`.trim(),
+          email: insc.email,
+          campus_id: insc.campus_id ? doc(db, 'campus', typeof insc.campus_id === 'string' ? insc.campus_id : insc.campus_id.id) : null,
+          promociones_id: insc.promocion_id ? [typeof insc.promocion_id === 'string' ? insc.promocion_id : insc.promocion_id.id] : [],
+          avatar: '',
+          modulos_id: [],
+          password: generatedPassword,
+          isActive: true
+        });
+      }
+
+      toast.success(isAccepted ? 'Solicitud aprobada y alumno creado correctamente' : 'Estado actualizado correctamente');
       setInscripciones(prev => prev.map(s => s.id === insc.id ? { ...s, aceptada: isAccepted } : s));
     } catch (error) {
       toast.error('Error al actualizar estado');
@@ -70,7 +106,7 @@ export default function InscripcionesView() {
     const searchString = `${insc.nombre || ''} ${insc.apellidos || ''} ${insc.email || ''} ${insc.dni || ''}`.toLowerCase();
     const matchesSearch = searchString.includes(searchTerm.toLowerCase());
       
-    const matchesStatus = insc.aceptada === true;
+    const matchesStatus = !insc.aceptada; // ONLY PENDING
 
     return matchesSearch && matchesStatus;
   });
@@ -83,8 +119,8 @@ export default function InscripcionesView() {
       <div className="animate-fade-in">
         <PageHeader 
           eyebrow="Admin"
-          title="Inscripciones Aceptadas"
-          description="Alumnos que han sido aceptados y matriculados en el campus."
+          title="Solicitudes Pendientes"
+          description="Gestiona las solicitudes de acceso al campus pendientes de revisión."
         />
 
         <div className="flex flex-col sm:flex-row gap-4 mt-6 mb-2">
@@ -107,7 +143,7 @@ export default function InscripcionesView() {
         {loading ? (
           <div className="flex flex-col items-center justify-center p-20 gap-4">
             <div className="w-12 h-12 border-4 border-brand-primary/20 border-t-brand-primary rounded-full animate-spin"></div>
-            <span className="text-gray-500 font-bold tracking-wide">Cargando inscripciones...</span>
+            <span className="text-gray-500 font-bold tracking-wide">Cargando solicitudes...</span>
           </div>
         ) : (
           <div className="flex flex-col gap-5 mt-8">
@@ -119,7 +155,7 @@ export default function InscripcionesView() {
                   </svg>
                 </div>
                 <p className="text-gray-500 font-bold text-lg m-0">
-                  {inscripciones.length === 0 ? "No hay inscripciones en el sistema." : "No se encontraron inscripciones con estos filtros."}
+                  {inscripciones.length === 0 ? "No hay solicitudes pendientes en el sistema." : "No se encontraron solicitudes con estos filtros."}
                 </p>
               </div>
             ) : (
@@ -162,16 +198,24 @@ export default function InscripcionesView() {
                       )}
                     </div>
                     
-                      <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-xl mt-1 border border-gray-100 text-left font-medium">
-                        {(() => {
-                          const campus = campuses?.find(c => c.id === insc.campus_id || c.id === insc.campus_id?.id);
-                          if (!campus) return 'Alumno del Campus';
-                          return `Alumno de ${campus.nombre}`;
-                        })()}
+                    {insc.observaciones && (
+                      <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-xl mt-1 border border-gray-100 italic text-left">
+                        {insc.observaciones}
                       </p>
+                    )}
                   </div>
 
                   <div className="flex flex-row items-center gap-3 w-full lg:w-auto mt-4 lg:mt-0 pt-4 lg:pt-0 border-t lg:border-t-0 lg:border-l border-gray-100 lg:pl-6 justify-center" onClick={(e) => e.stopPropagation()}>
+                    <div className="w-32 shrink-0">
+                      <Select 
+                        value={insc.aceptada ? 'aprobada' : 'pendiente'}
+                        onChange={(value) => handleStatusChange(insc, value === 'aprobada')}
+                        options={[
+                          { value: 'pendiente', label: 'Pendiente' },
+                          { value: 'aprobada', label: 'Aprobada' }
+                        ]}
+                      />
+                    </div>
                     
                     <button 
                       onClick={() => setInscripcionToDelete(insc)}
@@ -205,7 +249,7 @@ export default function InscripcionesView() {
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in" onMouseDown={(e) => { if (e.target === e.currentTarget) setSelectedInscripcion(null); }}>
           <div className="bg-surface border border-border-default rounded-3xl w-full max-w-lg shadow-2xl transform transition-all duration-400 overflow-hidden relative">
             <div className="px-8 py-6 border-b border-border-default bg-gray-50/50 flex justify-between items-center">
-              <h3 className="m-0 text-xl font-black text-text-strong">Detalles de la Inscripción</h3>
+              <h3 className="m-0 text-xl font-black text-text-strong">Detalles de la Solicitud</h3>
               <button className="w-8 h-8 rounded-full bg-surface flex items-center justify-center text-text-secondary hover:bg-danger/10 hover:text-brand-primary transition-colors border-none cursor-pointer" onClick={() => setSelectedInscripcion(null)}>✕</button>
             </div>
             <div className="p-8 flex flex-col gap-5">
@@ -262,7 +306,7 @@ export default function InscripcionesView() {
       <ConfirmModal 
         isOpen={!!inscripcionToDelete}
         title="Eliminar Inscripción"
-        message={`¿Estás seguro de que deseas eliminar la inscripción de ${inscripcionToDelete?.nombre || inscripcionToDelete?.email}? Esta acción no se puede deshacer.`}
+        message={`¿Estás seguro de que deseas eliminar la solicitud de ${inscripcionToDelete?.nombre || inscripcionToDelete?.email}? Esta acción no se puede deshacer.`}
         confirmText="Sí, Eliminar"
         cancelText="Cancelar"
         onConfirm={handleDelete}
