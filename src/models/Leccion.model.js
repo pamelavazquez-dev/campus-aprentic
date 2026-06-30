@@ -30,8 +30,8 @@ export const leccionConverter = {
       data.titulo || '',
       data.descripcion || data.description || '',
       data.contenido_url || '',
-      data.videos_url || [],
-      data.contenido_markdown || ''
+      Array.isArray(data.videos_url) ? data.videos_url : [],
+      data.contenido_markdown || data.contenido || ''
     );
   }
 };
