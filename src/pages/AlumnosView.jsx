@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext, useEffect, useMemo } from 'react';
 import { DataContext } from '../context/DataContext';
 import { useUsuarios } from '../hooks/useUsuarios';
 import PageHeader from '../components/ui/PageHeader';
@@ -9,7 +9,7 @@ import Avatar from '../components/ui/Avatar';
 import Select from '../components/ui/Select';
 import toast from 'react-hot-toast';
 import ConfirmModal from '../components/ui/ConfirmModal';
-import { createAuthUser, generateDefaultPassword } from '../utils/auth.utils';
+import { createAuthUserWithInitialPassword } from '../services/auth-admin.service';
 
 export default function UsuariosView() {
   const { campuses, modulos } = useContext(DataContext);
@@ -18,6 +18,7 @@ export default function UsuariosView() {
   
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, refetch } = useUsuarios(filterRol, filterCampus);
   const usuarios = data?.pages.flatMap(page => page.docs) || [];
+  const [searchName, setSearchName] = useState('');
   const [showWizard, setShowWizard] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [step, setStep] = useState(1);
@@ -26,6 +27,16 @@ export default function UsuariosView() {
   const [showMatricula, setShowMatricula] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [userToToggle, setUserToToggle] = useState(null);
+  const [createdCredentials, setCreatedCredentials] = useState(null);
+
+  const usuariosFiltrados = useMemo(() => {
+    const search = searchName.trim().toLowerCase();
+    if (!search) return usuarios;
+
+    return usuarios.filter((userItem) => (
+      (userItem.nombre || '').toLowerCase().includes(search)
+    ));
+  }, [searchName, usuarios]);
 
   // Set default campus when campuses load
   useEffect(() => {
@@ -39,20 +50,16 @@ export default function UsuariosView() {
   const handleSaveUser = async () => {
     setSaving(true);
     try {
-      // 1. Generate default password
-      const generatedPassword = generateDefaultPassword(usuario.nombre || usuario.email.split('@')[0]);
-      
-      // 2. Create user in Firebase Auth silently
-      const authUid = await createAuthUser(usuario.email, generatedPassword);
-      
-      // 3. Use the Auth UID as the Firestore document ID (or fallback)
-      const newId = authUid || `USR-${Date.now()}`;
+      const { uid, initialPassword } = await createAuthUserWithInitialPassword({
+        nombre: usuario.nombre,
+        email: usuario.email,
+      });
       
       let collectionName = 'alumnos';
       if (usuario.rol === 'Instructor') collectionName = 'profesores';
       if (usuario.rol === 'Administrador') collectionName = 'admin';
 
-      await createDoc(collectionName, newId, {
+      await createDoc(collectionName, uid, {
         nombre: usuario.nombre,
         email: usuario.email,
         campus_id: doc(db, 'campus', usuario.campus_id),
@@ -60,18 +67,25 @@ export default function UsuariosView() {
         promociones_id: [],
         modulos_id: [],
         isActive: true,
-        password: generatedPassword // Store the generated password in Firestore for debugging/records
+        password: initialPassword,
+        initialPasswordChangeRequired: true,
       });
       
-      console.log(`Usuario creado en Auth con UID: ${authUid}. Contraseña: ${generatedPassword}`);
-      toast.success(`Usuario creado. Contraseña: ${generatedPassword}`, { duration: 10000 });
-      
+      setCreatedCredentials({
+        email: usuario.email,
+        password: initialPassword,
+      });
+      toast.success('Usuario creado correctamente.');
       setStep(1);
       setUsuario({ nombre: '', email: '', rol: 'Instructor', campus_id: campuses[0]?.id || '' });
       setShowWizard(false);
     } catch (error) {
       console.error("Error al crear usuario", error);
-      toast.error("Error al crear el usuario.");
+      if (error.code === 'auth/email-already-in-use') {
+        toast.error('Ese email ya existe en Firebase Auth.');
+      } else {
+        toast.error(error.message || 'Error al crear el usuario.');
+      }
     } finally {
       setSaving(false);
     }
@@ -169,6 +183,15 @@ export default function UsuariosView() {
 
         <div className="flex flex-col sm:flex-row gap-4 mt-8 bg-surface backdrop-blur-md border border-gray-200/60 rounded-2xl p-4 shadow-sm relative z-20">
           <div className="flex-1 flex flex-col gap-1">
+            <label className="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Buscar por Nombre</label>
+            <input
+              className="w-full px-4 py-2.5 bg-surface-solid border border-border-default rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-brand-primary/50"
+              value={searchName}
+              onChange={(event) => setSearchName(event.target.value)}
+              placeholder="Ej: Laura Ruiz"
+            />
+          </div>
+          <div className="flex-1 flex flex-col gap-1">
             <label className="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Filtrar por Rol</label>
             <Select 
               value={filterRol} 
@@ -195,18 +218,18 @@ export default function UsuariosView() {
         </div>
 
         <div className="flex flex-col gap-5 mt-6">
-          {usuarios.length === 0 ? (
+          {usuariosFiltrados.length === 0 ? (
             <div className="py-20 text-center bg-surface backdrop-blur-md rounded-3xl border border-gray-200/60 shadow-sm">
               <div className="w-16 h-16 bg-surface-solid rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
                 <svg className="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
               </div>
-              <p className="text-gray-500 font-bold text-lg m-0">No hay usuarios registrados en el sistema bajo este rol.</p>
+              <p className="text-gray-500 font-bold text-lg m-0">No hay usuarios que coincidan con la busqueda.</p>
             </div>
           ) : (
             <>
-            {usuarios.map((u, i) => (
+            {usuariosFiltrados.map((u, i) => (
               <div key={u.id || i} className="bg-surface backdrop-blur-xl border border-gray-200/60 rounded-3xl p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-400 hover:-translate-y-1.5 hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] flex flex-col md:flex-row items-center gap-6 relative overflow-hidden group">
                 <div className="absolute top-0 left-0 w-1.5 h-full bg-brand-gradient opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 
@@ -384,6 +407,39 @@ export default function UsuariosView() {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {createdCredentials && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-surface border border-border-default rounded-3xl w-full max-w-md shadow-2xl overflow-hidden">
+            <div className="px-8 py-6 border-b border-border-default bg-gray-50/50">
+              <h3 className="m-0 text-xl font-black text-text-strong">Usuario creado</h3>
+              <p className="m-0 mt-2 text-sm font-semibold text-text-secondary">
+                Entrega estas credenciales iniciales al usuario.
+              </p>
+            </div>
+            <div className="p-8 flex flex-col gap-4">
+              <div className="bg-surface-solid border border-border-default rounded-xl p-4">
+                <span className="block text-xs font-black uppercase text-text-secondary mb-1">Email</span>
+                <strong className="text-text-strong break-all">{createdCredentials.email}</strong>
+              </div>
+              <div className="bg-surface-solid border border-border-default rounded-xl p-4">
+                <span className="block text-xs font-black uppercase text-text-secondary mb-1">Contraseña inicial</span>
+                <strong className="text-brand-primary text-lg">{createdCredentials.password}</strong>
+              </div>
+              <p className="m-0 text-sm font-semibold text-text-secondary">
+                Al iniciar sesión por primera vez, la plataforma le pedirá cambiar esta contraseña.
+              </p>
+              <button
+                type="button"
+                className="bg-brand-gradient text-white py-3 px-6 rounded-xl text-sm font-black transition-all hover:shadow-lg hover:-translate-y-0.5 border-none cursor-pointer"
+                onClick={() => setCreatedCredentials(null)}
+              >
+                Entendido
+              </button>
             </div>
           </div>
         </div>

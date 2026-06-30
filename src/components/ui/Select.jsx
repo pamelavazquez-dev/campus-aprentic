@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 export default function Select({ 
   value, 
@@ -9,6 +10,7 @@ export default function Select({
   disabled = false
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [dropdownStyle, setDropdownStyle] = useState({});
   const containerRef = useRef(null);
 
   // Cerrar al hacer clic fuera
@@ -21,6 +23,37 @@ export default function Select({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (!isOpen || !containerRef.current) return;
+
+    const updatePosition = () => {
+      const rect = containerRef.current.getBoundingClientRect();
+      const gap = 8;
+      const viewportPadding = 16;
+      const spaceBelow = window.innerHeight - rect.bottom - viewportPadding;
+      const preferredHeight = 240;
+      const availableHeight = Math.max(120, Math.min(preferredHeight, spaceBelow - gap));
+
+      setDropdownStyle({
+        position: 'fixed',
+        top: `${rect.bottom + gap}px`,
+        left: `${rect.left}px`,
+        width: `${rect.width}px`,
+        maxHeight: `${availableHeight}px`,
+        zIndex: 9999,
+      });
+    };
+
+    updatePosition();
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition, true);
+
+    return () => {
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition, true);
+    };
+  }, [isOpen]);
 
   const selectedOption = options.find(opt => opt.value === value) || null;
 
@@ -47,13 +80,14 @@ export default function Select({
         </svg>
       </button>
 
-      {isOpen && !disabled && (
-        <div className="absolute z-50 w-full mt-2 bg-surface backdrop-blur-xl border border-border-default rounded-xl shadow-xl overflow-hidden animate-fade-in origin-top">
-          <ul className="max-h-60 overflow-y-auto py-1 custom-scrollbar">
+      {isOpen && !disabled && createPortal(
+        <div style={dropdownStyle} className="bg-surface backdrop-blur-xl border border-border-default rounded-xl shadow-xl overflow-hidden animate-fade-in origin-top">
+          <ul className="overflow-y-auto py-1 custom-scrollbar" style={{ maxHeight: dropdownStyle.maxHeight }}>
             {options.map((opt) => (
               <li
                 key={opt.value}
-                onClick={() => {
+                onMouseDown={(event) => {
+                  event.preventDefault();
                   onChange(opt.value);
                   setIsOpen(false);
                 }}
@@ -77,7 +111,8 @@ export default function Select({
               </li>
             )}
           </ul>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

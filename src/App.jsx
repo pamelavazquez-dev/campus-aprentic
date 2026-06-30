@@ -11,6 +11,7 @@ import Login from './components/Login';
 import ErrorBoundary from './components/ErrorBoundary';
 import ProtectedRoute from './layouts/ProtectedRoute';
 import GlobalLoader from './components/ui/GlobalLoader';
+import ForcePasswordChangeModal from './components/auth/ForcePasswordChangeModal';
 
 const queryClient = new QueryClient();
 
@@ -35,8 +36,11 @@ const LeccionesView = lazy(() => import('./pages/LeccionesView'));
 const ModulosView = lazy(() => import('./pages/ModulosView'));
 
 function App() {
-  const { user, role } = useAuth();
+  const { user, role, profile } = useAuth();
   const homePath = user && role ? `/${role}` : '/login';
+  const passwordChangeCompleted = user
+    ? localStorage.getItem(`initialPasswordChanged_${user.uid}`) === 'true'
+    : false;
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -145,6 +149,9 @@ function App() {
 
                   <Route path="*" element={<Navigate to={homePath} replace />} />
                 </Routes>
+                {user && role && profile?.initialPasswordChangeRequired && !passwordChangeCompleted && (
+                  <ForcePasswordChangeModal />
+                )}
               </Suspense>
             </DataProvider>
           </ErrorBoundary>

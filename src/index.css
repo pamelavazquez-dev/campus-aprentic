@@ -199,6 +199,198 @@ p {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+.login-aurora-shell {
+  isolation: isolate;
+}
+
+.login-aurora-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255, 48, 69, 0.24), transparent 24%),
+    radial-gradient(circle at 82% 78%, rgba(37, 99, 235, 0.18), transparent 28%),
+    linear-gradient(135deg, #fff8f9 0%, #f7f8fb 46%, #f2f4ff 100%);
+}
+
+.dark .login-aurora-bg {
+  background:
+    radial-gradient(circle at 14% 12%, rgba(255, 48, 69, 0.24), transparent 28%),
+    radial-gradient(circle at 86% 82%, rgba(56, 189, 248, 0.18), transparent 30%),
+    linear-gradient(135deg, #07070a 0%, #160711 46%, #080b17 100%);
+}
+
+.login-aurora-bg::before,
+.login-aurora-bg::after {
+  content: "";
+  position: absolute;
+  inset: -18% -10%;
+  background:
+    linear-gradient(105deg, transparent 18%, rgba(255, 48, 69, 0.18) 23%, transparent 28%),
+    linear-gradient(118deg, transparent 48%, rgba(37, 99, 235, 0.12) 52%, transparent 57%);
+  filter: blur(32px);
+  opacity: 0.5;
+  transform: translateX(-8%) rotate(-4deg);
+  animation: auroraSweep 13s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+
+.login-aurora-bg::after {
+  background:
+    linear-gradient(72deg, transparent 24%, rgba(255, 255, 255, 0.2) 28%, transparent 32%),
+    linear-gradient(98deg, transparent 58%, rgba(255, 48, 69, 0.16) 63%, transparent 68%);
+  opacity: 0.38;
+  animation-delay: -6s;
+  animation-duration: 17s;
+}
+
+.dark .login-aurora-bg::before {
+  background:
+    linear-gradient(105deg, transparent 18%, rgba(255, 48, 69, 0.16) 23%, transparent 29%),
+    linear-gradient(118deg, transparent 48%, rgba(56, 189, 248, 0.09) 53%, transparent 58%);
+  filter: blur(36px);
+  opacity: 0.42;
+  mix-blend-mode: screen;
+}
+
+.dark .login-aurora-bg::after {
+  background:
+    linear-gradient(72deg, transparent 24%, rgba(255, 255, 255, 0.07) 28%, transparent 33%),
+    linear-gradient(98deg, transparent 58%, rgba(255, 48, 69, 0.15) 63%, transparent 69%);
+  filter: blur(38px);
+  opacity: 0.36;
+  mix-blend-mode: screen;
+}
+
+.login-aurora-ribbon {
+  position: absolute;
+  width: 125vw;
+  height: 34px;
+  left: -12vw;
+  border-radius: 999px 40% 999px 45%;
+  filter: blur(18px) saturate(1.18);
+  opacity: 0.72;
+  transform-origin: center;
+  will-change: transform, opacity, border-radius;
+  mix-blend-mode: multiply;
+  mask-image: linear-gradient(90deg, transparent 0%, black 14%, black 86%, transparent 100%);
+  animation: auroraWave 9s ease-in-out infinite alternate;
+}
+
+.login-aurora-ribbon-primary {
+  top: 15%;
+  --aurora-rotate: -9deg;
+  background:
+    radial-gradient(ellipse at 24% 50%, rgba(255, 255, 255, 0.5), transparent 10%),
+    linear-gradient(90deg, transparent 8%, rgba(255, 48, 69, 0.12) 18%, rgba(255, 48, 69, 0.52) 29%, rgba(255, 174, 186, 0.3) 38%, transparent 48%, rgba(111, 93, 255, 0.22) 65%, transparent 88%);
+}
+
+.login-aurora-ribbon-secondary {
+  top: 43%;
+  --aurora-rotate: 7deg;
+  background:
+    radial-gradient(ellipse at 68% 50%, rgba(255, 255, 255, 0.4), transparent 10%),
+    linear-gradient(90deg, transparent 6%, rgba(37, 99, 235, 0.24) 18%, transparent 31%, rgba(255, 48, 69, 0.38) 48%, rgba(56, 189, 248, 0.24) 62%, transparent 85%);
+  animation-delay: -3.5s;
+  animation-duration: 11s;
+}
+
+.login-aurora-ribbon-accent {
+  top: 66%;
+  height: 30px;
+  --aurora-rotate: -5deg;
+  background:
+    radial-gradient(ellipse at 42% 48%, rgba(255, 255, 255, 0.42), transparent 10%),
+    linear-gradient(90deg, transparent 10%, rgba(255, 48, 69, 0.26) 27%, transparent 38%, rgba(176, 22, 38, 0.32) 52%, rgba(37, 99, 235, 0.24) 74%, transparent 92%);
+  animation-delay: -7s;
+  animation-duration: 12.5s;
+}
+
+.dark .login-aurora-ribbon {
+  filter: blur(20px) saturate(1.4) brightness(1.08);
+  opacity: 0.62;
+  mix-blend-mode: screen;
+}
+
+.dark .login-aurora-ribbon-primary {
+  background:
+    radial-gradient(ellipse at 24% 50%, rgba(255, 240, 244, 0.42), transparent 10%),
+    linear-gradient(90deg, transparent 8%, rgba(255, 48, 69, 0.1) 18%, rgba(255, 48, 69, 0.48) 29%, rgba(255, 91, 111, 0.26) 38%, transparent 48%, rgba(111, 93, 255, 0.22) 65%, transparent 88%);
+}
+
+.dark .login-aurora-ribbon-secondary {
+  background:
+    radial-gradient(ellipse at 68% 50%, rgba(255, 255, 255, 0.24), transparent 10%),
+    linear-gradient(90deg, transparent 6%, rgba(56, 189, 248, 0.22) 18%, transparent 31%, rgba(255, 48, 69, 0.34) 48%, rgba(99, 102, 241, 0.24) 62%, transparent 85%);
+}
+
+.dark .login-aurora-ribbon-accent {
+  background:
+    radial-gradient(ellipse at 42% 48%, rgba(255, 255, 255, 0.18), transparent 10%),
+    linear-gradient(90deg, transparent 10%, rgba(255, 48, 69, 0.24) 27%, transparent 38%, rgba(176, 22, 38, 0.3) 52%, rgba(56, 189, 248, 0.2) 74%, transparent 92%);
+}
+
+.login-aurora-grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.52;
+  background-image:
+    linear-gradient(rgba(255, 48, 69, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(31, 35, 43, 0.08) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: radial-gradient(circle at center, black 0%, transparent 74%);
+  animation: auroraGridShift 22s linear infinite;
+}
+
+.dark .login-aurora-grid {
+  opacity: 0.36;
+  background-image:
+    linear-gradient(rgba(255, 48, 69, 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+}
+
+@keyframes auroraWave {
+  from {
+    transform: translate3d(-4%, -8px, 0) rotate(var(--aurora-rotate, -7deg)) skewX(-7deg) scaleY(0.92);
+    border-radius: 62% 38% 66% 34% / 48% 58% 42% 52%;
+  }
+  to {
+    transform: translate3d(5%, 12px, 0) rotate(calc(var(--aurora-rotate, -7deg) + 4deg)) skewX(7deg) scaleY(1.12);
+    border-radius: 36% 64% 38% 62% / 58% 42% 58% 42%;
+  }
+}
+
+@keyframes auroraSweep {
+  from {
+    transform: translate3d(-12%, -2%, 0) rotate(-5deg) scale(1);
+    opacity: 0.56;
+  }
+  to {
+    transform: translate3d(10%, 4%, 0) rotate(3deg) scale(1.08);
+    opacity: 0.92;
+  }
+}
+
+@keyframes auroraGridShift {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 42px 42px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-aurora-bg::before,
+  .login-aurora-bg::after,
+  .login-aurora-ribbon,
+  .login-aurora-grid {
+    animation: none;
+  }
+}
 @plugin "@tailwindcss/typography";
 
 /* Dark mode card surfaces */

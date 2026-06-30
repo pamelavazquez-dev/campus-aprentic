@@ -75,6 +75,7 @@ export default function CalificacionesView() {
   const [loadingNotas, setLoadingNotas] = useState(true);
   const [selectedModulo, setSelectedModulo] = useState('');
   const [filtroRevision, setFiltroRevision] = useState('todos');
+  const [searchAlumno, setSearchAlumno] = useState('');
   const [notaForm, setNotaForm] = useState({ id: null, alumnoId: '', valor: '', comentario: '' });
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -186,15 +187,19 @@ export default function CalificacionesView() {
   }, [notasPorAlumno]);
 
   const alumnosFiltrados = useMemo(() => alumnosDelModulo.filter((alumno) => {
+    const search = searchAlumno.trim().toLowerCase();
     const entregaAlumno = entregasPorAlumno.get(alumno.id);
     const existingNota = notasPorAlumno.get(alumno.id);
+    const matchesSearch = !search || (alumno.nombre || '').toLowerCase().includes(search);
+
+    if (!matchesSearch) return false;
 
     if (filtroRevision === 'pendientes') return entregaAlumno && !existingNota;
     if (filtroRevision === 'sin-entrega') return !entregaAlumno;
     if (filtroRevision === 'evaluados') return Boolean(existingNota);
 
     return true;
-  }), [alumnosDelModulo, entregasPorAlumno, filtroRevision, notasPorAlumno]);
+  }), [alumnosDelModulo, entregasPorAlumno, filtroRevision, notasPorAlumno, searchAlumno]);
 
   const filterOptions = useMemo(() => [
     { id: 'todos', label: 'Todos', count: alumnosDelModulo.length },
@@ -284,6 +289,16 @@ export default function CalificacionesView() {
 
       {selectedModulo && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div className="bg-surface backdrop-blur-md border border-border-default rounded-2xl p-4 shadow-sm">
+            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Buscar Alumno</label>
+            <input
+              className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-xl text-sm text-text-strong transition-all duration-200 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-brand-primary/50"
+              value={searchAlumno}
+              onChange={(event) => setSearchAlumno(event.target.value)}
+              placeholder="Buscar por nombre"
+            />
+          </div>
+
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px', flexWrap: 'wrap', marginTop: '16px' }}>
             <h3 style={{ margin: 0, fontSize: '20px', color: 'var(--text-strong)' }}>
               Alumnos Matriculados ({alumnosFiltrados.length}/{alumnosDelModulo.length})
