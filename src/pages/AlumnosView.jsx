@@ -9,6 +9,7 @@ import Avatar from '../components/ui/Avatar';
 import Select from '../components/ui/Select';
 import toast from 'react-hot-toast';
 import ConfirmModal from '../components/ui/ConfirmModal';
+import { createAuthUserWithInitialPassword } from '../services/auth-admin.service';
 
 export default function UsuariosView() {
   const { campuses, modulos } = useContext(DataContext);
@@ -25,6 +26,7 @@ export default function UsuariosView() {
   const [showMatricula, setShowMatricula] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [userToToggle, setUserToToggle] = useState(null);
+  const [createdCredentials, setCreatedCredentials] = useState(null);
 
   // Set default campus when campuses load
   useEffect(() => {
@@ -38,28 +40,41 @@ export default function UsuariosView() {
   const handleSaveUser = async () => {
     setSaving(true);
     try {
-      const newId = `USR-${Date.now()}`;
+      const { uid, initialPassword } = await createAuthUserWithInitialPassword({
+        nombre: usuario.nombre,
+        email: usuario.email,
+      });
       
       let collectionName = 'alumnos';
       if (usuario.rol === 'Instructor') collectionName = 'profesores';
       if (usuario.rol === 'Administrador') collectionName = 'admin';
 
-      await createDoc(collectionName, newId, {
+      await createDoc(collectionName, uid, {
         nombre: usuario.nombre,
         email: usuario.email,
         campus_id: doc(db, 'campus', usuario.campus_id),
         avatar: '',
         promociones_id: [],
         modulos_id: [],
-        isActive: true
+        isActive: true,
+        initialPasswordChangeRequired: true,
       });
       
+      setCreatedCredentials({
+        email: usuario.email,
+        password: initialPassword,
+      });
+      toast.success('Usuario creado correctamente.');
       setStep(1);
       setUsuario({ nombre: '', email: '', rol: 'Instructor', campus_id: campuses[0]?.id || '' });
       setShowWizard(false);
     } catch (error) {
       console.error("Error al crear usuario", error);
-      toast.error("Error al crear el usuario.");
+      if (error.code === 'auth/email-already-in-use') {
+        toast.error('Ese email ya existe en Firebase Auth.');
+      } else {
+        toast.error(error.message || 'Error al crear el usuario.');
+      }
     } finally {
       setSaving(false);
     }
@@ -372,6 +387,39 @@ export default function UsuariosView() {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {createdCredentials && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-surface border border-border-default rounded-3xl w-full max-w-md shadow-2xl overflow-hidden">
+            <div className="px-8 py-6 border-b border-border-default bg-gray-50/50">
+              <h3 className="m-0 text-xl font-black text-text-strong">Usuario creado</h3>
+              <p className="m-0 mt-2 text-sm font-semibold text-text-secondary">
+                Entrega estas credenciales iniciales al usuario.
+              </p>
+            </div>
+            <div className="p-8 flex flex-col gap-4">
+              <div className="bg-surface-solid border border-border-default rounded-xl p-4">
+                <span className="block text-xs font-black uppercase text-text-secondary mb-1">Email</span>
+                <strong className="text-text-strong break-all">{createdCredentials.email}</strong>
+              </div>
+              <div className="bg-surface-solid border border-border-default rounded-xl p-4">
+                <span className="block text-xs font-black uppercase text-text-secondary mb-1">Contraseña inicial</span>
+                <strong className="text-brand-primary text-lg">{createdCredentials.password}</strong>
+              </div>
+              <p className="m-0 text-sm font-semibold text-text-secondary">
+                Al iniciar sesión por primera vez, la plataforma le pedirá cambiar esta contraseña.
+              </p>
+              <button
+                type="button"
+                className="bg-brand-gradient text-white py-3 px-6 rounded-xl text-sm font-black transition-all hover:shadow-lg hover:-translate-y-0.5 border-none cursor-pointer"
+                onClick={() => setCreatedCredentials(null)}
+              >
+                Entendido
+              </button>
             </div>
           </div>
         </div>

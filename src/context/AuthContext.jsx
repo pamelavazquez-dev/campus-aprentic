@@ -18,6 +18,15 @@ export const AuthProvider = ({ children }) => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const refreshAuthProfile = async () => {
+    if (!user) return null;
+
+    const roleData = await getUserRole(user.uid, user.email);
+    setRole(roleData?.name || null);
+    setProfile(roleData?.profile || null);
+    return roleData;
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
@@ -50,7 +59,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, role, profile, loading, authInitPromise }}>
+    <AuthContext.Provider value={{ user, role, profile, loading, authInitPromise, refreshAuthProfile }}>
       {children}
     </AuthContext.Provider>
   );
