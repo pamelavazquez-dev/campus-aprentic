@@ -67,6 +67,7 @@ export default function UsuariosView() {
         promociones_id: [],
         modulos_id: [],
         isActive: true,
+        password: initialPassword,
         initialPasswordChangeRequired: true,
       });
       

@@ -9,12 +9,12 @@ export const getProfesorById = (id) => getDoc(COLLECTION, id, profesorConverter)
 export const getAllProfesores = () => getAll(COLLECTION, profesorConverter);
 export const createProfesor = (id, data) => {
   const profesorData = validateData(profesorSchema, data);
-  const model = data instanceof Profesor ? data : new Profesor(id, profesorData.nombre, profesorData.email, profesorData.avatar, profesorData.campus_id, profesorData.promocion_id, profesorData.isActive);
+  const model = data instanceof Profesor ? data : new Profesor(id, profesorData.nombre, profesorData.email, profesorData.avatar, profesorData.campus_id, profesorData.promocion_id, profesorData.isActive, profesorData.password);
   return createDoc(COLLECTION, id, model, profesorConverter);
 };
 export const updateProfesor = (id, data) => {
   const profesorData = validateData(profesorSchema, data);
-  const model = data instanceof Profesor ? data : new Profesor(id, profesorData.nombre, profesorData.email, profesorData.avatar, profesorData.campus_id, profesorData.promocion_id, profesorData.isActive);
+  const model = data instanceof Profesor ? data : new Profesor(id, profesorData.nombre, profesorData.email, profesorData.avatar, profesorData.campus_id, profesorData.promocion_id, profesorData.isActive, profesorData.password);
   return updateDoc(COLLECTION, id, model, profesorConverter);
 };
 export const updateProfesorEstado = async (id, isActive) => {

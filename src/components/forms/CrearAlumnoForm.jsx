@@ -5,6 +5,7 @@ import { getAllPromociones } from '../../services/promociones.service';
 import { alumnoSchema } from '../../schemas/app.schemas';
 import { getFieldErrors } from '../../schemas/validation';
 import Select from '../ui/Select';
+import { createAuthUser, generateDefaultPassword } from '../../utils/auth.utils';
 
 const INITIAL_FORM = {
   nombre: '',
@@ -56,18 +57,30 @@ export default function CrearAlumnoForm({ alumno = null, onClose, onSaved }) {
       const promocion = promociones.find((item) => item.id === formData.promocion_id);
       const currentPromotionId = getFirstPromotionId(alumno);
       const shouldKeepModulos = isEditing && currentPromotionId === formData.promocion_id;
-      const alumnoData = alumnoSchema.parse({
+      
+      let finalAlumnoData = {
         nombre: formData.nombre,
         email: formData.email,
         avatar: alumno?.avatar || '',
         promociones_id: formData.promocion_id ? [formData.promocion_id] : [],
         modulos_id: shouldKeepModulos ? alumno.modulos_id || [] : promocion?.modulos_id || [],
-      });
+      };
 
       setLoading(true);
+      let authUid = null;
+
+      if (!isEditing) {
+        const generatedPassword = generateDefaultPassword(formData.nombre);
+        
+        authUid = await createAuthUser(formData.email, generatedPassword);
+        finalAlumnoData.password = generatedPassword;
+      }
+
+      const validatedData = alumnoSchema.parse(finalAlumnoData);
+
       const savedAlumno = isEditing
-        ? await updateAlumno(alumno.id, alumnoData)
-        : await createAlumno(null, alumnoData);
+        ? await updateAlumno(alumno.id, validatedData)
+        : await createAlumno(authUid, validatedData);
 
       onSaved(savedAlumno);
       onClose();

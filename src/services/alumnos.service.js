@@ -9,12 +9,12 @@ export const getAlumnoById = (id) => getDoc(COLLECTION, id, alumnoConverter);
 export const getAllAlumnos = () => getAll(COLLECTION, alumnoConverter);
 export const createAlumno = (id, data) => {
   const alumnoData = validateData(alumnoSchema, data);
-  const model = data instanceof Alumno ? data : new Alumno(id, alumnoData.nombre, alumnoData.email, alumnoData.avatar, alumnoData.promociones_id, alumnoData.modulos_id);
+  const model = data instanceof Alumno ? data : new Alumno(id, alumnoData.nombre, alumnoData.email, alumnoData.avatar, alumnoData.promociones_id, alumnoData.modulos_id, alumnoData.password);
   return createDoc(COLLECTION, id, model, alumnoConverter);
 };
 export const updateAlumno = (id, data) => {
   const alumnoData = validateData(alumnoSchema, data);
-  const model = data instanceof Alumno ? data : new Alumno(id, alumnoData.nombre, alumnoData.email, alumnoData.avatar, alumnoData.promociones_id, alumnoData.modulos_id);
+  const model = data instanceof Alumno ? data : new Alumno(id, alumnoData.nombre, alumnoData.email, alumnoData.avatar, alumnoData.promociones_id, alumnoData.modulos_id, alumnoData.password);
   return updateDoc(COLLECTION, id, model, alumnoConverter);
 };
 export const deleteAlumno = (id) => deleteDoc(COLLECTION, id);

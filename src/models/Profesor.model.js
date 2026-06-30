@@ -1,5 +1,15 @@
 export class Profesor {
-  constructor(id, nombre, email, avatar, campus_id, promocion_id, isActive, initialPasswordChangeRequired = false) {
+  constructor(
+    id,
+    nombre,
+    email,
+    avatar,
+    campus_id,
+    promocion_id,
+    isActive,
+    password,
+    initialPasswordChangeRequired = false
+  ) {
     this.id = id;
     this.nombre = nombre;
     this.email = email;
@@ -8,19 +18,25 @@ export class Profesor {
     this.promocion_id = promocion_id;
     this.isActive = isActive;
     this.initialPasswordChangeRequired = initialPasswordChangeRequired;
+    if (password) this.password = password;
   }
 }
 
 export const profesorConverter = {
-  toFirestore: (prof) => ({
-    nombre: prof.nombre,
-    email: prof.email,
-    avatar: prof.avatar,
-    campus_id: prof.campus_id,
-    promocion_id: prof.promocion_id,
-    isActive: prof.isActive,
-    initialPasswordChangeRequired: prof.initialPasswordChangeRequired
-  }),
+  toFirestore: (prof) => {
+    const data = {
+      nombre: prof.nombre,
+      email: prof.email,
+      avatar: prof.avatar,
+      campus_id: prof.campus_id,
+      promocion_id: prof.promocion_id,
+      isActive: prof.isActive,
+      initialPasswordChangeRequired: prof.initialPasswordChangeRequired || false,
+    };
+
+    if (prof.password) data.password = prof.password;
+    return data;
+  },
   fromFirestore: (snapshot, options) => {
     const data = snapshot.data(options);
     return new Profesor(
@@ -31,7 +47,8 @@ export const profesorConverter = {
       data.campus_id || '',
       data.promocion_id || [],
       data.isActive !== undefined ? data.isActive : true,
+      data.password,
       data.initialPasswordChangeRequired || false
     );
-  }
+  },
 };
