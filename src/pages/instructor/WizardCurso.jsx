@@ -110,7 +110,13 @@ export default function WizardCurso() {
       await fetchData();
     } catch (e) {
       console.error('Error al crear lección:', e);
-      setMensaje({ text: 'Error al crear la lección. Inténtalo de nuevo.', type: 'error' });
+      let errorMsg = 'Error al crear la lección. Inténtalo de nuevo.';
+      if (e.issues) {
+        errorMsg = e.issues.map(i => i.message).join(', ');
+      } else if (e.message) {
+        errorMsg = e.message;
+      }
+      setMensaje({ text: `Error: ${errorMsg}`, type: 'error' });
     } finally {
       setSaving(false);
     }
