@@ -9,6 +9,68 @@ import { useRBAC } from '../../hooks/useRBAC';
 import ReactMarkdown from 'react-markdown';
 import rehypeSanitize from 'rehype-sanitize';
 import { useAuth } from '../../hooks/useAuth';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
+const CodeBlock = ({ inline, className, children, ...props }) => {
+  const [copied, setCopied] = useState(false);
+  const match = /language-(\w+)/.exec(className || '');
+  const language = match ? match[1] : '';
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(String(children).replace(/\n$/, ''));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  if (!inline && match) {
+    return (
+      <div className="relative rounded-lg overflow-hidden my-6 border border-border-default shadow-lg" style={{ background: '#1e1e1e' }}>
+        <div className="flex items-center justify-between px-4 py-2 bg-[#2d2d2d] border-b border-[#404040]">
+          <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">{language}</span>
+          <button
+            onClick={handleCopy}
+            className="flex items-center gap-1.5 text-xs font-semibold text-gray-300 hover:text-white transition-colors p-1 cursor-pointer"
+            title="Copiar código"
+          >
+            {copied ? (
+              <>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10B981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span style={{ color: '#10B981' }}>Copiado!</span>
+              </>
+            ) : (
+              <>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                <span>Copiar</span>
+              </>
+            )}
+          </button>
+        </div>
+        <SyntaxHighlighter
+          style={vscDarkPlus}
+          language={language}
+          PreTag="div"
+          customStyle={{
+            margin: 0,
+            padding: '16px',
+            background: '#1e1e1e',
+            fontSize: '14px',
+            fontFamily: 'Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace'
+          }}
+          {...props}
+        >
+          {String(children).replace(/\n$/, '')}
+        </SyntaxHighlighter>
+      </div>
+    );
+  }
+
+  return (
+    <code className={`${className || ''} bg-[var(--gray100)] text-[var(--text-strong)] rounded px-1.5 py-0.5 text-sm font-semibold`} {...props}>
+      {children}
+    </code>
+  );
+};
 
 export default function VisorLeccion() {
   const { id: moduloId } = useParams();
@@ -374,6 +436,7 @@ export default function VisorLeccion() {
                       <ReactMarkdown 
                         rehypePlugins={[rehypeSanitize]}
                         allowedElements={['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'a', 'ul', 'ol', 'li', 'b', 'i', 'strong', 'em', 'strike', 'code', 'pre', 'blockquote', 'hr', 'table', 'thead', 'tbody', 'tr', 'th', 'td']}
+                        components={{ code: CodeBlock }}
                       >
                         {markdownContent}
                       </ReactMarkdown>

@@ -50,17 +50,19 @@ export const proyectoConverter = {
   }),
   fromFirestore: (snapshot, options) => {
     const data = snapshot.data(options);
+    const extractId = (val) => typeof val === 'object' && val?.id ? String(val.id) : String(val);
+
     return new Proyecto(
       snapshot.id,
       data.titulo || '',
       data.descripcion || '',
-      data.promocionId || '',
+      data.promocionId ? extractId(data.promocionId) : '',
       data.estado || 'abierto',
-      data.alumnoId || '',
+      data.alumnoId ? extractId(data.alumnoId) : '',
       data.alumnoEmail || '',
       data.alumnoAuthUid || '',
-      data.moduloId || '',
-      data.leccionId || '',
+      data.moduloId ? extractId(data.moduloId) : '',
+      data.leccionId ? extractId(data.leccionId) : '',
       data.archivoUrl || '',
       data.archivoNombre || '',
       data.entregadoEn || '',

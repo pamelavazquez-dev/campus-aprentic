@@ -21,14 +21,17 @@ export const leccionConverter = {
   }),
   fromFirestore: (snapshot, options) => {
     const data = snapshot.data(options);
+
+    const extractId = (val) => typeof val === 'object' && val?.id ? String(val.id) : String(val);
+
     return new Leccion(
       snapshot.id,
-      data.modulo_id || '',
+      data.modulo_id ? extractId(data.modulo_id) : '',
       data.titulo || '',
       data.descripcion || data.description || '',
       data.contenido_url || '',
-      data.videos_url || [],
-      data.contenido_markdown || ''
+      Array.isArray(data.videos_url) ? data.videos_url : [],
+      data.contenido_markdown || data.contenido || ''
     );
   }
 };

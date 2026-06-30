@@ -12,7 +12,11 @@ export const getAllLecciones = () => getAll(COLLECTION, leccionConverter);
 
 export const getLeccionesByModuloId = async (moduloId) => {
   if (!moduloId) return [];
-  const q = query(collection(db, COLLECTION).withConverter(leccionConverter), where('modulo_id', '==', moduloId));
+  const moduloRef = doc(db, 'modulos', moduloId);
+  const q = query(
+    collection(db, COLLECTION).withConverter(leccionConverter), 
+    where('modulo_id', 'in', [moduloId, moduloRef])
+  );
   const snapshot = await getDocs(q);
   return snapshot.docs.map(doc => doc.data()); // Solo retorna metadatos sin el texto pesado
 };
@@ -34,6 +38,15 @@ export const getLeccionMarkdown = async (leccionId) => {
     if (snapshot.exists()) {
       return snapshot.data().texto || '';
     }
+    
+    // 3. Fallback a documento principal (Legacy Seed Data)
+    const mainDocRef = doc(db, COLLECTION, leccionId);
+    const mainSnapshot = await getDocFb(mainDocRef);
+    if (mainSnapshot.exists()) {
+      const data = mainSnapshot.data();
+      return data.contenido_markdown || data.contenido || '';
+    }
+
     return '';
   } catch (e) {
     console.error('Error fetching markdown', e);
