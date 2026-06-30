@@ -15,8 +15,14 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
+
+    if (!password.trim()) {
+      setError('Contraseña obligatoria');
+      return;
+    }
+
+    setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
     } catch (err) {
@@ -32,11 +38,13 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-canvas">
-      
-      {/* Background Decorators */}
-      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-brand-primary/10 blur-[120px] rounded-full pointer-events-none mix-blend-multiply dark:mix-blend-screen transition-all duration-1000"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-info/10 blur-[120px] rounded-full pointer-events-none mix-blend-multiply dark:mix-blend-screen transition-all duration-1000"></div>
+    <div className="login-aurora-shell min-h-screen flex items-center justify-center relative overflow-hidden bg-canvas">
+      <div className="login-aurora-bg" aria-hidden="true">
+        <span className="login-aurora-ribbon login-aurora-ribbon-primary"></span>
+        <span className="login-aurora-ribbon login-aurora-ribbon-secondary"></span>
+        <span className="login-aurora-ribbon login-aurora-ribbon-accent"></span>
+        <span className="login-aurora-grid"></span>
+      </div>
 
       {/* Theme Toggle Navbar */}
       <div className="absolute top-6 right-6 z-20">
@@ -73,7 +81,7 @@ export default function Login() {
               </div>
             )}
 
-            <form onSubmit={handleLogin} className="space-y-5">
+            <form onSubmit={handleLogin} noValidate className="space-y-5">
               <div className="space-y-2 text-left group">
                 <label className="block text-sm font-bold text-text-strong group-focus-within:text-brand-primary transition-colors">Correo electrónico</label>
                 <div className="relative">
@@ -85,7 +93,6 @@ export default function Login() {
                     className="w-full pl-11 pr-4 py-3.5 bg-canvas border border-border-default rounded-xl text-text-strong text-[15px] font-semibold transition-all duration-300 focus:outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 focus:-translate-y-[2px] shadow-sm" 
                     value={email} 
                     onChange={(e) => setEmail(e.target.value)} 
-                    required 
                     placeholder="usuario@thebridge.tech"
                   />
                 </div>
@@ -102,7 +109,6 @@ export default function Login() {
                     className="w-full pl-11 pr-12 py-3.5 bg-canvas border border-border-default rounded-xl text-text-strong text-[15px] font-semibold transition-all duration-300 focus:outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 focus:-translate-y-[2px] shadow-sm" 
                     value={password} 
                     onChange={(e) => setPassword(e.target.value)} 
-                    required 
                     placeholder="••••••••"
                   />
                   <button
