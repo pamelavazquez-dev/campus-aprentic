@@ -9,6 +9,8 @@ import { useRBAC } from '../../hooks/useRBAC';
 import ReactMarkdown from 'react-markdown';
 import rehypeSanitize from 'rehype-sanitize';
 import { useAuth } from '../../hooks/useAuth';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 const CodeBlock = ({ inline, className, children, ...props }) => {
   const [copied, setCopied] = useState(false);
@@ -44,11 +46,21 @@ const CodeBlock = ({ inline, className, children, ...props }) => {
             )}
           </button>
         </div>
-        <div className="p-4 overflow-x-auto">
-          <code className={className} style={{ color: '#e4e4e4', fontFamily: 'Consolas, Monaco, monospace', fontSize: '14px', whiteSpace: 'pre' }} {...props}>
-            {children}
-          </code>
-        </div>
+        <SyntaxHighlighter
+          style={vscDarkPlus}
+          language={language}
+          PreTag="div"
+          customStyle={{
+            margin: 0,
+            padding: '16px',
+            background: '#1e1e1e',
+            fontSize: '14px',
+            fontFamily: 'Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace'
+          }}
+          {...props}
+        >
+          {String(children).replace(/\n$/, '')}
+        </SyntaxHighlighter>
       </div>
     );
   }
