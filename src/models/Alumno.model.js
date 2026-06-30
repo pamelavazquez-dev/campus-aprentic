@@ -1,22 +1,27 @@
 export class Alumno {
-  constructor(id, nombre, email, avatar, promociones_id, modulos_id) {
+  constructor(id, nombre, email, avatar, promociones_id, modulos_id, password) {
     this.id = id;
     this.nombre = nombre;
     this.email = email;
     this.avatar = avatar;
     this.promociones_id = promociones_id;
     this.modulos_id = modulos_id;
+    if (password) this.password = password;
   }
 }
 
 export const alumnoConverter = {
-  toFirestore: (alumno) => ({
-    nombre: alumno.nombre,
-    email: alumno.email,
-    avatar: alumno.avatar,
-    promociones_id: alumno.promociones_id,
-    modulos_id: alumno.modulos_id
-  }),
+  toFirestore: (alumno) => {
+    const data = {
+      nombre: alumno.nombre,
+      email: alumno.email,
+      avatar: alumno.avatar,
+      promociones_id: alumno.promociones_id,
+      modulos_id: alumno.modulos_id
+    };
+    if (alumno.password) data.password = alumno.password;
+    return data;
+  },
   fromFirestore: (snapshot, options) => {
     const data = snapshot.data(options);
     return new Alumno(
@@ -25,7 +30,8 @@ export const alumnoConverter = {
       data.email || '',
       data.avatar || '',
       data.promociones_id || (data.promocion_id ? [data.promocion_id] : []),
-      data.modulos_id || []
+      data.modulos_id || [],
+      data.password
     );
   }
 };

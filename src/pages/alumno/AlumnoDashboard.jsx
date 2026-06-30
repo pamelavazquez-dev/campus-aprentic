@@ -63,6 +63,15 @@ export default function AlumnoDashboard() {
     return leccionesMap;
   }, [lecciones]);
 
+  const totalLeccionesActivas = useMemo(() => {
+    let total = 0;
+    modulosAsignados.forEach(mod => {
+      const lecs = leccionesPorModulo.get(mod.id) || [];
+      total += lecs.length;
+    });
+    return total;
+  }, [modulosAsignados, leccionesPorModulo]);
+
   const progresoPorModulo = useMemo(() => {
     if (!alumnoActual) return {};
 
@@ -132,7 +141,7 @@ export default function AlumnoDashboard() {
               <div className="student-dashboard-stat" style={{ background: 'var(--gray100)', borderRadius: '10px', padding: '12px 20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ fontSize: '24px' }}>📄</span>
                 <div>
-                  <div style={{ fontSize: '20px', fontWeight: 900, color: 'var(--text-strong)' }}>{lecciones.length}</div>
+                  <div style={{ fontSize: '20px', fontWeight: 900, color: 'var(--text-strong)' }}>{totalLeccionesActivas}</div>
                   <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>Lecciones</div>
                 </div>
               </div>
