@@ -52,7 +52,7 @@ export default function Login() {
       </div>
 
       <div 
-        className="bg-surface backdrop-blur-lg border border-border-default rounded-3xl w-full max-w-[500px] shadow-2xl relative z-10 transform-gpu overflow-hidden flex flex-col" 
+        className={`bg-surface backdrop-blur-lg border border-border-default rounded-3xl w-[92%] ${showSolicitud ? 'max-w-[680px]' : 'max-w-[500px]'} shadow-2xl relative z-10 transform-gpu overflow-hidden flex flex-col transition-all duration-500`}
         style={{ backfaceVisibility: 'hidden', transform: 'translateZ(0)', minHeight: '680px' }}
       >
         

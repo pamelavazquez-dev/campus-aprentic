@@ -67,6 +67,16 @@ const AlumnoCalificacionCard = memo(function AlumnoCalificacionCard({
   );
 });
 
+const getTime = (value) => {
+  if (!value) return null;
+  if (typeof value === 'object' && typeof value.seconds === 'number') {
+    return value.seconds * 1000;
+  }
+
+  const time = new Date(value).getTime();
+  return Number.isNaN(time) ? null : time;
+};
+
 export default function CalificacionesView() {
   const { modulos, promociones, loading } = useContext(DataContext);
   const { profile } = useAuth();
@@ -167,15 +177,30 @@ export default function CalificacionesView() {
     return entregasMap;
   }, [proyectos, selectedModulo]);
 
+  const alumnosIdsDelModulo = useMemo(
+    () => new Set(alumnosDelModulo.map((alumno) => alumno.id)),
+    [alumnosDelModulo]
+  );
+
   const notasPorAlumno = useMemo(() => {
     const notasMap = new Map();
 
     notas
-      .filter((nota) => nota.proyectoId === selectedModulo)
+      .filter((nota) => {
+        if (nota.proyectoId !== selectedModulo || !alumnosIdsDelModulo.has(nota.alumnoId)) return false;
+
+        const entrega = entregasPorAlumno.get(nota.alumnoId);
+        if (!entrega) return false;
+
+        const notaTime = getTime(nota.actualizadoEn || nota.creadoEn);
+        const entregaTime = getTime(entrega.entregadoEn || entrega.actualizadoEn);
+
+        return !notaTime || !entregaTime || notaTime >= entregaTime;
+      })
       .forEach((nota) => notasMap.set(nota.alumnoId, nota));
 
     return notasMap;
-  }, [notas, selectedModulo]);
+  }, [alumnosIdsDelModulo, entregasPorAlumno, notas, selectedModulo]);
 
   const notaMediaModulo = useMemo(() => {
     const valores = Array.from(notasPorAlumno.values()).map((nota) => Number(nota.valor));

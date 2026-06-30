@@ -166,7 +166,7 @@ export default function FormularioSolicitud({ onBack }) {
       </div>
 
       <div className="flex flex-col md:flex-row gap-4 w-full">
-        <div className="flex flex-col gap-1 w-full md:w-1/2">
+        <div className="flex flex-col gap-1 w-full md:flex-[1.2]">
           <label className="text-xs font-bold text-gray-500 uppercase">DNI / NIE</label>
           <input
             type="text"
@@ -178,7 +178,7 @@ export default function FormularioSolicitud({ onBack }) {
           />
         </div>
 
-        <div className="flex flex-col gap-1 w-full md:w-1/2">
+        <div className="flex flex-col gap-1 w-full md:flex-1">
           <label className="text-xs font-bold text-gray-500 uppercase">Email</label>
           <input
             type="email"
