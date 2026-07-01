@@ -46,15 +46,30 @@ export const getUniqueModulesByName = (modulos) => {
   });
 };
 
+export const getProfilePromotionIds = (profile) => {
+  const rawIds = Array.isArray(profile?.promocion_id)
+    ? profile.promocion_id
+    : Array.isArray(profile?.promociones_id)
+      ? profile.promociones_id
+      : [profile?.promocion_id || profile?.promociones_id].filter(Boolean);
+
+  return rawIds.map((id) => (typeof id === 'object' && id?.id ? String(id.id) : String(id)));
+};
+
+export const getProfileModuleIds = (profile) => {
+  const rawIds = Array.isArray(profile?.modulos_id)
+    ? profile.modulos_id
+    : [profile?.modulos_id].filter(Boolean);
+
+  return rawIds.map((id) => (typeof id === 'object' && id?.id ? String(id.id) : String(id)));
+};
+
 export const getProfesorTracks = (profesor, promociones) => {
-  const profesorPromociones = Array.isArray(profesor?.promocion_id)
-    ? profesor.promocion_id
-    : [profesor?.promocion_id].filter(Boolean);
+  const profesorPromociones = getProfilePromotionIds(profesor);
 
   const tracks = profesorPromociones
     .map((promocionId) => {
-      const idStr = typeof promocionId === 'object' && promocionId.id ? String(promocionId.id) : String(promocionId);
-      return promociones.find((promocion) => promocion.id === idStr);
+      return promociones.find((promocion) => promocion.id === promocionId);
     })
     .map(getPromotionTrack)
     .filter(Boolean);

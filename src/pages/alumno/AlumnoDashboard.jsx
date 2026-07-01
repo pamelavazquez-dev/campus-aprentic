@@ -151,7 +151,7 @@ export default function AlumnoDashboard() {
         
         <div>
           <h3 style={{ margin: '0 0 24px 0', fontSize: '20px', color: 'var(--text-strong)', fontWeight: 800 }}>Tus Módulos Activos</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: '24px' }}>
             {modulosAsignados.length === 0 ? (
               <div style={{ padding: '48px', textAlign: 'center', background: 'var(--surface)', borderRadius: '16px', border: '1px dashed var(--border)', gridColumn: '1 / -1' }}>
                 <div style={{ fontSize: '48px', marginBottom: '16px' }}>📭</div>

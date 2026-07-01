@@ -35,7 +35,7 @@ export default function RoleLayoutShell({ user, menuItems, roleLabel, brandLabel
         <div className="flex justify-between items-center h-[72px] gap-3">
           <div className="flex items-center gap-3 lg:gap-4 min-w-0">
             <Logo size="md" showText={false} />
-            <div className="flex flex-col gap-0.5 ml-1 min-w-0">
+            <div className="app-shell-brand-text flex flex-col gap-0.5 ml-1 min-w-0">
               <span className="font-['Montserrat'] text-[14px] lg:text-[15px] font-black text-white leading-none tracking-tight truncate">The Bridge</span>
               <span className="font-['Montserrat'] text-[13px] lg:text-[14px] font-black text-brand-primary leading-none tracking-tight truncate">{brandLabel}</span>
             </div>

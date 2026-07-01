@@ -9,7 +9,7 @@ export default function GlobalLoader({ text = "Cargando The Bridge Academy..." }
         <div className="absolute bottom-[-20%] right-[-10%] w-[50vw] h-[50vw] bg-brand-primary/5 rounded-full blur-[120px] animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
       </div>
 
-      <div className="relative z-10 flex flex-col items-center gap-8 animate-fade-in">
+      <div className="relative z-10 flex w-full max-w-[320px] flex-col items-center gap-8 px-6 text-center animate-fade-in">
         {/* Contenedor del Logo con brillo */}
         <div className="relative flex items-center justify-center w-24 h-24">
           <div className="absolute inset-0 bg-brand-gradient opacity-30 rounded-full blur-xl animate-pulse"></div>
@@ -22,8 +22,8 @@ export default function GlobalLoader({ text = "Cargando The Bridge Academy..." }
         </div>
 
         {/* Texto y Spinner inline */}
-        <div className="flex flex-col items-center gap-3">
-          <h2 className="m-0 text-xl font-black text-text-strong tracking-tight">{text}</h2>
+        <div className="flex w-full flex-col items-center gap-3">
+          <h2 className="m-0 max-w-full text-center text-xl font-black text-text-strong tracking-tight leading-tight break-words">{text}</h2>
           <div className="flex gap-1.5 items-center justify-center">
             <div className="w-2.5 h-2.5 rounded-full bg-brand-primary/40 animate-bounce" style={{ animationDelay: '0s' }}></div>
             <div className="w-2.5 h-2.5 rounded-full bg-brand-primary/70 animate-bounce" style={{ animationDelay: '0.15s' }}></div>

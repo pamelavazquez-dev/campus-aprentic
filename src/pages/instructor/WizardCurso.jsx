@@ -162,7 +162,7 @@ export default function WizardCurso() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+    <div className="wizard-curso-page" style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
 
       {/* Page Header */}
       <div className="instructor-page-hero" style={{ margin: '-48px -48px 0 -48px', background: 'var(--surface-solid)', borderBottom: '1px solid var(--border)' }}>
@@ -197,7 +197,7 @@ export default function WizardCurso() {
       )}
 
       {/* Selectores */}
-      <div style={{ display: 'flex', alignItems: 'flex-end', gap: '16px', flexWrap: 'wrap' }}>
+      <div className="wizard-curso-selectors" style={{ display: 'flex', alignItems: 'flex-end', gap: '16px', flexWrap: 'wrap' }}>
         <div style={{ flex: 1, minWidth: '240px' }}>
           <label style={{ display: 'block', fontSize: '13px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>
             1. Seleccionar promocion
@@ -295,7 +295,7 @@ export default function WizardCurso() {
 
       {/* Formulario de creación de lección */}
       {showCrear && (
-        <div style={{
+        <div className="wizard-curso-create-form" style={{
           background: 'var(--surface-solid)',
           border: '2px solid var(--brand-primary)',
           borderRadius: '16px',
@@ -312,7 +312,7 @@ export default function WizardCurso() {
             >✕</button>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <div className="wizard-curso-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
             <div style={{ gridColumn: '1 / -1' }}>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '6px' }}>Título de la lección *</label>
               <input
@@ -385,7 +385,7 @@ export default function WizardCurso() {
             </div>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '24px' }}>
+          <div className="wizard-curso-form-actions" style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '24px' }}>
             <button className="bg-transparent text-[#64748B] border-none py-2 px-4 rounded-md text-sm font-black cursor-pointer transition-colors duration-300 hover:bg-black/5 hover:text-brand-primary inline-flex items-center justify-center gap-2" onClick={() => setShowCrear(false)} style={{ padding: '10px 20px', width: 'auto' }}>
               Cancelar
             </button>
@@ -403,7 +403,7 @@ export default function WizardCurso() {
 
       {/* Info del módulo seleccionado */}
       {moduloActual && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+        <div className="wizard-curso-summary-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
           <div style={{ background: 'var(--surface-solid)', border: '1px solid var(--border)', borderRadius: '12px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
             <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Módulo</span>
             <span style={{ fontSize: '20px', fontWeight: 900, color: 'var(--text-strong)' }}>{moduloActual.nombre}</span>
@@ -504,8 +504,8 @@ export default function WizardCurso() {
 
                   {/* Contenido expandido */}
                   {isExpanded && (
-                    <div style={{ padding: '0 24px 24px 24px', borderTop: '1px solid var(--border)', animation: 'fadeSlideDown 0.3s ease' }}>
-                      <div style={{ paddingTop: '20px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div className="wizard-curso-lesson-detail" style={{ padding: '0 24px 24px 24px', borderTop: '1px solid var(--border)', animation: 'fadeSlideDown 0.3s ease' }}>
+                      <div className="wizard-curso-lesson-detail-grid" style={{ paddingTop: '20px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                         <div style={{ gridColumn: '1 / -1', background: 'var(--gray50)', borderRadius: '10px', padding: '16px', border: '1px solid var(--border)' }}>
                           <div style={{ fontSize: '12px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>Descripción</div>
                           <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-strong)', lineHeight: 1.6 }}>
@@ -545,7 +545,7 @@ export default function WizardCurso() {
 
                       {/* Acciones del instructor sobre la lección */}
                       {!isAdmin && (
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--border)' }}>
+                        <div className="wizard-curso-lesson-actions" style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--border)' }}>
                           <button
                             onClick={(e) => { e.stopPropagation(); handleEliminarLeccion(lec.id, lec.titulo); }}
                             style={{

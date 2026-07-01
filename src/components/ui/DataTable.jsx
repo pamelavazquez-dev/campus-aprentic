@@ -1,6 +1,6 @@
 export default function DataTable({ columns, rows, emptyMessage, loading, loadingMessage }) {
   return (
-    <div className="bg-surface backdrop-blur-xl border border-border-default rounded-3xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all">
+    <div className="data-table bg-surface backdrop-blur-xl border border-border-default rounded-3xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all">
       {loading ? (
         <div className="p-16 flex flex-col items-center justify-center gap-4 text-center">
           <div className="w-10 h-10 border-4 border-brand-primary/20 border-t-brand-primary rounded-full animate-spin"></div>

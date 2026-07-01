@@ -48,12 +48,12 @@ export default function Login() {
       </div>
 
       {/* Theme Toggle Navbar */}
-      <div className="absolute top-6 right-6 z-20">
+      <div className="login-theme-toggle absolute top-6 right-6 z-20">
         <ThemeToggle variant="adaptive" />
       </div>
 
       <div 
-        className={`bg-surface backdrop-blur-lg border border-border-default rounded-3xl w-[92%] ${showSolicitud ? 'max-w-[680px]' : 'max-w-[500px]'} shadow-2xl relative z-10 transform-gpu overflow-hidden flex flex-col transition-all duration-500`}
+        className={`login-auth-card bg-surface backdrop-blur-lg border border-border-default rounded-3xl w-[92%] ${showSolicitud ? 'max-w-[680px]' : 'max-w-[500px]'} shadow-2xl relative z-10 transform-gpu overflow-hidden flex flex-col transition-all duration-500`}
         style={{ backfaceVisibility: 'hidden', transform: 'translateZ(0)', minHeight: '680px' }}
       >
         
@@ -185,8 +185,6 @@ export default function Login() {
           </div>
         </div>
       </div>
-
-      
     </div>
   );
 }

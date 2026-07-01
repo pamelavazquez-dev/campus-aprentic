@@ -215,7 +215,7 @@ export default function PromocionesView() {
                           </span>
                         </div>
                         
-                        <div className="mt-auto pt-4 border-t border-border-default flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="promo-modal-actions mt-auto pt-4 border-t border-border-default flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
                           <button 
                             onClick={() => handleToggleEstadoClick(promo)}
                             className={`${promo.estado === 'completada' ? 'text-green-600 bg-green-50 hover:bg-green-100' : 'text-amber-600 bg-amber-50 hover:bg-amber-100'} p-2 rounded-xl transition-colors cursor-pointer border-none flex-1 flex justify-center`}

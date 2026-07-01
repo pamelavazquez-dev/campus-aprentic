@@ -8,7 +8,7 @@ import { getAllProyectos, getProyectosByModuloId } from '../../services/proyecto
 import { getAllAlumnos } from '../../services/alumnos.service';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../hooks/useAuth';
-import { filterModulesByTracks, getProfesorTracks, getUniqueModulesByName, normalizeModuleName } from '../../utils/academicFilters';
+import { filterModulesByTracks, getProfesorTracks, getProfileModuleIds, getProfilePromotionIds, getUniqueModulesByName, normalizeModuleName } from '../../utils/academicFilters';
 import Select from '../../components/ui/Select';
 
 const AlumnoCalificacionCard = memo(function AlumnoCalificacionCard({
@@ -95,27 +95,34 @@ export default function CalificacionesView() {
   );
 
   const profesorPromocionIds = useMemo(() => {
-    const rawIds = Array.isArray(profile?.promocion_id)
-      ? profile.promocion_id
-      : [profile?.promocion_id].filter(Boolean);
+    return getProfilePromotionIds(profile);
+  }, [profile]);
 
-    return rawIds.map((id) => (typeof id === 'object' && id?.id ? String(id.id) : String(id)));
+  const profesorModuloIds = useMemo(() => {
+    return getProfileModuleIds(profile);
   }, [profile]);
 
   const modulosProfesor = useMemo(() => {
-    const modulosPorTrack = filterModulesByTracks(modulos, profesorTracks);
-    const modulosDeSusPromociones = modulosPorTrack.filter((modulo) => {
+    if (!profile?.id) return [];
+
+    const modulosBase = profesorTracks.length > 0 ? filterModulesByTracks(modulos, profesorTracks) : modulos;
+    const modulosEstrictos = modulosBase.filter((modulo) => {
       const promocionesActivas = Array.isArray(modulo.promociones_activas)
         ? modulo.promociones_activas.map((id) => (typeof id === 'object' && id?.id ? String(id.id) : String(id)))
         : [];
+      const profesorId = typeof modulo.profesor_id === 'object' && modulo.profesor_id?.id
+        ? String(modulo.profesor_id.id)
+        : String(modulo.profesor_id || '');
+      const pertenecePorProfesor = profile?.id && profesorId === profile.id;
+      const pertenecePorModuloAsignado = profesorModuloIds.includes(modulo.id);
+      const pertenecePorPromocion = promocionesActivas.some((promocionId) => profesorPromocionIds.includes(promocionId));
 
-      if (promocionesActivas.length === 0) return false;
-
-      return promocionesActivas.some((promocionId) => profesorPromocionIds.includes(promocionId));
+      return pertenecePorProfesor || pertenecePorModuloAsignado || pertenecePorPromocion;
     });
+    const modulosVisibles = modulosEstrictos.length > 0 ? modulosEstrictos : modulosBase;
 
-    return getUniqueModulesByName(modulosDeSusPromociones);
-  }, [modulos, profesorPromocionIds, profesorTracks]);
+    return getUniqueModulesByName(modulosVisibles);
+  }, [modulos, profile?.id, profesorModuloIds, profesorPromocionIds, profesorTracks]);
 
   const selectedModuloData = useMemo(
     () => modulosProfesor.find((modulo) => modulo.id === selectedModulo),
@@ -127,7 +134,9 @@ export default function CalificacionesView() {
       ? selectedModuloData.promociones_activas.map((id) => (typeof id === 'object' && id?.id ? String(id.id) : String(id)))
       : [];
 
-    return promocionesActivas.filter((promocionId) => profesorPromocionIds.includes(promocionId));
+    const promocionesCoincidentes = promocionesActivas.filter((promocionId) => profesorPromocionIds.includes(promocionId));
+
+    return promocionesCoincidentes.length > 0 ? promocionesCoincidentes : profesorPromocionIds;
   }, [profesorPromocionIds, selectedModuloData]);
 
   const selectedModuloIds = useMemo(() => {
@@ -143,7 +152,9 @@ export default function CalificacionesView() {
         const promocionesActivas = Array.isArray(modulo.promociones_activas)
           ? modulo.promociones_activas.map((id) => (typeof id === 'object' && id?.id ? String(id.id) : String(id)))
           : [];
-        const sharesPromotion = promocionesActivas.some((promocionId) => selectedModuloPromociones.includes(promocionId));
+        const sharesPromotion = promocionesActivas.length === 0
+          ? selectedModuloPromociones.length > 0
+          : promocionesActivas.some((promocionId) => selectedModuloPromociones.includes(promocionId));
 
         return sameName && sameTrack && sharesPromotion;
       })

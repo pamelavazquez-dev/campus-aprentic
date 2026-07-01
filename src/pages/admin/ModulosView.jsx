@@ -103,11 +103,11 @@ export default function ModulosView() {
                     <td className="px-6 py-4 border-b border-border-default text-sm text-[#334155]">{mod.lecciones_Id ? mod.lecciones_Id.length : 0}</td>
                     <td className="px-6 py-4 border-b border-border-default text-sm text-[#334155]">
                       {asignando === mod.id ? (
-                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <div className="admin-modulos-profesor-selector" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                           <Select
                             value={mod.profesor_id || ''}
                             onChange={(value) => handleAsignar(mod.id, value)}
-                            className="min-w-[180px]"
+                            className="admin-modulos-profesor-select"
                             options={[
                               { value: '', label: 'Sin asignar' },
                               ...profesores.map(p => ({ value: p.id, label: p.nombre || p.email }))

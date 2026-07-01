@@ -87,7 +87,7 @@ export default function InstructorDashboard() {
       {/* Main Content */}
       <div style={{ width: '100%', margin: '0 auto' }}>
         <h3 style={{ margin: '0 0 24px 0', fontSize: '20px', color: 'var(--text-strong)', fontWeight: 800 }}>Tus Módulos Asignados</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: '24px' }}>
           {modulos.length === 0 ? (
             <div style={{ padding: '48px', textAlign: 'center', background: 'var(--surface)', borderRadius: '16px', border: '1px dashed var(--border)', gridColumn: '1 / -1' }}>
               <p style={{ color: 'var(--text-secondary)', margin: '0', fontSize: '16px' }}>No tienes módulos asignados aún.</p>
