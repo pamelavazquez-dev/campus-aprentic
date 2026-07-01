@@ -1,7 +1,6 @@
 import { useContext, useState, useEffect } from 'react';
 import { DataContext } from '../../context/DataContext';
 import { useNavigate } from 'react-router-dom';
-import ValoracionesTab from './ValoracionesTab';
 import DirectorioTab from './DirectorioTab';
 import Avatar from '../../components/ui/Avatar';
 import { collection, getCountFromServer, getDocs, query, limit } from 'firebase/firestore';
@@ -80,11 +79,6 @@ export default function DashboardAdmin() {
               onClick={() => setActiveTab('resumen')}
               style={{ padding: '12px 0', borderBottom: `2px solid ${activeTab === 'resumen' ? 'var(--brand-primary)' : 'transparent'}`, color: activeTab === 'resumen' ? 'var(--text-strong)' : 'var(--text-secondary)', fontWeight: activeTab === 'resumen' ? 700 : 600, fontSize: '14px', cursor: 'pointer', transition: 'all 0.2s' }}>
               Resumen General
-            </div>
-            <div 
-              onClick={() => setActiveTab('valoraciones')}
-              style={{ padding: '12px 0', borderBottom: `2px solid ${activeTab === 'valoraciones' ? 'var(--brand-primary)' : 'transparent'}`, color: activeTab === 'valoraciones' ? 'var(--text-strong)' : 'var(--text-secondary)', fontWeight: activeTab === 'valoraciones' ? 700 : 600, fontSize: '14px', cursor: 'pointer', transition: 'all 0.2s' }}>
-              Valoraciones
             </div>
             <div 
               onClick={() => setActiveTab('directorio')}
@@ -199,8 +193,6 @@ export default function DashboardAdmin() {
 
           </>
         )}
-
-        {activeTab === 'valoraciones' && <ValoracionesTab />}
 
         {activeTab === 'directorio' && <DirectorioTab />}
 
