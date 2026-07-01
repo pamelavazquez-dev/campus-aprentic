@@ -1,7 +1,7 @@
 import { memo, useState, useEffect, useContext, useMemo } from 'react';
 import { DataContext } from '../../context/DataContext';
 import { useAuth } from '../../hooks/useAuth';
-import { getNotasByAlumnoId } from '../../services/notas.service';
+import { getNotasByAlumnoId, deleteNota } from '../../services/notas.service';
 import { getAllProyectos } from '../../services/proyectos.service';
 import PageHeader from '../../components/ui/PageHeader';
 
@@ -26,6 +26,23 @@ const NotaCard = memo(function NotaCard({ nota, modulo }) {
           <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
             Evaluado el {formatDate(nota.actualizadoEn || nota.creadoEn)}
           </span>
+          {!modulo && (
+            <div style={{ marginTop: '8px' }}>
+              <button
+                onClick={async () => {
+                  if (window.confirm('¿Seguro que quieres eliminar esta nota corrupta de la base de datos?')) {
+                    await deleteNota(nota.id);
+                    window.location.reload();
+                  }
+                }}
+                style={{ background: '#EF4444', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '6px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 2px 4px rgba(239,68,68,0.2)' }}
+                onMouseEnter={e => e.currentTarget.style.background = '#DC2626'}
+                onMouseLeave={e => e.currentTarget.style.background = '#EF4444'}
+              >
+                🗑️ Eliminar de BBDD
+              </button>
+            </div>
+          )}
         </div>
         <div style={{ textAlign: 'right' }}>
           <div style={{ fontSize: '32px', fontWeight: 900, color: isAprobado ? '#10B981' : '#EF4444', lineHeight: 1 }}>
@@ -135,6 +152,10 @@ export default function MisNotasView() {
           misNotas.map(nota => {
             const proyecto = proyectos.find(p => p.id === nota.proyectoId);
             const modulo = proyecto ? modulosPorId.get(proyecto.moduloId) : null;
+            
+            // Ocultar la tarjeta si el módulo es desconocido (nota huérfana o corrupta)
+            if (!modulo) return null;
+
             return (
               <NotaCard
                 key={nota.id}
