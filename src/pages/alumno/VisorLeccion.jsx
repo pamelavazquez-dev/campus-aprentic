@@ -340,10 +340,11 @@ export default function VisorLeccion() {
         </button>
       )}
 
-      <div className="lesson-view-shell animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1260px', margin: '0 auto' }}>      {/* Header del módulo */}
-      <div className="lesson-view-header bg-gradient-to-br from-surface to-brand-primary/10 rounded-2xl relative overflow-hidden border border-border-default shadow-sm" style={{ padding: '28px 36px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      <div className="lesson-view-shell animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1260px', margin: '0 auto', padding: '0 16px' }}>
+      {/* Header del módulo */}
+      <div className="lesson-view-header bg-gradient-to-br from-surface to-brand-primary/10 rounded-2xl relative overflow-hidden border border-border-default shadow-sm p-5 md:p-7">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="flex flex-wrap items-center gap-3 md:gap-4">
             <button
               onClick={() => navigate(backUrl)}
               className="text-text-strong"
@@ -356,7 +357,7 @@ export default function VisorLeccion() {
               {modulo?.nombre || modulo?.titulo || 'Cargando...'}
             </h3>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div className="flex flex-wrap items-center gap-3 md:gap-4 w-full md:w-auto mt-2 md:mt-0">
             {todasCompletadas && (
               <span style={{ background: '#D1FAE5', color: '#065F46', border: '1px solid #A7F3D0', borderRadius: '999px', padding: '8px 12px', fontSize: '12px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
                 Tareas completadas
@@ -376,14 +377,14 @@ export default function VisorLeccion() {
       </div>
 
       {/* Layout principal: Sidebar + Contenido */}
-      <div className="lesson-view-main" style={{ display: 'grid', gridTemplateColumns: '380px minmax(0, 1fr)', gap: '24px', alignItems: 'flex-start' }}>
+      <div className="lesson-view-main grid grid-cols-1 lg:grid-cols-[300px_minmax(0,1fr)] xl:grid-cols-[380px_minmax(0,1fr)] gap-6 items-start">
         
         {/* Sidebar de lecciones */}
-        <div className="lesson-sidebar" style={{
+        <div className="lesson-sidebar lg:sticky lg:top-[96px]" style={{
           background: 'var(--surface)', border: '1px solid var(--border)',
           borderRadius: '18px', overflowY: 'auto', padding: '20px',
           boxShadow: 'var(--shadow-sm)', backdropFilter: 'blur(14px)',
-          position: 'sticky', top: '96px', maxHeight: 'calc(100vh - 120px)'
+          maxHeight: 'calc(100vh - 120px)'
         }}>
           <div style={{ padding: '0 16px 12px 16px' }}>
             <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
@@ -468,14 +469,14 @@ export default function VisorLeccion() {
 
               {/* Contenido Markdown */}
               {(markdownContent || loadingMarkdown) && (
-                <div style={{ marginBottom: '24px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px', padding: '32px' }}>
+                <div className="p-4 md:p-8" style={{ marginBottom: '24px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px' }}>
                   <div style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '24px', borderBottom: '1px solid var(--border)', paddingBottom: '12px' }}>
                     📖 Apuntes de la lección
                   </div>
                   {loadingMarkdown ? (
                     <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>Cargando contenido...</p>
                   ) : (
-                    <div className="prose prose-invert max-w-[800px] mx-auto prose-p:leading-loose prose-p:text-[17px] prose-headings:font-black prose-headings:tracking-tight prose-a:text-brand-primary prose-a:no-underline hover:prose-a:underline overflow-hidden break-words prose-pre:overflow-x-auto prose-table:block prose-table:overflow-x-auto" style={{ color: 'var(--text-strong)', textAlign: 'left' }}>
+                    <div className="prose prose-invert max-w-full md:max-w-[800px] mx-auto prose-p:leading-loose prose-p:text-[16px] md:prose-p:text-[17px] prose-headings:font-black prose-headings:tracking-tight prose-a:text-brand-primary prose-a:no-underline hover:prose-a:underline break-words prose-pre:max-w-[85vw] md:prose-pre:max-w-full prose-pre:overflow-x-auto prose-table:block prose-table:overflow-x-auto overflow-hidden" style={{ color: 'var(--text-strong)', textAlign: 'left' }}>
                       <ReactMarkdown 
                         rehypePlugins={[rehypeSanitize]}
                         allowedElements={['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'a', 'ul', 'ol', 'li', 'b', 'i', 'strong', 'em', 'strike', 'code', 'pre', 'blockquote', 'hr', 'table', 'thead', 'tbody', 'tr', 'th', 'td']}
