@@ -91,7 +91,7 @@ const CertificadoPDF = ({ nombreAlumno, fecha, nombreCurso }) => {
         </p>
         
         <p style={{ fontSize: '22px', color: '#FFFFFF', margin: '0 0 15px 0', fontWeight: 500, padding: '0 40px', lineHeight: '1.4', textAlign: 'center' }}>
-          Ha completado satisfactoriamente todos los módulos<br/>en coordinación y completado requerimientos en
+          Ha completado satisfactoriamente todos los módulos correspondientes a:
         </p>
         
         {/* Nombre del Curso */}
@@ -105,10 +105,7 @@ const CertificadoPDF = ({ nombreAlumno, fecha, nombreCurso }) => {
         
         {/* Izquierda: Firma 1 */}
         <div style={{ textAlign: 'center', width: '240px' }}>
-          <div style={{ fontFamily: "'Brush Script MT', 'Comic Sans MS', cursive, sans-serif", fontSize: '46px', color: '#FFFFFF', opacity: 0.9, lineHeight: 1, paddingBottom: '10px' }}>
-            Signatura
-          </div>
-          <div style={{ borderTop: '2px solid #FFFFFF', paddingTop: '8px' }}>
+          <div style={{ borderTop: '2px solid #FFFFFF', paddingTop: '8px', marginTop: '40px' }}>
             <p style={{ margin: 0, fontSize: '14px', color: '#FFFFFF', fontWeight: 800, letterSpacing: '1px', textTransform: 'uppercase' }}>Firma del Tutor</p>
           </div>
         </div>
@@ -122,10 +119,7 @@ const CertificadoPDF = ({ nombreAlumno, fecha, nombreCurso }) => {
 
         {/* Derecha: Firma 2 */}
         <div style={{ textAlign: 'center', width: '240px' }}>
-          <div style={{ fontFamily: "'Brush Script MT', 'Comic Sans MS', cursive, sans-serif", fontSize: '46px', color: '#FFFFFF', opacity: 0.9, lineHeight: 1, paddingBottom: '10px' }}>
-            Signatura
-          </div>
-          <div style={{ borderTop: '2px solid #FFFFFF', paddingTop: '8px' }}>
+          <div style={{ borderTop: '2px solid #FFFFFF', paddingTop: '8px', marginTop: '40px' }}>
             <p style={{ margin: 0, fontSize: '14px', color: '#FFFFFF', fontWeight: 800, letterSpacing: '1px', textTransform: 'uppercase' }}>Dirección Académica</p>
           </div>
         </div>
