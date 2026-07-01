@@ -35,7 +35,7 @@ const AlumnoCalificacionCard = memo(function AlumnoCalificacionCard({
           ) : (
             <div style={{ fontSize: '13px', fontWeight: 600, color: '#F59E0B' }}>Sin calificar</div>
           )}
-          <button className="bg-brand-gradient text-white py-3 px-6 rounded-lg text-sm font-black transition-all duration-300 hover:-translate-y-0.5 shadow-glow inline-flex items-center justify-center gap-2 border-none cursor-pointer" style={{ padding: '8px 16px', fontSize: '13px' }} onClick={() => onEvaluar(alumno)}>
+          <button className="bg-brand-gradient text-white py-3 px-6 rounded-lg text-sm font-black transition-all duration-300 hover:-translate-y-0.5 shadow-glow inline-flex items-center justify-center gap-2 border-none cursor-pointer" style={{ padding: '8px 16px', fontSize: '13px' }} onClick={() => onEvaluar()}>
             {nota ? 'Modificar Nota' : 'Evaluar'}
           </button>
         </div>
@@ -58,7 +58,7 @@ const AlumnoCalificacionCard = memo(function AlumnoCalificacionCard({
           </>
         ) : (
           <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)' }}>
-            Sin entrega registrada para este modulo.
+            Sin entrega registrada para este módulo.
           </span>
         )}
       </div>
@@ -235,13 +235,10 @@ export default function CalificacionesView() {
     proyectos
       .filter((proyecto) => selectedModuloIdsSet.has(proyecto.moduloId))
       .forEach((proyecto) => {
-        const current = entregasMap.get(proyecto.alumnoId);
-        const currentTime = getTime(current?.actualizadoEn || current?.entregadoEn) || 0;
-        const nextTime = getTime(proyecto.actualizadoEn || proyecto.entregadoEn) || 0;
-
-        if (!current || nextTime >= currentTime) {
-          entregasMap.set(proyecto.alumnoId, proyecto);
+        if (!entregasMap.has(proyecto.alumnoId)) {
+          entregasMap.set(proyecto.alumnoId, []);
         }
+        entregasMap.get(proyecto.alumnoId).push(proyecto);
       });
 
     return entregasMap;
@@ -267,12 +264,12 @@ export default function CalificacionesView() {
       }
     });
 
-    entregasPorAlumno.forEach((entrega, alumnoId) => {
-      if (!alumnosMap.has(alumnoId)) {
+    entregasPorAlumno.forEach((entregas, alumnoId) => {
+      if (!alumnosMap.has(alumnoId) && entregas.length > 0) {
         alumnosMap.set(alumnoId, {
           id: alumnoId,
-          nombre: entrega.alumnoEmail || 'Alumno con entrega',
-          email: entrega.alumnoEmail || '',
+          nombre: entregas[0].alumnoEmail || 'Alumno con entrega',
+          email: entregas[0].alumnoEmail || '',
         });
       }
     });
@@ -285,92 +282,104 @@ export default function CalificacionesView() {
     [alumnosDelModulo]
   );
 
-  const notasPorAlumno = useMemo(() => {
+  const notasPorProyecto = useMemo(() => {
     const notasMap = new Map();
-
-    notas
-      .filter((nota) => {
-        if (!alumnosIdsDelModulo.has(nota.alumnoId)) return false;
-
-        const entrega = entregasPorAlumno.get(nota.alumnoId);
-        if (!entrega) return false;
-
-        const notaPerteneceAEntrega = nota.proyectoId === entrega.id;
-        const notaLegacyDelModulo = selectedModuloIdsSet.has(nota.proyectoId);
-        if (!notaPerteneceAEntrega && !notaLegacyDelModulo) return false;
-
-        const notaTime = getTime(nota.actualizadoEn || nota.creadoEn);
-        const entregaTime = getTime(entrega.entregadoEn || entrega.actualizadoEn);
-
-        return !notaTime || !entregaTime || notaTime >= entregaTime;
-      })
-      .forEach((nota) => notasMap.set(nota.alumnoId, nota));
-
+    notas.forEach((nota) => notasMap.set(nota.proyectoId, nota));
     return notasMap;
-  }, [alumnosIdsDelModulo, entregasPorAlumno, notas]);
+  }, [notas]);
 
   const notaMediaModulo = useMemo(() => {
-    const valores = Array.from(notasPorAlumno.values()).map((nota) => Number(nota.valor));
+    const valores = Array.from(notasPorProyecto.values())
+      .filter(nota => selectedModuloIdsSet.has(nota.proyectoId) || (proyectos.find(p => p.id === nota.proyectoId && selectedModuloIdsSet.has(p.moduloId))))
+      .map((nota) => Number(nota.valor));
 
     if (valores.length === 0) return null;
 
     const total = valores.reduce((acc, valor) => acc + valor, 0);
     return (total / valores.length).toFixed(1);
-  }, [notasPorAlumno]);
+  }, [notasPorProyecto, proyectos, selectedModuloIdsSet]);
 
   const alumnosFiltrados = useMemo(() => alumnosDelModulo.filter((alumno) => {
     const search = searchAlumno.trim().toLowerCase();
-    const entregaAlumno = entregasPorAlumno.get(alumno.id);
-    const existingNota = notasPorAlumno.get(alumno.id);
+    const entregasAlumno = entregasPorAlumno.get(alumno.id) || [];
     const matchesSearch = !search || (alumno.nombre || '').toLowerCase().includes(search);
 
     if (!matchesSearch) return false;
 
-    if (filtroRevision === 'pendientes') return entregaAlumno && !existingNota;
-    if (filtroRevision === 'sin-entrega') return !entregaAlumno;
-    if (filtroRevision === 'evaluados') return Boolean(existingNota);
+    if (filtroRevision === 'pendientes') {
+      return entregasAlumno.some(e => {
+        const n = notasPorProyecto.get(e.id);
+        const notaTime = getTime(n?.actualizadoEn || n?.creadoEn);
+        const entregaTime = getTime(e?.entregadoEn || e?.actualizadoEn);
+        return !n || (notaTime && entregaTime && notaTime < entregaTime);
+      });
+    }
+    if (filtroRevision === 'sin-entrega') return entregasAlumno.length === 0;
+    if (filtroRevision === 'evaluados') {
+      return entregasAlumno.length > 0 && entregasAlumno.every(e => {
+        const n = notasPorProyecto.get(e.id);
+        const notaTime = getTime(n?.actualizadoEn || n?.creadoEn);
+        const entregaTime = getTime(e?.entregadoEn || e?.actualizadoEn);
+        return n && (!notaTime || !entregaTime || notaTime >= entregaTime);
+      });
+    }
 
     return true;
-  }), [alumnosDelModulo, entregasPorAlumno, filtroRevision, notasPorAlumno, searchAlumno]);
+  }), [alumnosDelModulo, entregasPorAlumno, filtroRevision, notasPorProyecto, searchAlumno]);
 
   const filterOptions = useMemo(() => [
     { id: 'todos', label: 'Todos', count: alumnosDelModulo.length },
     {
       id: 'pendientes',
       label: 'Pendientes de revisar',
-      count: alumnosDelModulo.filter(alumno => entregasPorAlumno.get(alumno.id) && !notasPorAlumno.get(alumno.id)).length
+      count: alumnosDelModulo.filter(alumno => {
+        const entregas = entregasPorAlumno.get(alumno.id) || [];
+        return entregas.some(e => {
+          const n = notasPorProyecto.get(e.id);
+          const notaTime = getTime(n?.actualizadoEn || n?.creadoEn);
+          const entregaTime = getTime(e?.entregadoEn || e?.actualizadoEn);
+          return !n || (notaTime && entregaTime && notaTime < entregaTime);
+        });
+      }).length
     },
     {
       id: 'sin-entrega',
       label: 'Sin entrega',
-      count: alumnosDelModulo.filter(alumno => !entregasPorAlumno.get(alumno.id)).length
+      count: alumnosDelModulo.filter(alumno => !(entregasPorAlumno.get(alumno.id) || []).length).length
     },
     {
       id: 'evaluados',
-      label: 'Evaluados',
-      count: alumnosDelModulo.filter(alumno => notasPorAlumno.get(alumno.id)).length
+      label: 'Completamente Evaluados',
+      count: alumnosDelModulo.filter(alumno => {
+        const entregas = entregasPorAlumno.get(alumno.id) || [];
+        if (entregas.length === 0) return false;
+        return entregas.every(e => {
+          const n = notasPorProyecto.get(e.id);
+          const notaTime = getTime(n?.actualizadoEn || n?.creadoEn);
+          const entregaTime = getTime(e?.entregadoEn || e?.actualizadoEn);
+          return n && (!notaTime || !entregaTime || notaTime >= entregaTime);
+        });
+      }).length
     },
-  ], [alumnosDelModulo, entregasPorAlumno, notasPorAlumno]);
+  ], [alumnosDelModulo, entregasPorAlumno, notasPorProyecto]);
 
-  const handleOpenGrade = useCallback((alumno) => {
-    const entrega = entregasPorAlumno.get(alumno.id);
-
+  const handleOpenGrade = useCallback((alumno, entrega) => {
     if (!entrega) {
       toast.error('Este alumno todavia no tiene una entrega para evaluar.');
       return;
     }
 
-    const existingNota = notasPorAlumno.get(alumno.id);
+    const rawNota = notas.find(n => n.alumnoId === alumno.id && n.proyectoId === entrega.id);
     
     setNotaForm({
-      id: existingNota?.id || null,
+      id: rawNota?.id || null,
       alumnoId: alumno.id,
       proyectoId: entrega.id,
-      valor: existingNota?.valor || '',
-      comentario: existingNota?.comentario || ''
+      valor: rawNota?.valor || '',
+      comentario: rawNota?.comentario || ''
     });
     setShowModal(true);
-  }, [entregasPorAlumno, notasPorAlumno]);
+  }, [notas]);
 
   const handleSaveNota = async () => {
     setSaving(true);
@@ -440,9 +449,17 @@ export default function CalificacionesView() {
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px', flexWrap: 'wrap', marginTop: '16px' }}>
-            <h3 style={{ margin: 0, fontSize: '20px', color: 'var(--text-strong)' }}>
-              Alumnos Matriculados ({alumnosFiltrados.length}/{alumnosDelModulo.length})
-            </h3>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <h3 style={{ margin: 0, fontSize: '20px', color: 'var(--text-strong)' }}>
+                Alumnos Matriculados ({alumnosFiltrados.length}/{alumnosDelModulo.length})
+              </h3>
+              <button 
+                onClick={fetchNotas}
+                className="bg-surface-solid border border-border-default rounded-lg px-3 py-1.5 text-xs font-black text-text-secondary hover:text-brand-primary hover:border-brand-primary transition-all cursor-pointer inline-flex items-center gap-1 shadow-sm"
+              >
+                ↻ Refrescar entregas
+              </button>
+            </div>
             {notaMediaModulo && (
               <span className="bg-surface-solid border border-border-default rounded-lg px-3 py-2 text-xs font-black text-text-secondary">
                 Media del modulo: {notaMediaModulo}/10
@@ -473,15 +490,40 @@ export default function CalificacionesView() {
           ) : alumnosFiltrados.length === 0 ? (
             <p style={{ color: 'var(--text-secondary)' }}>No hay alumnos que coincidan con este filtro.</p>
           ) : (
-            alumnosFiltrados.map(alumno => (
-              <AlumnoCalificacionCard
-                key={alumno.id}
-                alumno={alumno}
-                entrega={entregasPorAlumno.get(alumno.id)}
-                nota={notasPorAlumno.get(alumno.id)}
-                onEvaluar={handleOpenGrade}
-              />
-            ))
+            alumnosFiltrados.map(alumno => {
+              const entregas = entregasPorAlumno.get(alumno.id) || [];
+              if (entregas.length === 0) {
+                return (
+                  <AlumnoCalificacionCard
+                    key={`${alumno.id}-no-entrega`}
+                    alumno={alumno}
+                    entrega={null}
+                    nota={null}
+                    onEvaluar={() => handleOpenGrade(alumno, null)}
+                  />
+                );
+              }
+
+              return entregas.map((entrega) => {
+                let n = notasPorProyecto.get(entrega.id);
+                // Si la entrega es más reciente que la nota, se considera pendiente
+                const notaTime = getTime(n?.actualizadoEn || n?.creadoEn);
+                const entregaTime = getTime(entrega?.entregadoEn || entrega?.actualizadoEn);
+                if (n && notaTime && entregaTime && notaTime < entregaTime) {
+                  n = null; // Ocultamos la nota en la UI para forzar reevaluación
+                }
+
+                return (
+                  <AlumnoCalificacionCard
+                    key={`${alumno.id}-${entrega.id}`}
+                    alumno={alumno}
+                    entrega={entrega}
+                    nota={n}
+                    onEvaluar={() => handleOpenGrade(alumno, entrega)}
+                  />
+                );
+              });
+            })
           )}
         </div>
       )}
