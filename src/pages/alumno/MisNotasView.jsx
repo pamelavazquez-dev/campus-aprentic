@@ -107,17 +107,22 @@ export default function MisNotasView() {
     fetchNotasAndProyectos();
   }, [profile?.id]);
 
-  // Filtrar notas para el alumno actual
-  const misNotas = useMemo(() => {
-    if (!profile) return [];
-    return notas.filter(n => n.alumnoId === profile.id);
-  }, [notas, profile]);
-
   const modulosPorId = useMemo(() => {
     const modulosMap = new Map();
     modulos.forEach((modulo) => modulosMap.set(modulo.id, modulo));
     return modulosMap;
   }, [modulos]);
+
+  // Filtrar notas válidas para el alumno actual (ignorando huérfanas o corruptas)
+  const misNotas = useMemo(() => {
+    if (!profile) return [];
+    return notas.filter(n => {
+      if (n.alumnoId !== profile.id) return false;
+      const proyecto = proyectos.find(p => p.id === n.proyectoId);
+      const modulo = proyecto ? modulosPorId.get(proyecto.moduloId) : null;
+      return !!modulo;
+    });
+  }, [notas, profile, proyectos, modulosPorId]);
 
   const notaMediaAlumno = useMemo(() => {
     if (misNotas.length === 0) return null;
@@ -151,10 +156,7 @@ export default function MisNotasView() {
         ) : (
           misNotas.map(nota => {
             const proyecto = proyectos.find(p => p.id === nota.proyectoId);
-            const modulo = proyecto ? modulosPorId.get(proyecto.moduloId) : null;
-            
-            // Ocultar la tarjeta si el módulo es desconocido (nota huérfana o corrupta)
-            if (!modulo) return null;
+            const modulo = modulosPorId.get(proyecto.moduloId);
 
             return (
               <NotaCard
