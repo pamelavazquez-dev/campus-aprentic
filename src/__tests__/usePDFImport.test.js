@@ -2,21 +2,24 @@ import { renderHook, act } from '@testing-library/react';
 import { usePDFImport } from '../hooks/usePDFImport';
 import { extractTextFromPDF } from '../utils/pdfExtractor';
 import toast from 'react-hot-toast';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock dependencies
-jest.mock('../utils/pdfExtractor', () => ({
-  extractTextFromPDF: jest.fn(),
+vi.mock('../utils/pdfExtractor', () => ({
+  extractTextFromPDF: vi.fn(),
 }));
 
-jest.mock('react-hot-toast', () => ({
-  error: jest.fn(),
-  success: jest.fn(),
-  loading: jest.fn(),
+vi.mock('react-hot-toast', () => ({
+  default: {
+    error: vi.fn(),
+    success: vi.fn(),
+    loading: vi.fn(),
+  }
 }));
 
 describe('usePDFImport', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('debe abortar y mostrar error si el PDF extraído supera los 800 KB', async () => {

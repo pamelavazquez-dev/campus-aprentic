@@ -6,31 +6,40 @@ import { useRBAC } from '../hooks/useRBAC';
 import { getModuloById } from '../services/modulos.service';
 import { getLeccionesByModuloId } from '../services/lecciones.service';
 import { getProyectosByModuloId } from '../services/proyectos.service';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock dependencies
-jest.mock('../hooks/useAuth', () => ({
-  useAuth: jest.fn(),
+vi.mock('react-router-dom', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    useParams: () => ({ moduloId: 'mod1', leccionId: 'lec1' })
+  };
+});
+
+vi.mock('../hooks/useAuth', () => ({
+  useAuth: vi.fn(),
 }));
 
-jest.mock('../hooks/useRBAC', () => ({
-  useRBAC: jest.fn(),
+vi.mock('../hooks/useRBAC', () => ({
+  useRBAC: vi.fn(),
 }));
 
-jest.mock('../services/modulos.service', () => ({
-  getModuloById: jest.fn(),
+vi.mock('../services/modulos.service', () => ({
+  getModuloById: vi.fn(),
 }));
 
-jest.mock('../services/lecciones.service', () => ({
-  getLeccionesByModuloId: jest.fn(),
+vi.mock('../services/lecciones.service', () => ({
+  getLeccionesByModuloId: vi.fn(),
 }));
 
-jest.mock('../services/proyectos.service', () => ({
-  getProyectosByModuloId: jest.fn(),
+vi.mock('../services/proyectos.service', () => ({
+  getProyectosByModuloId: vi.fn(),
 }));
 
 describe('VisorLeccion - Sanitización XSS', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('debe sanitizar payloads XSS en el contenido markdown usando rehype-sanitize', async () => {
