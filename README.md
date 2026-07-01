@@ -1,152 +1,92 @@
-# 🎓 The Bridge Academy - E-Learning Platform
+# The Bridge Academy - Plataforma E-Learning 🎓
 
-<div align="center">
-  <p><em>Arquitectura Avanzada orientada a Rendimiento Extremo, DevSecOps y FinOps</em></p>
+> Empoderando el talento tecnológico con una plataforma escalable, segura y altamente eficiente.
 
-  ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-  ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
-  ![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
-  ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
-  ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
-  ![Zod](https://img.shields.io/badge/Zod-3068b7?style=for-the-badge&logo=zod&logoColor=white)
-</div>
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Firebase](https://img.shields.io/badge/Firebase-039BE5?style=for-the-badge&logo=Firebase&logoColor=white)
+![Vitest](https://img.shields.io/badge/Vitest-6E9F18?style=for-the-badge&logo=Vitest&logoColor=white)
+![Zod](https://img.shields.io/badge/Zod-3E67B1?style=for-the-badge&logo=Zod&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
-<br />
+## 🚀 Propuesta de Valor
 
-## 1. Visión General y Stack Tecnológico
+The Bridge Academy es una plataforma de e-learning B2B/B2C diseñada desde cero para resolver los problemas clásicos de la educación tecnológica a distancia: altos costes de infraestructura y baja retención de estudiantes. Nuestra arquitectura nos otorga una ventaja competitiva única: **eficiencia extrema en costes operativos**. Hemos descentralizado el procesamiento de grandes volúmenes de datos mediante un innovador sistema de extracción de texto de PDFs directamente en el navegador del cliente (*Client-Side Processing*). Esto elimina por completo la necesidad de costosos servidores de procesamiento (Cloud Functions/Lambdas) y minimiza drásticamente el uso de Storage, permitiendo a la plataforma escalar de manera exponencial sin que los costes de infraestructura se disparen.
 
-The Bridge Academy es una plataforma LMS (Learning Management System) de última generación diseñada para maximizar el rendimiento y minimizar los costes operativos (Zero-Cost Architecture). Reemplaza el procesamiento tradicional en backend por computación descentralizada en el cliente.
+## ✨ Características Clave
 
-**Stack Técnico Principal:**
-* **Core Frontend:** React 19 (Hooks, Context, Lazy Loading), Vite, React Router DOM v7.
-* **Estado y Caching:** React Query (TanStack Query v5) para sincronización asíncrona y estado de servidor.
-* **Estilos y UI:** Tailwind CSS v4, Tailwind Typography, CSS Variables para theming dinámico (Dark/Light mode).
-* **BaaS (Backend as a Service):** Firebase (Auth, Firestore) con reglas de seguridad granulares.
-* **Procesamiento de Archivos:** PDF.js (v3) operando en Web Workers (Client-Side Parsing).
-* **Seguridad y Parseo:** Zod (validación de esquemas), React Markdown + Rehype Sanitize (prevención XSS).
-* **Testing:** Vitest + React Testing Library + JSDOM.
+- **Experiencia de Usuario Inmersiva:** Interfaz limpia, accesible e inspirada en las mejores prácticas de diseño UI/UX para maximizar la retención y concentración del estudiante.
+- **Creación de Contenido Dinámico:** Los instructores pueden importar documentos complejos en PDF directamente o escribir lecciones con soporte Markdown enriquecido. El contenido se sanitiza instantáneamente contra vulnerabilidades XSS.
+- **Jerarquía de Roles (RBAC) Granular:** Diferenciación estricta entre Administradores, Instructores y Alumnos. Cada perfil tiene una vista adaptada (Dashboard) que muestra únicamente lo que necesitan, garantizando el principio de menor privilegio.
+- **Gestión Multi-Campus y Promociones:** Control total sobre diferentes sedes (ej. Sevilla, Málaga) y especialidades (Full Stack, Ciberseguridad), permitiendo segmentar el acceso a los módulos educativos de forma inteligente y automatizada.
+- **Validación Robusta (Zero-Trust):** Aseguramiento de los datos de extremo a extremo usando `Zod` en el frontend y Reglas de Seguridad estrictas en Firestore, evitando la entrada de payloads corruptos o maliciosos.
 
----
+## 🏗️ Arquitectura y Tech Stack
 
-## 2. Arquitectura Global del Sistema
+Nuestro flujo de datos está diseñado para ser rápido, seguro y tolerante a fallos:
 
-El sistema opera bajo un paradigma de **Desacoplamiento Estricto** y **Delegación al Cliente**:
+- **Frontend:** Construido con **React 19** y **Vite**, utilizando **TailwindCSS v4** para un sistema de diseño consistente.
+- **Base de Datos y Auth:** Integración nativa con **Firebase Authentication** y **Firestore**. El acceso a los documentos está fuertemente protegido mediante *Firestore Security Rules*, bloqueando lecturas/escrituras no autorizadas.
+- **Gestión de Estado y Formularios:** Patrones de Hooks personalizados (`useAuth`, `useRBAC`, `usePDFImport`) que abstraen la complejidad y conectan la vista con los conversores bidireccionales de Firestore (modelos de datos).
+- **QA y Testing:** Suite de pruebas integral construida con **Vitest** y **React Testing Library**, asegurando validaciones, lógica asíncrona y flujos de UI a prueba de regresiones.
 
-1. **Capa de Presentación (UI):** Componentes funcionales aislados y de presentación, estilizados mediante utilidad-first (Tailwind).
-2. **Capa de Orquestación (Hooks/Context):** Hooks personalizados (`useAuth`, `usePDFImport`) encapsulan la lógica de negocio y el ciclo de vida, sirviendo de puente entre la UI y los servicios. React Query maneja el caché de los datos asíncronos.
-3. **Capa de Servicios y Modelos:** Patrón repositorio/servicio (`lecciones.service.js`) para abstraer completamente las interacciones de red con Firestore, apoyado por esquemas de datos (`schemas/`) para garantizar la integridad antes de cualquier mutación.
-4. **Capa de Datos (Backend Serverless):** Firebase provee la autenticación basada en JWT y almacenamiento NoSQL particionado (subcolecciones masivas) para optimizar el FinOps de lectura.
+## ⚙️ Quick Start
 
----
+Instrucciones a prueba de fallos para clonar, instalar y levantar el proyecto en menos de 2 minutos.
 
-## 3. Características Principales (Core Features)
+```bash
+# 1. Clona el repositorio
+git clone https://github.com/TheBridge-FullStackDeveloper/AprenTIC_Academy_-FullStack_Web_Sevilla_Group_1.git
+cd AprenTIC_Academy_-FullStack_Web_Sevilla_Group_1
 
-* **Autenticación Basada en Roles (RBAC):** Flujo seguro manejado por `useAuth`. Redirección automática (`ProtectedRoute`) basada en el perfil del JWT (Administrador, Instructor, Alumno), inyectando el Layout (`AdminLayout`, `AlumnoLayout`) de forma perezosa (Lazy Loading).
-* **Motor de Procesamiento PDF en Navegador:** Los instructores suben PDFs que son analizados bit a bit por `pdf.js` en el hilo secundario (Web Worker). Extrae texto limpio, evitando cuellos de botella en la red y almacenamiento en buckets S3 o Cloud Functions.
-* **Lector Markdown Inmersivo:** Visor adaptativo (`VisorLeccion`) que convierte Markdown a HTML seguro en tiempo real, integrando un sticky progress bar interactivo.
-* **Gestión Multi-Entidad:** Abstracciones completas para CRUD de Promociones, Alumnos, Profesores, Módulos y Lecciones.
+# 2. Instala las dependencias
+npm install
 
----
+# 3. Configura las variables de entorno
+# Crea un archivo .env en la raíz e inyecta tus credenciales de Firebase:
+# VITE_FIREBASE_API_KEY="tu_api_key"
+# VITE_FIREBASE_AUTH_DOMAIN="tu_auth_domain"
+# VITE_FIREBASE_PROJECT_ID="tu_project_id"
+# ... 
 
-## 4. Patrones de Diseño Aplicados
-
-* **Separation of Concerns (SoC):** La vista jamás realiza fetches directos. Invocan funciones del `service` o custom hooks.
-* **Lazy Loading en Rutas:** En `App.jsx`, los layouts pesados y los dashboards se importan con `React.lazy()` y `<Suspense>`, logrando que el bundle inicial (login) sea ultraligero y el TTI (Time to Interactive) casi instantáneo.
-* **Patrón Factory / DTO:** Los modelos (`models/`) instancian objetos estándar antes de ser devueltos a la interfaz, normalizando los tipos de datos que provienen de Firestore.
-* **Subcolecciones de Carga Diferida (Lazy Fetching):** Los índices de lecciones nunca cargan el contenido Markdown masivo. El cuerpo de la lección reside en la subcolección `contenido/main` y solo se descarga bajo demanda al abrir la vista de lectura.
-
----
-
-## 5. Estructura de Directorios
-
-```text
-src/
-├── components/   # Componentes puros de presentación (UI compartida)
-├── config/       # Inicialización del SDK de Firebase y variables de entorno
-├── context/      # Estados globales (ThemeContext, DataContext)
-├── hooks/        # Lógica de negocio reutilizable (useAuth, usePDFImport)
-├── layouts/      # Estructuras de página base según rol (AdminLayout, etc.)
-├── models/       # Normalización de datos (DTOs) recibidos desde la BBDD
-├── pages/        # Vistas ruteables organizadas por dominio (admin, alumno, instructor)
-├── schemas/      # Validaciones Zod estáticas de frontera
-├── services/     # Controladores de red (APIs de Firebase abstractas)
-├── utils/        # Funciones auxiliares puras y formateadores
-└── __tests__/    # Suite de pruebas automatizadas (Vitest)
+# 4. Inicia el servidor de desarrollo
+npm run dev
 ```
 
+La plataforma estará disponible localmente en `http://localhost:5173`.
+
+## 📂 Estructura del Proyecto (Migración a FSD - Feature-Sliced Design)
+
+Para garantizar la escalabilidad a nivel *Enterprise*, el proyecto adopta los principios de **Feature-Sliced Design**. Esto significa que el código no solo se divide por capas técnicas, sino por **Dominios de Negocio (Features)**.
+
+```text
+📦 TheBridge-Academy
+ ┣ 📂 src
+ ┃ ┣ 📂 app          # Configuración global, Providers (Auth, Data) y Enrutador principal (App.jsx)
+ ┃ ┣ 📂 features     # 🚀 Dominios de Negocio (Módulos independientes)
+ ┃ ┃ ┣ 📂 auth       # Lógica de Login, Cambio de Contraseña, Validaciones Zod de Auth
+ ┃ ┃ ┣ 📂 lecciones  # Visor PDF, Creador Markdown, usePDFImport, Servicios de Lecciones
+ ┃ ┃ ┣ 📂 usuarios   # Gestión CRUD de Alumnos/Profesores, Modelos, Tablas UI
+ ┃ ┃ ┗ 📂 campus     # Gestión de Sedes (Sevilla/Málaga) y Promociones
+ ┃ ┣ 📂 shared       # 🧱 Código compartido y agnóstico (UI Kit)
+ ┃ ┃ ┣ 📂 ui         # Componentes base (Botones, Inputs, Badges, Modales)
+ ┃ ┃ ┣ 📂 api        # Configuración base de Firebase y base.service.js
+ ┃ ┃ ┗ 📂 utils      # Helpers globales (RBAC, formateadores, etc.)
+ ┃ ┗ 📂 pages        # Vistas de alto nivel (Agrupan features)
+ ┃   ┣ 📂 admin
+ ┃   ┣ 📂 instructor
+ ┃   ┗ 📂 alumno
+ ┣ 📜 package.json
+ ┗ 📜 README.md
+```
+
+Esta estructura garantiza **alta cohesión** (todo lo relacionado con lecciones vive junto) y **bajo acoplamiento** (las features no se cruzan indiscriminadamente).
+
+## 🤝 Comercialización y Contacto
+
+The Bridge Academy está preparado para revolucionar el sector EdTech. Su arquitectura modular permite adaptarlo rápidamente a otras verticales formativas, universidades corporativas o plataformas SaaS privadas, ofreciendo rentabilidad inmediata gracias a la optimización de procesamiento en cliente.
+
+¿Interesado en una **demo técnica**, integración B2B o explorar una colaboración estratégica como inversor?  
+📬 Contáctanos directamente a través del repositorio para agendar una llamada y descubrir el potencial tecnológico de la plataforma.
+
 ---
-
-## 6. Seguridad y Rendimiento
-
-* **Límite Duro en Memoria (Bloqueo 800 KB):** El hook `usePDFImport` inyecta asincronía en su bucle (Event Loop yielding) para no congelar la UI, e interrumpe el procesamiento si el tamaño del payload supera los 800 KB, previniendo DoS en cliente.
-* **Sanitización Dinámica XSS:** Todo texto proveniente de la base de datos se filtra con `rehype-sanitize` en tiempo de montaje del DOM (Zero Trust).
-* **FinOps con `{ source: 'cache' }`:** React y los servicios obligan a leer desde `IndexedDB` las lecciones pesadas previas, erradicando los costes de lecturas documentales redundantes en Firestore.
-* **Reglas de Seguridad O(1):** El archivo `firestore.rules` emplea `match` directo contra `request.auth.uid`, sin funciones recursivas externas, asegurando máxima velocidad y cero riesgo de manipulación de payloads HTTP.
-* **Supply Chain Seguro:** Los cMaps críticos requeridos por PDF.js no dependen de CDNs; están incrustados estáticamente en `/public/cmaps/`.
-
----
-
-## 7. 📸 Interfaz de Usuario (Módulos Críticos)
-
-### Visor de Lecciones (Vista Alumno)
-![Visor de Lecciones Optimizado para Carga Cognitiva](./docs/assets/visor-alumno.png)
-> Entorno de lectura inmersivo libre de distracciones. Incluye barra de progreso de lectura (sticky progress), botón inteligente para retornar arriba, y una escala tipográfica diseñada para optimizar la retención cognitiva en pantallas de escritorio y móviles.
-
-### Motor de Procesamiento (Vista Profesor)
-![Interfaz del Profesor y Procesamiento PDF](./docs/assets/procesamiento-profesor.png)
-> La extracción de documentos ocurre localmente de manera asíncrona (Event Loop yielding). Muestra un spinner de progreso interactivo informando de que el parseo en Web Workers está activo.
-
-### Bloqueo Amigable por Límite de Memoria (FinOps & UX)
-![Toaster Bloqueo 800KB](./docs/assets/bloqueo-800kb.png)
-> Interceptor de interfaz empático: Si el documento extraído sobrepasa el límite seguro de 800 KB, aborta la subida y sugiere dividir el temario antes de llegar a Firestore.
-
-### Autenticación Segura (Login)
-![Portal de Autenticación Centralizado](./docs/assets/login.png)
-> Puerta de enlace universal. Valida las credenciales JWT de Firebase y enruta estáticamente al Layout correspondiente de forma imperceptible gracias al prefetching.
-
----
-
-## 8. Guía de Desarrollo y Despliegue
-
-### Requisitos Previos
-* Node.js v18+ y npm
-* Firebase CLI (`npm install -g firebase-tools`)
-
-### Configuración del Entorno Local
-
-1. **Clonar repositorio e instalar dependencias:**
-   ```bash
-   git clone <repo-url>
-   cd thebridge-academy
-   npm install
-   ```
-
-2. **Variables de Entorno (`.env`):**
-   ```env
-   VITE_FIREBASE_API_KEY=dummy
-   VITE_FIREBASE_AUTH_DOMAIN=dummy
-   VITE_FIREBASE_PROJECT_ID=dummy
-   VITE_FIREBASE_STORAGE_BUCKET=dummy
-   VITE_FIREBASE_MESSAGING_SENDER_ID=dummy
-   VITE_FIREBASE_APP_ID=dummy
-   ```
-
-3. **Ejecutar Suite de Testing (Vitest):**
-   ```bash
-   npm run test
-   ```
-
-4. **Levantar Entorno (Emuladores + React):**
-   Para un entorno de desarrollo aislado (Cero Costes en Cloud):
-   ```bash
-   npm run emulators
-   # En otra terminal:
-   npm run dev
-   ```
-   La plataforma estará disponible en `http://localhost:5173`.
-
-5. **Construcción para Producción:**
-   ```bash
-   npm run build
-   ```
-   Genera el bundle estático minificado en el directorio `/dist`, listo para ser servido por Firebase Hosting o Vercel.
+*Construido con código limpio, arquitectura resiliente y visión de producto.*
