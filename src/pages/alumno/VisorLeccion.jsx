@@ -340,7 +340,7 @@ export default function VisorLeccion() {
         </button>
       )}
 
-      <div className="lesson-view-shell animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1260px', margin: '0 auto', padding: '0 16px' }}>
+      <div className="lesson-view-shell animate-fade-in px-5 sm:px-8 md:px-10 py-6 w-full overflow-hidden" style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1260px', margin: '0 auto', boxSizing: 'border-box' }}>
       {/* Header del módulo */}
       <div className="lesson-view-header bg-gradient-to-br from-surface to-brand-primary/10 rounded-2xl relative overflow-hidden border border-border-default shadow-sm p-5 md:p-7">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -380,7 +380,7 @@ export default function VisorLeccion() {
       <div className="lesson-view-main grid grid-cols-1 lg:grid-cols-[300px_minmax(0,1fr)] xl:grid-cols-[380px_minmax(0,1fr)] gap-6 items-start">
         
         {/* Sidebar de lecciones */}
-        <div className="lesson-sidebar lg:sticky lg:top-[96px]" style={{
+        <div className="lesson-sidebar lg:sticky lg:top-[96px] w-full" style={{
           background: 'var(--surface)', border: '1px solid var(--border)',
           borderRadius: '18px', overflowY: 'auto', padding: '20px',
           boxShadow: 'var(--shadow-sm)', backdropFilter: 'blur(14px)',
@@ -442,11 +442,11 @@ export default function VisorLeccion() {
         </div>
 
         {/* Panel de contenido de la lección */}
-        <div className="lesson-content" style={{ flex: 1, minWidth: 0 }}>
+        <div className="lesson-content w-full overflow-hidden" style={{ flex: 1, minWidth: 0 }}>
           {selectedLeccion ? (
             <div style={{ animation: 'fadeSlideDown 0.3s ease' }}>
               {/* Título y meta */}
-                <div className="bg-surface backdrop-blur-lg border border-border-default rounded-xl p-8 shadow-sm" style={{ marginBottom: '24px' }}>
+              <div className="bg-surface backdrop-blur-lg border border-border-default rounded-xl p-5 md:p-8 shadow-sm overflow-hidden" style={{ marginBottom: '24px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
                   {aprobadas[selectedLeccion.id] && (
                     <span style={{ fontSize: '11px', fontWeight: 700, background: '#D1FAE5', color: '#065F46', padding: '4px 10px', borderRadius: '6px' }}>
@@ -469,14 +469,14 @@ export default function VisorLeccion() {
 
               {/* Contenido Markdown */}
               {(markdownContent || loadingMarkdown) && (
-                <div className="p-4 md:p-8" style={{ marginBottom: '24px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px' }}>
+                <div className="p-5 md:p-8 overflow-hidden w-full" style={{ marginBottom: '24px', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '12px' }}>
                   <div style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '24px', borderBottom: '1px solid var(--border)', paddingBottom: '12px' }}>
                     📖 Apuntes de la lección
                   </div>
                   {loadingMarkdown ? (
                     <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>Cargando contenido...</p>
                   ) : (
-                    <div className="prose prose-invert max-w-full md:max-w-[800px] mx-auto prose-p:leading-loose prose-p:text-[16px] md:prose-p:text-[17px] prose-headings:font-black prose-headings:tracking-tight prose-a:text-brand-primary prose-a:no-underline hover:prose-a:underline break-words prose-pre:max-w-[85vw] md:prose-pre:max-w-full prose-pre:overflow-x-auto prose-table:block prose-table:overflow-x-auto overflow-hidden" style={{ color: 'var(--text-strong)', textAlign: 'left' }}>
+                    <div className="prose prose-invert max-w-full mx-auto prose-p:leading-loose prose-p:text-[16px] md:prose-p:text-[17px] prose-headings:font-black prose-headings:tracking-tight prose-a:text-brand-primary prose-a:no-underline hover:prose-a:underline break-words prose-pre:w-full prose-pre:max-w-full prose-pre:overflow-x-auto prose-table:block prose-table:overflow-x-auto overflow-hidden" style={{ color: 'var(--text-strong)', textAlign: 'left' }}>
                       <ReactMarkdown 
                         rehypePlugins={[rehypeSanitize]}
                         allowedElements={['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'a', 'ul', 'ol', 'li', 'b', 'i', 'strong', 'em', 'strike', 'code', 'pre', 'blockquote', 'hr', 'table', 'thead', 'tbody', 'tr', 'th', 'td']}
@@ -491,7 +491,7 @@ export default function VisorLeccion() {
 
               {/* Material */}
               {selectedLeccion.contenido_url && (
-                <div style={{ marginBottom: '24px', background: 'var(--surface-solid)', border: '1px solid var(--border)', borderRadius: '12px', padding: '24px' }}>
+                <div className="p-5 md:p-6" style={{ marginBottom: '24px', background: 'var(--surface-solid)', border: '1px solid var(--border)', borderRadius: '12px' }}>
                   <div style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px' }}>
                     📎 Material de la lección
                   </div>
@@ -507,7 +507,7 @@ export default function VisorLeccion() {
 
               {/* Vídeos */}
               {selectedLeccion.videos_url && selectedLeccion.videos_url.length > 0 && (
-                <div style={{ marginBottom: '24px', background: 'var(--surface-solid)', border: '1px solid var(--border)', borderRadius: '12px', padding: '24px' }}>
+                <div className="p-5 md:p-6 overflow-hidden" style={{ marginBottom: '24px', background: 'var(--surface-solid)', border: '1px solid var(--border)', borderRadius: '12px' }}>
                   <div style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px' }}>
                     🎬 Vídeos de la lección
                   </div>
@@ -565,12 +565,12 @@ export default function VisorLeccion() {
               {!canEditModules && (
                 <form
                   onSubmit={handleSubmitEntrega}
+                  className="p-5 md:p-6 overflow-hidden"
                   style={{
                     marginBottom: '24px',
                     background: 'var(--surface-solid)',
                     border: '1px solid var(--border)',
                     borderRadius: '12px',
-                    padding: '24px',
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '16px'
@@ -653,12 +653,11 @@ export default function VisorLeccion() {
                     />
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <div className="flex justify-center md:justify-end w-full mt-2">
                     <button
                       type="submit"
-                      className="bg-brand-gradient text-white py-3 px-6 rounded-lg text-sm font-black transition-all duration-300 hover:-translate-y-0.5 shadow-glow inline-flex items-center justify-center gap-2 border-none cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                      className="w-full md:w-auto bg-brand-gradient text-white py-3 px-8 rounded-xl text-[15px] font-black transition-all duration-300 hover:-translate-y-0.5 shadow-[0_8px_20px_rgba(255,48,69,0.25)] inline-flex items-center justify-center gap-2 border-none cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
                       disabled={subiendoEntrega || !entregaForm.titulo.trim() || !entregaForm.archivoUrl.trim()}
-                      style={{ width: 'auto', padding: '12px 24px' }}
                     >
                       {subiendoEntrega ? 'Guardando...' : selectedEntrega ? 'Actualizar entrega' : 'Entregar proyecto'}
                     </button>
