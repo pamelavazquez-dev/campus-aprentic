@@ -5,6 +5,9 @@ import { getAllProyectos } from '../../services/proyectos.service';
 import { getNotasByAlumnoId } from '../../services/notas.service';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import CertificadoPDF from '../../components/ui/CertificadoPDF';
 
 export default function AlumnoDashboard() {
   const [modulos, setModulos] = useState([]);
@@ -13,6 +16,7 @@ export default function AlumnoDashboard() {
   const [notas, setNotas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [alumnoActual, setAlumnoActual] = useState(null);
+  const [descargandoPDF, setDescargandoPDF] = useState(false);
   const navigate = useNavigate();
   const { profile } = useAuth();
 
@@ -87,7 +91,11 @@ export default function AlumnoDashboard() {
           proyecto.leccionId === leccion.id
         ));
 
-        return Boolean(entrega);
+        if (!entrega) return false;
+        
+        // El progreso solo sube si hay una entrega Y el profesor la ha evaluado con nota >= 5
+        const nota = notas.find(n => n.proyectoId === entrega.id);
+        return nota && Number(nota.valor) >= 5;
       }).length;
 
       acc[modulo.id] = {
@@ -103,6 +111,35 @@ export default function AlumnoDashboard() {
   const isModuloFinalizado = useCallback((moduloId) => (
     progresoPorModulo[moduloId]?.porcentaje === 100
   ), [progresoPorModulo]);
+
+  const cursoCompletado = useMemo(() => {
+    if (!alumnoActual || modulosAsignados.length === 0) return false;
+    return modulosAsignados.every(mod => progresoPorModulo[mod.id]?.porcentaje === 100);
+  }, [alumnoActual, modulosAsignados, progresoPorModulo]);
+
+  const handleDownloadPDF = async () => {
+    setDescargandoPDF(true);
+    try {
+      const element = document.getElementById('certificado-pdf-container');
+      if (!element) return;
+      
+      const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+      const imgData = canvas.toDataURL('image/png');
+      
+      const pdf = new jsPDF({
+        orientation: 'landscape',
+        unit: 'px',
+        format: [1122, 793]
+      });
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, 1122, 793);
+      pdf.save('Certificado_AprenTIC_Academy.pdf');
+    } catch (error) {
+      console.error('Error generando PDF', error);
+    } finally {
+      setDescargandoPDF(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -128,6 +165,15 @@ export default function AlumnoDashboard() {
               <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: '15px' }}>Continúa tu aprendizaje en The Bridge Academy.</p>
             </div>
             <div className="student-dashboard-stats" style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+              {cursoCompletado && (
+                <button
+                  onClick={handleDownloadPDF}
+                  disabled={descargandoPDF}
+                  className="bg-brand-gradient text-white py-3 px-6 rounded-xl font-black transition-all duration-300 hover:-translate-y-1 shadow-[0_8px_20px_rgba(255,48,69,0.3)] border-none cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  {descargandoPDF ? 'Generando...' : '🏆 Descargar Certificado'}
+                </button>
+              )}
               <div className="student-dashboard-stat" style={{ background: 'var(--gray100)', borderRadius: '10px', padding: '12px 20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{ fontSize: '24px' }}>📚</span>
                 <div>
@@ -217,6 +263,14 @@ export default function AlumnoDashboard() {
             )}
           </div>
         </div>
+      </div>
+      {/* Componente Oculto para PDF */}
+      <div style={{ position: 'absolute', left: '-9999px', top: '-9999px', overflow: 'hidden' }}>
+        <CertificadoPDF 
+          nombreAlumno={`${alumnoActual?.nombre || ''} ${alumnoActual?.apellidos || ''}`.trim() || 'Estudiante'}
+          fecha={new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}
+          nombreCurso="AprenTIC Academy Full Stack"
+        />
       </div>
     </div>
   );
