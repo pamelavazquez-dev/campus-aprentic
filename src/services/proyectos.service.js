@@ -15,8 +15,6 @@ const buildProyecto = (id, data) => (
       data.titulo,
       data.descripcion,
       data.promocionId,
-      data.alumnoIds,
-      data.notas,
       data.estado,
       data.alumnoId,
       data.alumnoEmail,

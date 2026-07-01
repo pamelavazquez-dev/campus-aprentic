@@ -3,13 +3,12 @@ import { memo, useCallback, useState, useEffect, useContext, useMemo } from 'rea
 import { createPortal } from 'react-dom';
 import { DataContext } from '../../context/DataContext';
 import PageHeader from '../../components/ui/PageHeader';
-import { getAllNotas, getNotasByModuloId, createNota, updateNota } from '../../services/notas.service';
+import { getAllNotas, createNota, updateNota } from '../../services/notas.service';
 import { getAllProyectos, getProyectosByModuloId } from '../../services/proyectos.service';
+import { getAllAlumnos } from '../../services/alumnos.service';
 import { useQuery } from '@tanstack/react-query';
-import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db } from '../../config/firebase';
 import { useAuth } from '../../hooks/useAuth';
-import { filterModulesByTracks, getProfesorTracks, getUniqueModulesByName } from '../../utils/academicFilters';
+import { filterModulesByTracks, getProfesorTracks, getUniqueModulesByName, normalizeModuleName } from '../../utils/academicFilters';
 import Select from '../../components/ui/Select';
 
 const AlumnoCalificacionCard = memo(function AlumnoCalificacionCard({
@@ -86,7 +85,7 @@ export default function CalificacionesView() {
   const [selectedModulo, setSelectedModulo] = useState('');
   const [filtroRevision, setFiltroRevision] = useState('todos');
   const [searchAlumno, setSearchAlumno] = useState('');
-  const [notaForm, setNotaForm] = useState({ id: null, alumnoId: '', valor: '', comentario: '' });
+  const [notaForm, setNotaForm] = useState({ id: null, alumnoId: '', proyectoId: '', valor: '', comentario: '' });
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -95,9 +94,65 @@ export default function CalificacionesView() {
     [profile, promociones]
   );
 
-  const modulosProfesor = useMemo(
-    () => getUniqueModulesByName(filterModulesByTracks(modulos, profesorTracks)),
-    [modulos, profesorTracks]
+  const profesorPromocionIds = useMemo(() => {
+    const rawIds = Array.isArray(profile?.promocion_id)
+      ? profile.promocion_id
+      : [profile?.promocion_id].filter(Boolean);
+
+    return rawIds.map((id) => (typeof id === 'object' && id?.id ? String(id.id) : String(id)));
+  }, [profile]);
+
+  const modulosProfesor = useMemo(() => {
+    const modulosPorTrack = filterModulesByTracks(modulos, profesorTracks);
+    const modulosDeSusPromociones = modulosPorTrack.filter((modulo) => {
+      const promocionesActivas = Array.isArray(modulo.promociones_activas)
+        ? modulo.promociones_activas.map((id) => (typeof id === 'object' && id?.id ? String(id.id) : String(id)))
+        : [];
+
+      if (promocionesActivas.length === 0) return false;
+
+      return promocionesActivas.some((promocionId) => profesorPromocionIds.includes(promocionId));
+    });
+
+    return getUniqueModulesByName(modulosDeSusPromociones);
+  }, [modulos, profesorPromocionIds, profesorTracks]);
+
+  const selectedModuloData = useMemo(
+    () => modulosProfesor.find((modulo) => modulo.id === selectedModulo),
+    [modulosProfesor, selectedModulo]
+  );
+
+  const selectedModuloPromociones = useMemo(() => {
+    const promocionesActivas = Array.isArray(selectedModuloData?.promociones_activas)
+      ? selectedModuloData.promociones_activas.map((id) => (typeof id === 'object' && id?.id ? String(id.id) : String(id)))
+      : [];
+
+    return promocionesActivas.filter((promocionId) => profesorPromocionIds.includes(promocionId));
+  }, [profesorPromocionIds, selectedModuloData]);
+
+  const selectedModuloIds = useMemo(() => {
+    if (!selectedModuloData) return selectedModulo ? [selectedModulo] : [];
+
+    const selectedName = normalizeModuleName(selectedModuloData.nombre);
+    const selectedTrack = selectedModuloData.tipo || '';
+
+    return modulos
+      .filter((modulo) => {
+        const sameName = normalizeModuleName(modulo.nombre) === selectedName;
+        const sameTrack = !selectedTrack || !modulo.tipo || modulo.tipo === selectedTrack;
+        const promocionesActivas = Array.isArray(modulo.promociones_activas)
+          ? modulo.promociones_activas.map((id) => (typeof id === 'object' && id?.id ? String(id.id) : String(id)))
+          : [];
+        const sharesPromotion = promocionesActivas.some((promocionId) => selectedModuloPromociones.includes(promocionId));
+
+        return sameName && sameTrack && sharesPromotion;
+      })
+      .map((modulo) => modulo.id);
+  }, [modulos, selectedModulo, selectedModuloData, selectedModuloPromociones]);
+
+  const selectedModuloIdsSet = useMemo(
+    () => new Set(selectedModuloIds),
+    [selectedModuloIds]
   );
 
   useEffect(() => {
@@ -111,22 +166,15 @@ export default function CalificacionesView() {
     }
   }, [modulosProfesor, selectedModulo]);
 
-  const { data: alumnosDelModulo = [], isLoading: loadingAlumnos } = useQuery({
-    queryKey: ['alumnos', 'modulo', selectedModulo],
+  const { data: alumnos = [], isLoading: loadingAlumnos } = useQuery({
+    queryKey: ['alumnos', 'calificaciones'],
     queryFn: async () => {
-      if (!selectedModulo) return [];
-      const q = query(
-        collection(db, 'alumnos'), 
-        where('modulos_id', 'array-contains', selectedModulo)
-      );
-      const snap = await getDocs(q);
-      return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      return getAllAlumnos();
     },
-    enabled: !!selectedModulo,
   });
 
   const fetchNotas = useCallback(async () => {
-    if (!selectedModulo) {
+    if (!selectedModuloIds.length) {
       setNotas([]);
       setProyectos([]);
       setLoadingNotas(false);
@@ -135,18 +183,21 @@ export default function CalificacionesView() {
     
     setLoadingNotas(true);
     try {
-      const [notasData, proyectosData] = await Promise.all([
-        getNotasByModuloId(selectedModulo),
-        getProyectosByModuloId(selectedModulo)
-      ]);
-      setNotas(notasData);
+      const proyectosGroups = await Promise.all(selectedModuloIds.map((moduloId) => getProyectosByModuloId(moduloId)));
+      const proyectosData = proyectosGroups.flat();
+      const proyectoIds = new Set(proyectosData.map((proyecto) => proyecto.id));
+      const notasData = await getAllNotas();
+
+      setNotas(notasData.filter((nota) => (
+        proyectoIds.has(nota.proyectoId) || selectedModuloIds.includes(nota.proyectoId)
+      )));
       setProyectos(proyectosData);
     } catch (error) {
       console.error("Error cargando notas y entregas:", error);
     } finally {
       setLoadingNotas(false);
     }
-  }, [selectedModulo]);
+  }, [selectedModuloIds]);
 
   useEffect(() => {
     fetchNotas();
@@ -171,11 +222,52 @@ export default function CalificacionesView() {
     const entregasMap = new Map();
 
     proyectos
-      .filter((proyecto) => proyecto.moduloId === selectedModulo)
-      .forEach((proyecto) => entregasMap.set(proyecto.alumnoId, proyecto));
+      .filter((proyecto) => selectedModuloIdsSet.has(proyecto.moduloId))
+      .forEach((proyecto) => {
+        const current = entregasMap.get(proyecto.alumnoId);
+        const currentTime = getTime(current?.actualizadoEn || current?.entregadoEn) || 0;
+        const nextTime = getTime(proyecto.actualizadoEn || proyecto.entregadoEn) || 0;
+
+        if (!current || nextTime >= currentTime) {
+          entregasMap.set(proyecto.alumnoId, proyecto);
+        }
+      });
 
     return entregasMap;
-  }, [proyectos, selectedModulo]);
+  }, [proyectos, selectedModuloIdsSet]);
+
+  const alumnosDelModulo = useMemo(() => {
+    const alumnosMap = new Map();
+
+    alumnos.forEach((alumno) => {
+      const promocionesAlumno = Array.isArray(alumno.promociones_id)
+        ? alumno.promociones_id.map(String)
+        : [];
+      const modulosAlumno = Array.isArray(alumno.modulos_id)
+        ? alumno.modulos_id.map(String)
+        : [];
+
+      const pertenecePorPromocion = promocionesAlumno.some((promocionId) => selectedModuloPromociones.includes(promocionId));
+      const pertenecePorModulo = modulosAlumno.some((moduloId) => selectedModuloIdsSet.has(moduloId));
+      const tieneEntrega = entregasPorAlumno.has(alumno.id);
+
+      if (pertenecePorPromocion || pertenecePorModulo || tieneEntrega) {
+        alumnosMap.set(alumno.id, alumno);
+      }
+    });
+
+    entregasPorAlumno.forEach((entrega, alumnoId) => {
+      if (!alumnosMap.has(alumnoId)) {
+        alumnosMap.set(alumnoId, {
+          id: alumnoId,
+          nombre: entrega.alumnoEmail || 'Alumno con entrega',
+          email: entrega.alumnoEmail || '',
+        });
+      }
+    });
+
+    return Array.from(alumnosMap.values()).sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
+  }, [alumnos, entregasPorAlumno, selectedModuloIdsSet, selectedModuloPromociones]);
 
   const alumnosIdsDelModulo = useMemo(
     () => new Set(alumnosDelModulo.map((alumno) => alumno.id)),
@@ -187,10 +279,14 @@ export default function CalificacionesView() {
 
     notas
       .filter((nota) => {
-        if (nota.proyectoId !== selectedModulo || !alumnosIdsDelModulo.has(nota.alumnoId)) return false;
+        if (!alumnosIdsDelModulo.has(nota.alumnoId)) return false;
 
         const entrega = entregasPorAlumno.get(nota.alumnoId);
         if (!entrega) return false;
+
+        const notaPerteneceAEntrega = nota.proyectoId === entrega.id;
+        const notaLegacyDelModulo = selectedModuloIdsSet.has(nota.proyectoId);
+        if (!notaPerteneceAEntrega && !notaLegacyDelModulo) return false;
 
         const notaTime = getTime(nota.actualizadoEn || nota.creadoEn);
         const entregaTime = getTime(entrega.entregadoEn || entrega.actualizadoEn);
@@ -200,7 +296,7 @@ export default function CalificacionesView() {
       .forEach((nota) => notasMap.set(nota.alumnoId, nota));
 
     return notasMap;
-  }, [alumnosIdsDelModulo, entregasPorAlumno, notas, selectedModulo]);
+  }, [alumnosIdsDelModulo, entregasPorAlumno, notas]);
 
   const notaMediaModulo = useMemo(() => {
     const valores = Array.from(notasPorAlumno.values()).map((nota) => Number(nota.valor));
@@ -246,24 +342,32 @@ export default function CalificacionesView() {
   ], [alumnosDelModulo, entregasPorAlumno, notasPorAlumno]);
 
   const handleOpenGrade = useCallback((alumno) => {
+    const entrega = entregasPorAlumno.get(alumno.id);
+
+    if (!entrega) {
+      toast.error('Este alumno todavia no tiene una entrega para evaluar.');
+      return;
+    }
+
     const existingNota = notasPorAlumno.get(alumno.id);
     
     setNotaForm({
       id: existingNota?.id || null,
       alumnoId: alumno.id,
+      proyectoId: entrega.id,
       valor: existingNota?.valor || '',
       comentario: existingNota?.comentario || ''
     });
     setShowModal(true);
-  }, [notasPorAlumno]);
+  }, [entregasPorAlumno, notasPorAlumno]);
 
   const handleSaveNota = async () => {
     setSaving(true);
     try {
       const data = {
-        proyectoId: selectedModulo,
+        proyectoId: notaForm.proyectoId,
         alumnoId: notaForm.alumnoId,
-        profesorId: 'current-instructor', // This should technically come from auth context
+        profesorId: profile?.id || '',
         valor: Number(notaForm.valor),
         comentario: notaForm.comentario,
         creadoEn: new Date(),

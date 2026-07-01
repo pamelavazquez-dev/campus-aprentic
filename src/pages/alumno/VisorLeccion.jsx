@@ -12,6 +12,31 @@ import { useAuth } from '../../hooks/useAuth';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
+const getTime = (value) => {
+  if (!value) return 0;
+  if (typeof value === 'object' && typeof value.seconds === 'number') return value.seconds * 1000;
+
+  const time = new Date(value).getTime();
+  return Number.isNaN(time) ? 0 : time;
+};
+
+const getLegacyEntregaId = (entregas, nota) => {
+  if (entregas.length === 0) return '';
+
+  const notaTime = getTime(nota.creadoEn || nota.actualizadoEn);
+  const entregasOrdenadas = [...entregas].sort((a, b) => (
+    getTime(a.entregadoEn || a.actualizadoEn) - getTime(b.entregadoEn || b.actualizadoEn)
+  ));
+
+  if (!notaTime) return entregasOrdenadas[0].id;
+
+  const entregasPrevias = entregasOrdenadas.filter((entrega) => (
+    getTime(entrega.entregadoEn || entrega.actualizadoEn) <= notaTime
+  ));
+
+  return (entregasPrevias.at(-1) || entregasOrdenadas[0])?.id || '';
+};
+
 const CodeBlock = ({ inline, className, children, ...props }) => {
   const [copied, setCopied] = useState(false);
   const match = /language-(\w+)/.exec(className || '');
@@ -222,32 +247,44 @@ export default function VisorLeccion() {
   const backUrl = canEditModules ? '/admin/modulos' : '/alumno';
   const backText = canEditModules ? '← Volver a Gestión de Módulos' : '← Volver a Mis Módulos';
 
-  const notaAprobadaModulo = useMemo(() => (
-    notas.some(nota => nota.proyectoId === moduloId && Number(nota.valor) >= 5)
-  ), [notas, moduloId]);
+  const estadoLecciones = useMemo(() => {
+    if (!alumnoActual) return { entregadas: {}, aprobadas: {} };
 
-  const completadas = useMemo(() => {
-    if (!alumnoActual) return {};
+    const entregasModulo = proyectos.filter(proyecto => (
+      proyecto.alumnoId === alumnoActual.id &&
+      proyecto.moduloId === moduloId
+    ));
+    const legacyEntregaAprobadaIds = new Set(
+      notas
+        .filter(nota => nota.proyectoId === moduloId && Number(nota.valor) >= 5)
+        .map(nota => getLegacyEntregaId(entregasModulo, nota))
+        .filter(Boolean)
+    );
 
     return lecciones.reduce((acc, leccion) => {
-      const entrega = proyectos.find(proyecto => (
-        proyecto.alumnoId === alumnoActual.id &&
-        proyecto.moduloId === moduloId &&
+      const entrega = entregasModulo.find(proyecto => (
         proyecto.leccionId === leccion.id
       ));
 
-      const notaAprobadaEntrega = entrega
-        ? notas.some(nota => nota.proyectoId === entrega.id && Number(nota.valor) >= 5)
-        : false;
+      if (!entrega) return acc;
 
-      if (notaAprobadaModulo || notaAprobadaEntrega) {
-        acc[leccion.id] = true;
+      acc.entregadas[leccion.id] = true;
+
+      const notaAprobadaEntrega = notas.some(nota => (
+        nota.proyectoId === entrega.id &&
+        Number(nota.valor) >= 5
+      ));
+
+      if (notaAprobadaEntrega || legacyEntregaAprobadaIds.has(entrega.id)) {
+        acc.aprobadas[leccion.id] = true;
       }
 
       return acc;
-    }, {});
-  }, [alumnoActual, lecciones, moduloId, notaAprobadaModulo, notas, proyectos]);
+    }, { entregadas: {}, aprobadas: {} });
+  }, [alumnoActual, lecciones, moduloId, notas, proyectos]);
 
+  const completadas = estadoLecciones.entregadas;
+  const aprobadas = estadoLecciones.aprobadas;
   const completadasCount = Object.keys(completadas).length;
   const progreso = lecciones.length > 0 ? Math.round((completadasCount / lecciones.length) * 100) : 0;
   const todasCompletadas = lecciones.length > 0 && completadasCount === lecciones.length;
@@ -361,7 +398,8 @@ export default function VisorLeccion() {
           ) : (
             lecciones.map((lec, index) => {
               const isSelected = selectedLeccion?.id === lec.id;
-              const isComplete = completadas[lec.id];
+              const isDelivered = completadas[lec.id];
+              const isApproved = aprobadas[lec.id];
               return (
                 <div
                   key={lec.id}
@@ -382,10 +420,10 @@ export default function VisorLeccion() {
                     width: '34px', height: '34px', flexShrink: 0, borderRadius: '10px',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: '12px', fontWeight: 800,
-                    background: isComplete ? '#10B981' : (isSelected ? 'var(--brand-primary)' : 'var(--gray200)'),
-                    color: (isComplete || isSelected) ? 'white' : 'var(--text-secondary)'
+                    background: isApproved ? '#10B981' : (isDelivered ? '#F59E0B' : (isSelected ? 'var(--brand-primary)' : 'var(--gray200)')),
+                    color: (isApproved || isDelivered || isSelected) ? 'white' : 'var(--text-secondary)'
                   }}>
-                    {isComplete ? '✓' : index + 1}
+                    {isApproved ? '✓' : index + 1}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{
@@ -407,11 +445,16 @@ export default function VisorLeccion() {
           {selectedLeccion ? (
             <div style={{ animation: 'fadeSlideDown 0.3s ease' }}>
               {/* Título y meta */}
-              <div className="bg-surface backdrop-blur-lg border border-border-default rounded-xl p-8 shadow-sm" style={{ marginBottom: '24px' }}>
+                <div className="bg-surface backdrop-blur-lg border border-border-default rounded-xl p-8 shadow-sm" style={{ marginBottom: '24px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                  {completadas[selectedLeccion.id] && (
+                  {aprobadas[selectedLeccion.id] && (
                     <span style={{ fontSize: '11px', fontWeight: 700, background: '#D1FAE5', color: '#065F46', padding: '4px 10px', borderRadius: '6px' }}>
-                      ✓ Completada
+                      ✓ Aprobada
+                    </span>
+                  )}
+                  {completadas[selectedLeccion.id] && !aprobadas[selectedLeccion.id] && (
+                    <span style={{ fontSize: '11px', fontWeight: 700, background: '#FEF3C7', color: '#92400E', padding: '4px 10px', borderRadius: '6px' }}>
+                      Entregada
                     </span>
                   )}
                 </div>
@@ -625,13 +668,17 @@ export default function VisorLeccion() {
               {/* Botón marcar como completada */}
               {!canEditModules && (
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', paddingTop: '16px', borderTop: '1px solid var(--border)' }}>
-                  {completadas[selectedLeccion.id] ? (
+                  {aprobadas[selectedLeccion.id] ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#10B981', fontWeight: 700, fontSize: '14px' }}>
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                         <polyline points="22 4 12 14.01 9 11.01"></polyline>
                       </svg>
-                      Lección completada
+                      Lección aprobada
+                    </div>
+                  ) : completadas[selectedLeccion.id] ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#F59E0B', fontWeight: 700, fontSize: '14px' }}>
+                      Entrega realizada
                     </div>
                   ) : (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', fontWeight: 700, fontSize: '14px' }}>

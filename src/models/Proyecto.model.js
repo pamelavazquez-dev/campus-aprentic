@@ -37,7 +37,7 @@ export const proyectoConverter = {
     titulo: proyecto.titulo,
     descripcion: proyecto.descripcion,
     promocionId: proyecto.promocionId,
-    estado: proyecto.estado,
+    estado: proyecto.estado || 'entregado',
     alumnoId: proyecto.alumnoId,
     alumnoEmail: proyecto.alumnoEmail,
     alumnoAuthUid: proyecto.alumnoAuthUid,

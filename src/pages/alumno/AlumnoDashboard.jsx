@@ -77,20 +77,17 @@ export default function AlumnoDashboard() {
 
     return modulosAsignados.reduce((acc, modulo) => {
       const leccionesModulo = leccionesPorModulo.get(modulo.id) || [];
-      const notaAprobadaModulo = notas.some(nota => nota.proyectoId === modulo.id && Number(nota.valor) >= 5);
+      const entregasModulo = proyectos.filter(proyecto => (
+        proyecto.alumnoId === alumnoActual.id &&
+        proyecto.moduloId === modulo.id
+      ));
 
       const completadas = leccionesModulo.filter((leccion) => {
-        if (notaAprobadaModulo) return true;
-
-        const entrega = proyectos.find(proyecto => (
-          proyecto.alumnoId === alumnoActual.id &&
-          proyecto.moduloId === modulo.id &&
+        const entrega = entregasModulo.find(proyecto => (
           proyecto.leccionId === leccion.id
         ));
 
-        return entrega
-          ? notas.some(nota => nota.proyectoId === entrega.id && Number(nota.valor) >= 5)
-          : false;
+        return Boolean(entrega);
       }).length;
 
       acc[modulo.id] = {

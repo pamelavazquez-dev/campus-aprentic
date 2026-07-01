@@ -26,7 +26,7 @@ export const inferModuleTrack = (modulo) => {
   return 'fs';
 };
 
-const normalizeModuleName = (nombre) => (
+export const normalizeModuleName = (nombre) => (
   nombre
     ?.toLowerCase()
     .replace(/\s+/g, ' ')
