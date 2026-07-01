@@ -285,7 +285,7 @@ export default function VisorLeccion() {
 
   const completadas = estadoLecciones.entregadas;
   const aprobadas = estadoLecciones.aprobadas;
-  const completadasCount = Object.keys(completadas).length;
+  const completadasCount = Object.keys(aprobadas).length;
   const progreso = lecciones.length > 0 ? Math.round((completadasCount / lecciones.length) * 100) : 0;
   const todasCompletadas = lecciones.length > 0 && completadasCount === lecciones.length;
 

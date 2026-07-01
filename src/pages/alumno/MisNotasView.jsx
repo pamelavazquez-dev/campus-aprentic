@@ -2,7 +2,16 @@ import { memo, useState, useEffect, useContext, useMemo } from 'react';
 import { DataContext } from '../../context/DataContext';
 import { useAuth } from '../../hooks/useAuth';
 import { getNotasByAlumnoId } from '../../services/notas.service';
+import { getAllProyectos } from '../../services/proyectos.service';
 import PageHeader from '../../components/ui/PageHeader';
+
+const formatDate = (dateVal) => {
+  if (!dateVal) return 'N/A';
+  if (typeof dateVal.toDate === 'function') return dateVal.toDate().toLocaleDateString();
+  if (dateVal.seconds) return new Date(dateVal.seconds * 1000).toLocaleDateString();
+  const d = new Date(dateVal);
+  return isNaN(d.getTime()) ? 'N/A' : d.toLocaleDateString();
+};
 
 const NotaCard = memo(function NotaCard({ nota, modulo }) {
   const isAprobado = nota.valor >= 5;
@@ -15,7 +24,7 @@ const NotaCard = memo(function NotaCard({ nota, modulo }) {
             {modulo?.nombre || 'Modulo Desconocido'}
           </h3>
           <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-            Evaluado el {nota.actualizadoEn ? new Date(nota.actualizadoEn).toLocaleDateString() : 'N/A'}
+            Evaluado el {formatDate(nota.actualizadoEn || nota.creadoEn)}
           </span>
         </div>
         <div style={{ textAlign: 'right' }}>
@@ -50,11 +59,13 @@ export default function MisNotasView() {
   const { profile } = useAuth();
   const { modulos, loading: dataLoading } = useContext(DataContext);
   const [notas, setNotas] = useState([]);
+  const [proyectos, setProyectos] = useState([]);
   const [loadingNotas, setLoadingNotas] = useState(true);
 
-  const fetchNotas = async () => {
+  const fetchNotasAndProyectos = async () => {
     if (!profile?.id) {
       setNotas([]);
+      setProyectos([]);
       setLoadingNotas(false);
       return;
     }
@@ -62,17 +73,21 @@ export default function MisNotasView() {
     setLoadingNotas(true);
 
     try {
-      const data = await getNotasByAlumnoId(profile.id);
-      setNotas(data);
+      const [notasData, proyectosData] = await Promise.all([
+        getNotasByAlumnoId(profile.id),
+        getAllProyectos()
+      ]);
+      setNotas(notasData);
+      setProyectos(proyectosData.filter(p => p.alumnoId === profile.id));
     } catch (error) {
-      console.error("Error cargando notas:", error);
+      console.error("Error cargando notas y proyectos:", error);
     } finally {
       setLoadingNotas(false);
     }
   };
 
   useEffect(() => {
-    fetchNotas();
+    fetchNotasAndProyectos();
   }, [profile?.id]);
 
   // Filtrar notas para el alumno actual
@@ -117,13 +132,17 @@ export default function MisNotasView() {
             <p style={{ color: 'var(--text-secondary)', margin: 0, fontSize: '14px' }}>Tus notas aparecerán aquí cuando los instructores evalúen tu desempeño.</p>
           </div>
         ) : (
-          misNotas.map(nota => (
-            <NotaCard
-              key={nota.id}
-              nota={nota}
-              modulo={modulosPorId.get(nota.proyectoId)}
-            />
-          ))
+          misNotas.map(nota => {
+            const proyecto = proyectos.find(p => p.id === nota.proyectoId);
+            const modulo = proyecto ? modulosPorId.get(proyecto.moduloId) : null;
+            return (
+              <NotaCard
+                key={nota.id}
+                nota={nota}
+                modulo={modulo}
+              />
+            );
+          })
         )}
       </div>
     </div>
