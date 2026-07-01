@@ -1,13 +1,11 @@
-import { useState, useEffect, useMemo, useContext, useRef } from 'react';
+import { useState, useEffect, useMemo, useContext, useRef, useCallback } from 'react';
 import { getAllModulos, updateModulo } from '../../services/modulos.service';
 import { getAllLecciones, createLeccion, deleteLeccion } from '../../services/lecciones.service';
-import { useNavigate } from 'react-router-dom';
 import { useRBAC } from '../../hooks/useRBAC';
 import { useAuth } from '../../hooks/useAuth';
 import { DataContext } from '../../context/DataContext';
 import { ROLES } from '../../utils/rbac';
 import { usePDFImport } from '../../hooks/usePDFImport';
-import toast from 'react-hot-toast';
 import { filterModulesByTracks, getProfesorTracks, getUniqueModulesByName, inferModuleTrack } from '../../utils/academicFilters';
 import Select from '../../components/ui/Select';
 
@@ -23,7 +21,6 @@ export default function WizardCurso() {
   const [nuevaLeccion, setNuevaLeccion] = useState({ titulo: '', descripcion: '', contenido_url: '', videos_url: '' });
   const { isImporting, importPDF, clearPDF, markdownRef, markdownKey } = usePDFImport();
   const [mensaje, setMensaje] = useState({ text: '', type: '' });
-  const navigate = useNavigate();
   const { isAuthorized } = useRBAC();
   const { profile } = useAuth();
   const { promociones } = useContext(DataContext);
@@ -46,7 +43,7 @@ export default function WizardCurso() {
     }
   }, [profesorPromociones, selectedPromocion]);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const [mods, lecs] = await Promise.all([getAllModulos(), getAllLecciones()]);
       const visibleMods = isAdmin
@@ -63,9 +60,11 @@ export default function WizardCurso() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [isAdmin, profesorTracks, selectedModulo]);
 
-  useEffect(() => { fetchData(); }, [isAdmin, profesorTracks.join('|')]);
+  useEffect(() => { 
+    fetchData(); 
+  }, [fetchData]);
 
   // Filtrar lecciones por módulo seleccionado
   const leccionesFiltradas = useMemo(() => {
@@ -376,7 +375,7 @@ export default function WizardCurso() {
               <textarea
                 key={markdownKey}
                 className="w-full px-4 py-3 bg-surface-solid border border-border-default rounded-lg text-sm text-ink transition-all duration-300 outline-none focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10 hover:border-[#94A3B8]"
-                defaultValue={markdownRef.current}
+                defaultValue={nuevaLeccion.contenido_markdown || ""}
                 onChange={e => { markdownRef.current = e.target.value; }}
                 placeholder="# Título Principal\n\nEl texto de tu lección aquí..."
                 rows={6}

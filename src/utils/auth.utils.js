@@ -11,7 +11,7 @@ import { firebaseConfig } from '../config/firebase';
  * @returns {Promise<string|null>} The UID of the newly created user or null if failed.
  */
 export const createAuthUser = async (email, password) => {
-  let authUid = null;
+  let authUid;
   try {
     const secondaryApp = initializeApp(firebaseConfig, `SecondaryApp-${Date.now()}`);
     const secondaryAuth = getAuth(secondaryApp);
@@ -35,8 +35,8 @@ export const createAuthUser = async (email, password) => {
  * @returns {string} The generated password
  */
 export const generateDefaultPassword = (nombreCompleto, apellidosExtra = '') => {
-  let nombre = '';
-  let apellidos = '';
+  let nombre;
+  let apellidos;
 
   if (apellidosExtra) {
     nombre = nombreCompleto.trim();
