@@ -38,18 +38,8 @@ const CertificadoPDF = ({ nombreAlumno, fecha, nombreCurso }) => {
         <div style={{ position: 'absolute', bottom: -6, right: 40, width: 6, height: 40, backgroundColor: 'var(--brand-primary, #FF3045)' }}></div>
       </div>
       
-      {/* Fondo sólido central para legibilidad (cubriendo toda el área central) */}
-      <div style={{
-        position: 'absolute',
-        top: '60px', left: '100px', right: '100px', bottom: '60px',
-        backgroundColor: '#050505',
-        zIndex: 1,
-        borderRadius: '20px',
-        boxShadow: '0 0 80px 80px #050505' 
-      }}></div>
-
       {/* --- HEADER --- */}
-      <div style={{ zIndex: 10, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '10px' }}>
+      <div style={{ zIndex: 10, position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '10px' }}>
         {/* Símbolo A y Texto */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '24px' }}>
           <div style={{ 
@@ -79,7 +69,7 @@ const CertificadoPDF = ({ nombreAlumno, fecha, nombreCurso }) => {
       </div>
 
       {/* --- BODY (Nombre y Curso) --- */}
-      <div style={{ zIndex: 10, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
+      <div style={{ zIndex: 10, position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
         
         {/* Nombre del Alumno */}
         <h3 style={{ 
@@ -111,7 +101,7 @@ const CertificadoPDF = ({ nombreAlumno, fecha, nombreCurso }) => {
       </div>
 
       {/* --- FOOTER (Firmas) --- */}
-      <div style={{ zIndex: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', width: '100%', padding: '0 20px', boxSizing: 'border-box' }}>
+      <div style={{ zIndex: 10, position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', width: '100%', padding: '0 20px', boxSizing: 'border-box' }}>
         
         {/* Izquierda: Firma 1 */}
         <div style={{ textAlign: 'center', width: '240px' }}>
