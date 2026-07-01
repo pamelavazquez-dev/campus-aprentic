@@ -6,6 +6,7 @@ import Logo from '../components/Logo';
 import Avatar from '../components/ui/Avatar';
 import ThemeToggle from '../components/ui/ThemeToggle';
 import ConfirmModal from '../components/ui/ConfirmModal';
+import AppFooter from '../components/ui/AppFooter';
 import { useAuth } from '../hooks/useAuth';
 
 export default function RoleLayoutShell({ user, menuItems, roleLabel, brandLabel }) {
@@ -129,6 +130,8 @@ export default function RoleLayoutShell({ user, menuItems, roleLabel, brandLabel
       <main className="app-shell-main flex-1 px-4 py-6 lg:p-12 w-full max-w-full box-border overflow-x-hidden">
         <Outlet />
       </main>
+
+      <AppFooter />
 
       <ConfirmModal 
         isOpen={showLogoutConfirm}

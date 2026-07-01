@@ -6,6 +6,8 @@ GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url
 ).toString();
 
+const standardFontDataUrl = '/standard_fonts/';
+
 export const extractTextFromPDF = async (file) => {
   const arrayBuffer = await file.arrayBuffer();
   
@@ -14,6 +16,8 @@ export const extractTextFromPDF = async (file) => {
     data: arrayBuffer,
     cMapUrl: '/cmaps/',
     cMapPacked: true,
+    standardFontDataUrl,
+    useSystemFonts: true,
   });
   const pdf = await loadingTask.promise;
   

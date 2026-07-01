@@ -4,6 +4,7 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import Logo from './Logo';
 import ThemeToggle from './ui/ThemeToggle';
 import FormularioSolicitud from './forms/FormularioSolicitud';
+import AppFooter from './ui/AppFooter';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -184,6 +185,8 @@ export default function Login() {
           </div>
         </div>
       </div>
+
+      <AppFooter variant="floating" />
     </div>
   );
 }
