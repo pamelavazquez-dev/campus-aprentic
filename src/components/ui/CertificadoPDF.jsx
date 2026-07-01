@@ -1,7 +1,7 @@
 import React from 'react';
 
-// Patrón más complejo y estético simulando circuitos
-const circuitBg = `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg stroke='%23333333' stroke-width='1' stroke-opacity='0.4'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10S0 25.523 0 20s4.477-10 10-10zm10 8c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm40 40c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8z' /%3E%3Cpath d='M30 30h20v20H30z' /%3E%3Cpath d='M0 40h80M40 0v80M20 20l40 40M60 20L20 60' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`;
+// Patrón más complejo y estético simulando circuitos (adaptado para fondo claro)
+const circuitBg = `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg stroke='%23cbd5e1' stroke-width='1' stroke-opacity='0.6'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10S0 25.523 0 20s4.477-10 10-10zm10 8c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm40 40c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8z' /%3E%3Cpath d='M30 30h20v20H30z' /%3E%3Cpath d='M0 40h80M40 0v80M20 20l40 40M60 20L20 60' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`;
 
 const CertificadoPDF = ({ nombreAlumno, fecha, nombreCurso }) => {
   return (
@@ -10,7 +10,7 @@ const CertificadoPDF = ({ nombreAlumno, fecha, nombreCurso }) => {
       style={{
         width: '1122px', // A4 Landscape
         height: '793px',
-        backgroundColor: '#050505',
+        backgroundColor: '#FFFFFF',
         backgroundImage: circuitBg,
         position: 'relative',
         display: 'flex',
@@ -19,7 +19,7 @@ const CertificadoPDF = ({ nombreAlumno, fecha, nombreCurso }) => {
         alignItems: 'center',
         padding: '60px 80px', // Aumentado el padding para dar respiro
         boxSizing: 'border-box',
-        color: '#FFFFFF',
+        color: '#0f172a',
         fontFamily: "'Inter', sans-serif",
         border: '18px solid #E6293C', 
         overflow: 'hidden',
@@ -63,7 +63,7 @@ const CertificadoPDF = ({ nombreAlumno, fecha, nombreCurso }) => {
           CERTIFICADO DE FINALIZACIÓN
         </h2>
         
-        <p style={{ fontSize: '22px', color: '#FFFFFF', margin: '0', fontWeight: 400 }}>
+        <p style={{ fontSize: '22px', color: '#334155', margin: '0', fontWeight: 400 }}>
           Este documento certifica que
         </p>
       </div>
@@ -86,11 +86,11 @@ const CertificadoPDF = ({ nombreAlumno, fecha, nombreCurso }) => {
         </h3>
         
         {/* Subtexto extra */}
-        <p style={{ fontSize: '11px', color: '#888888', margin: '0 0 30px 0', maxWidth: '750px', textAlign: 'center', lineHeight: '1.5' }}>
+        <p style={{ fontSize: '11px', color: '#64748b', margin: '0 0 30px 0', maxWidth: '750px', textAlign: 'center', lineHeight: '1.5' }}>
           Este documento certifica que {nombreAlumno || 'el alumno'} ha completado satisfactoriamente todos los módulos teóricos y prácticos de la formación, demostrando las aptitudes necesarias.
         </p>
         
-        <p style={{ fontSize: '22px', color: '#FFFFFF', margin: '0 0 15px 0', fontWeight: 500, padding: '0 40px', lineHeight: '1.4', textAlign: 'center' }}>
+        <p style={{ fontSize: '22px', color: '#334155', margin: '0 0 15px 0', fontWeight: 500, padding: '0 40px', lineHeight: '1.4', textAlign: 'center' }}>
           Ha completado satisfactoriamente todos los módulos correspondientes a:
         </p>
         
@@ -105,22 +105,22 @@ const CertificadoPDF = ({ nombreAlumno, fecha, nombreCurso }) => {
         
         {/* Izquierda: Firma 1 */}
         <div style={{ textAlign: 'center', width: '240px' }}>
-          <div style={{ borderTop: '2px solid #FFFFFF', paddingTop: '8px', marginTop: '40px' }}>
-            <p style={{ margin: 0, fontSize: '14px', color: '#FFFFFF', fontWeight: 800, letterSpacing: '1px', textTransform: 'uppercase' }}>Firma del Tutor</p>
+          <div style={{ borderTop: '2px solid #0f172a', paddingTop: '8px', marginTop: '40px' }}>
+            <p style={{ margin: 0, fontSize: '14px', color: '#0f172a', fontWeight: 800, letterSpacing: '1px', textTransform: 'uppercase' }}>Firma del Tutor</p>
           </div>
         </div>
 
         {/* Centro: Fecha */}
         <div style={{ textAlign: 'center', paddingBottom: '16px', flex: 1 }}>
-          <p style={{ margin: 0, fontSize: '24px', fontWeight: 700, color: '#FFFFFF', letterSpacing: '1px' }}>
+          <p style={{ margin: 0, fontSize: '24px', fontWeight: 700, color: '#0f172a', letterSpacing: '1px' }}>
             {fecha || 'DD/MM/YYYY'}
           </p>
         </div>
 
         {/* Derecha: Firma 2 */}
         <div style={{ textAlign: 'center', width: '240px' }}>
-          <div style={{ borderTop: '2px solid #FFFFFF', paddingTop: '8px', marginTop: '40px' }}>
-            <p style={{ margin: 0, fontSize: '14px', color: '#FFFFFF', fontWeight: 800, letterSpacing: '1px', textTransform: 'uppercase' }}>Dirección Académica</p>
+          <div style={{ borderTop: '2px solid #0f172a', paddingTop: '8px', marginTop: '40px' }}>
+            <p style={{ margin: 0, fontSize: '14px', color: '#0f172a', fontWeight: 800, letterSpacing: '1px', textTransform: 'uppercase' }}>Dirección Académica</p>
           </div>
         </div>
 
