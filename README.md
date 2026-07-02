@@ -16,6 +16,7 @@ The Bridge Academy es una plataforma de e-learning B2B/B2C diseñada desde cero 
 
 - **Experiencia de Usuario Inmersiva:** Interfaz limpia, accesible e inspirada en las mejores prácticas de diseño UI/UX para maximizar la retención y concentración del estudiante.
 - **Creación de Contenido Dinámico:** Los instructores pueden importar documentos complejos en PDF directamente o escribir lecciones con soporte Markdown enriquecido. El contenido se sanitiza instantáneamente contra vulnerabilidades XSS.
+- **Generación de Certificados en Cliente:** Generación dinámica y pixel-perfect de diplomas en PDF directamente en el navegador del alumno (`html2canvas` + `jspdf`) una vez supera todos los módulos (nota >= 5), eliminando la carga en servidores.
 - **Jerarquía de Roles (RBAC) Granular:** Diferenciación estricta entre Administradores, Instructores y Alumnos. Cada perfil tiene una vista adaptada (Dashboard) que muestra únicamente lo que necesitan, garantizando el principio de menor privilegio.
 - **Gestión Multi-Campus y Promociones:** Control total sobre diferentes sedes (ej. Sevilla, Málaga) y especialidades (Full Stack, Ciberseguridad), permitiendo segmentar el acceso a los módulos educativos de forma inteligente y automatizada.
 - **Validación Robusta (Zero-Trust):** Aseguramiento de los datos de extremo a extremo usando `Zod` en el frontend y Reglas de Seguridad estrictas en Firestore, evitando la entrada de payloads corruptos o maliciosos.
