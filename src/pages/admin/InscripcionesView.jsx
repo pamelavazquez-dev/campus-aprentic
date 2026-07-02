@@ -217,13 +217,8 @@ export default function InscripcionesView() {
                       <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-xl border border-gray-100 text-left font-medium m-0">
                         {(() => {
                           const campus = campuses?.find(c => c.id === insc.campus_id || c.id === insc.campus_id?.id);
-                          const promo = promociones?.find(p => p.id === insc.promocion_id || p.id === insc.promocion_id?.id);
-                          const campusName = campus ? campus.nombre : '';
-                          const promoName = promo ? promo.nombre : '';
-                          if (promoName && campusName) return `Alumno de ${promoName} ${campusName}`;
-                          if (campusName) return `Alumno de ${campusName}`;
-                          if (promoName) return `Alumno de ${promoName}`;
-                          return 'Alumno de la Academia';
+                          if (!campus) return 'Alumno del Campus';
+                          return `Alumno de ${campus.nombre}`;
                         })()}
                       </p>
                       {activeTab === 'pendientes' && insc.observaciones && (
