@@ -39,23 +39,15 @@ const CertificadoPDF = ({ nombreAlumno, fecha, nombreCurso }) => {
       </div>
       
       {/* --- HEADER --- */}
-      <div style={{ zIndex: 10, position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '10px' }}>
-        {/* Símbolo A y Texto */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '24px' }}>
-          <div style={{ 
-            fontSize: '64px', 
-            fontWeight: 900, 
-            color: '#E6293C', 
-            lineHeight: 1,
-            fontFamily: 'sans-serif',
-            marginBottom: '4px',
-            transform: 'scaleY(1.1) scaleX(1.2)'
-          }}>
-            A
-          </div>
-          <h1 style={{ color: '#E6293C', margin: 0, fontSize: '20px', fontWeight: 900, letterSpacing: '4px' }}>
-            APRENTIC ACADEMY
-          </h1>
+      <div style={{ zIndex: 10, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '10px' }}>
+        
+        {/* Logo The Bridge */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+          <img 
+            src="/Logo.svg" 
+            alt="The Bridge Logo" 
+            style={{ height: '65px', objectFit: 'contain' }} 
+          />
         </div>
 
         {/* Título Principal */}
