@@ -213,24 +213,41 @@ export default function InscripcionesView() {
                       )}
                     </div>
                     
-                    {insc.observaciones && (
-                      <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-xl mt-1 border border-gray-100 italic text-left">
-                        {insc.observaciones}
+                    <div className="flex flex-col gap-2 w-full mt-1">
+                      <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-xl border border-gray-100 text-left font-medium m-0">
+                        {(() => {
+                          const campus = campuses?.find(c => c.id === insc.campus_id || c.id === insc.campus_id?.id);
+                          const promo = promociones?.find(p => p.id === insc.promocion_id || p.id === insc.promocion_id?.id);
+                          const campusName = campus ? campus.nombre : '';
+                          const promoName = promo ? promo.nombre : '';
+                          if (promoName && campusName) return `Alumno de ${promoName} ${campusName}`;
+                          if (campusName) return `Alumno de ${campusName}`;
+                          if (promoName) return `Alumno de ${promoName}`;
+                          return 'Alumno de la Academia';
+                        })()}
                       </p>
-                    )}
+                      {activeTab === 'pendientes' && insc.observaciones && (
+                        <p className="text-sm text-gray-500 bg-orange-50/50 p-3 rounded-xl border border-orange-100 italic text-left m-0">
+                          <span className="font-bold text-orange-600 mr-1">Mensaje:</span> 
+                          {insc.observaciones}
+                        </p>
+                      )}
+                    </div>
                   </div>
 
                   <div className="flex flex-row items-center gap-3 w-full lg:w-auto mt-4 lg:mt-0 pt-4 lg:pt-0 border-t lg:border-t-0 lg:border-l border-gray-100 lg:pl-6 justify-center" onClick={(e) => e.stopPropagation()}>
-                    <div className="w-32 shrink-0">
-                      <Select 
-                        value={insc.aceptada ? 'aprobada' : 'pendiente'}
-                        onChange={(value) => handleStatusChange(insc, value === 'aprobada')}
-                        options={[
-                          { value: 'pendiente', label: 'Pendiente' },
-                          { value: 'aprobada', label: 'Aprobada' }
-                        ]}
-                      />
-                    </div>
+                    {activeTab === 'pendientes' && (
+                      <div className="w-32 shrink-0">
+                        <Select 
+                          value={insc.aceptada ? 'aprobada' : 'pendiente'}
+                          onChange={(value) => handleStatusChange(insc, value === 'aprobada')}
+                          options={[
+                            { value: 'pendiente', label: 'Pendiente' },
+                            { value: 'aprobada', label: 'Aprobada' }
+                          ]}
+                        />
+                      </div>
+                    )}
                     
                     <button 
                       onClick={() => setInscripcionToDelete(insc)}
