@@ -1,5 +1,9 @@
 import { useState, useEffect, useContext } from 'react';
 import { getAllInscripciones, updateInscripcion, deleteInscripcion } from '../../services/inscripciones.service';
+import { createDoc } from '../../services/base.service';
+import { doc } from 'firebase/firestore';
+import { db } from '../../config/firebase';
+import { createAuthUser, generateDefaultPassword } from '../../utils/auth.utils';
 import { DataContext } from '../../context/DataContext';
 import PageHeader from '../../components/ui/PageHeader';
 import Avatar from '../../components/ui/Avatar';
@@ -15,16 +19,16 @@ export default function InscripcionesView() {
   const [selectedInscripcion, setSelectedInscripcion] = useState(null);
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
+  const [activeTab, setActiveTab] = useState('pendientes'); // 'pendientes' | 'aceptadas'
   const limit = 20;
 
   useEffect(() => {
     setPage(1);
-  }, [searchTerm]);
+  }, [searchTerm, activeTab]);
 
   const fetchInscripciones = async () => {
     try {
       const data = await getAllInscripciones();
-      // Sort by newest first if they have a date, otherwise just keep order
       const sorted = data.sort((a, b) => {
         if (!a.creadoEn) return 1;
         if (!b.creadoEn) return -1;
@@ -45,8 +49,34 @@ export default function InscripcionesView() {
 
   const handleStatusChange = async (insc, isAccepted) => {
     try {
+      // Solo crear el alumno en Firebase si estamos aceptando una solicitud que antes estaba pendiente
+      if (isAccepted && !insc.aceptada) {
+        const generatedPassword = generateDefaultPassword(insc.nombre || '', insc.apellidos || '');
+
+        let authUid = null;
+        try {
+          authUid = await createAuthUser(insc.email, generatedPassword);
+        } catch (authError) {
+          console.error("Error creating auth user:", authError);
+        }
+
+        const newId = authUid || `USR-${Date.now()}`;
+
+        await createDoc('alumnos', newId, {
+          nombre: `${insc.nombre || ''} ${insc.apellidos || ''}`.trim(),
+          email: insc.email,
+          campus_id: insc.campus_id ? doc(db, 'campus', typeof insc.campus_id === 'string' ? insc.campus_id : insc.campus_id.id) : null,
+          promociones_id: insc.promocion_id ? [typeof insc.promocion_id === 'string' ? insc.promocion_id : insc.promocion_id.id] : [],
+          avatar: '',
+          modulos_id: [],
+          password: generatedPassword,
+          isActive: true
+        });
+      }
+
       await updateInscripcion(insc.id, { ...insc, aceptada: isAccepted });
-      toast.success('Estado actualizado correctamente');
+
+      toast.success(isAccepted ? 'Solicitud aprobada y alumno creado correctamente' : 'Estado actualizado correctamente');
       setInscripciones(prev => prev.map(s => s.id === insc.id ? { ...s, aceptada: isAccepted } : s));
     } catch (error) {
       toast.error('Error al actualizar estado');
@@ -70,7 +100,7 @@ export default function InscripcionesView() {
     const searchString = `${insc.nombre || ''} ${insc.apellidos || ''} ${insc.email || ''} ${insc.dni || ''}`.toLowerCase();
     const matchesSearch = searchString.includes(searchTerm.toLowerCase());
       
-    const matchesStatus = insc.aceptada === true;
+    const matchesStatus = activeTab === 'pendientes' ? !insc.aceptada : insc.aceptada === true;
 
     return matchesSearch && matchesStatus;
   });
@@ -83,11 +113,35 @@ export default function InscripcionesView() {
       <div className="animate-fade-in">
         <PageHeader 
           eyebrow="Admin"
-          title="Inscripciones Aceptadas"
-          description="Alumnos que han sido aceptados y matriculados en el campus."
+          title="Gestión de Inscripciones"
+          description="Administra todas las solicitudes pendientes y los alumnos ya matriculados."
         />
 
-        <div className="flex flex-col sm:flex-row gap-4 mt-8 bg-surface backdrop-blur-md border border-gray-200/60 rounded-2xl p-4 shadow-sm relative z-20">
+        {/* Tabs de Navegación */}
+        <div className="flex gap-2 mt-6 border-b border-gray-200">
+          <button
+            onClick={() => setActiveTab('pendientes')}
+            className={`px-6 py-3 font-bold text-sm transition-colors border-b-2 cursor-pointer ${
+              activeTab === 'pendientes' 
+                ? 'border-brand-primary text-brand-primary' 
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Pendientes
+          </button>
+          <button
+            onClick={() => setActiveTab('aceptadas')}
+            className={`px-6 py-3 font-bold text-sm transition-colors border-b-2 cursor-pointer ${
+              activeTab === 'aceptadas' 
+                ? 'border-brand-primary text-brand-primary' 
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Aceptadas
+          </button>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-4 mt-6 bg-surface backdrop-blur-md border border-gray-200/60 rounded-2xl p-4 shadow-sm relative z-20">
           <div className="flex-1">
             <input 
               type="text" 
@@ -102,7 +156,7 @@ export default function InscripcionesView() {
         {loading ? (
           <div className="flex flex-col items-center justify-center p-20 gap-4">
             <div className="w-12 h-12 border-4 border-brand-primary/20 border-t-brand-primary rounded-full animate-spin"></div>
-            <span className="text-gray-500 font-bold tracking-wide">Cargando inscripciones...</span>
+            <span className="text-gray-500 font-bold tracking-wide">Cargando datos...</span>
           </div>
         ) : (
           <div className="flex flex-col gap-5 mt-8">
@@ -114,7 +168,9 @@ export default function InscripcionesView() {
                   </svg>
                 </div>
                 <p className="text-gray-500 font-bold text-lg m-0">
-                  {inscripciones.length === 0 ? "No hay inscripciones en el sistema." : "No se encontraron inscripciones con estos filtros."}
+                  {inscripciones.length === 0 
+                    ? "No hay registros en el sistema." 
+                    : `No se encontraron inscripciones ${activeTab === 'pendientes' ? 'pendientes' : 'aceptadas'}.`}
                 </p>
               </div>
             ) : (
@@ -157,16 +213,24 @@ export default function InscripcionesView() {
                       )}
                     </div>
                     
-                      <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-xl mt-1 border border-gray-100 text-left font-medium">
-                        {(() => {
-                          const campus = campuses?.find(c => c.id === insc.campus_id || c.id === insc.campus_id?.id);
-                          if (!campus) return 'Alumno del Campus';
-                          return `Alumno de ${campus.nombre}`;
-                        })()}
+                    {insc.observaciones && (
+                      <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-xl mt-1 border border-gray-100 italic text-left">
+                        {insc.observaciones}
                       </p>
+                    )}
                   </div>
 
                   <div className="flex flex-row items-center gap-3 w-full lg:w-auto mt-4 lg:mt-0 pt-4 lg:pt-0 border-t lg:border-t-0 lg:border-l border-gray-100 lg:pl-6 justify-center" onClick={(e) => e.stopPropagation()}>
+                    <div className="w-32 shrink-0">
+                      <Select 
+                        value={insc.aceptada ? 'aprobada' : 'pendiente'}
+                        onChange={(value) => handleStatusChange(insc, value === 'aprobada')}
+                        options={[
+                          { value: 'pendiente', label: 'Pendiente' },
+                          { value: 'aprobada', label: 'Aprobada' }
+                        ]}
+                      />
+                    </div>
                     
                     <button 
                       onClick={() => setInscripcionToDelete(insc)}
@@ -200,7 +264,7 @@ export default function InscripcionesView() {
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in" onMouseDown={(e) => { if (e.target === e.currentTarget) setSelectedInscripcion(null); }}>
           <div className="bg-surface border border-border-default rounded-3xl w-full max-w-lg shadow-2xl transform transition-all duration-400 overflow-hidden relative">
             <div className="px-8 py-6 border-b border-border-default bg-gray-50/50 flex justify-between items-center">
-              <h3 className="m-0 text-xl font-black text-text-strong">Detalles de la Inscripción</h3>
+              <h3 className="m-0 text-xl font-black text-text-strong">Detalles del Registro</h3>
               <button className="w-8 h-8 rounded-full bg-surface flex items-center justify-center text-text-secondary hover:bg-danger/10 hover:text-brand-primary transition-colors border-none cursor-pointer" onClick={() => setSelectedInscripcion(null)}>✕</button>
             </div>
             <div className="p-8 flex flex-col gap-5">
@@ -256,8 +320,8 @@ export default function InscripcionesView() {
 
       <ConfirmModal 
         isOpen={!!inscripcionToDelete}
-        title="Eliminar Inscripción"
-        message={`¿Estás seguro de que deseas eliminar la inscripción de ${inscripcionToDelete?.nombre || inscripcionToDelete?.email}? Esta acción no se puede deshacer.`}
+        title="Eliminar Registro"
+        message={`¿Estás seguro de que deseas eliminar el registro de ${inscripcionToDelete?.nombre || inscripcionToDelete?.email}? Esta acción no se puede deshacer.`}
         confirmText="Sí, Eliminar"
         cancelText="Cancelar"
         onConfirm={handleDelete}
